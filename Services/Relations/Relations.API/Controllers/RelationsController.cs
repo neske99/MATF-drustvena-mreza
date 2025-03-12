@@ -22,6 +22,34 @@ namespace Relations.API.Controllers
             return Ok(friends);
         }
 
+        [HttpGet("blocked/{userId}")]
+        [ProducesResponseType(typeof(IEnumerable<User>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<User>>> GetBlockedUsers(string userId)
+        {
+            var blockedUsers = await _repository.GetBlockedUsers(userId);
+            return Ok(blockedUsers);
+        }
+
+        [HttpGet("sent/{userId}")]
+        [ProducesResponseType(typeof(IEnumerable<User>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<User>>> GetSentFriendRequests(string userId)
+        {
+            var sentFriendRequests = await _repository.GetSentFriendRequests(userId);
+            return Ok(sentFriendRequests);
+        }
+
+        [HttpGet("received/{userId}")]
+        [ProducesResponseType(typeof(IEnumerable<User>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<User>>> GetReceivedFriendRequests(string userId)
+        {
+            var receivedFriendRequests = await _repository.GetReceivedFriendRequests(userId);
+            return Ok(receivedFriendRequests);
+        }
+
+
+
+
+
 
     }
 
