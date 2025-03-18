@@ -5,9 +5,13 @@ namespace Relations.API.Data
     public class RelationsContext : IRelationsContext
     {
 
-        public RelationsContext()
+        public RelationsContext(IConfiguration configuration)
         {
-            DatabaseClient = new BoltGraphClient("neo4j://localhost:7687", "neo4j", "12345678");
+
+            DatabaseClient = new BoltGraphClient(configuration.GetValue<string>("Neo4jSettings:ConnectionString"),
+                                                 configuration.GetValue<string>("Neo4jSettings:Username"),
+                                                 configuration.GetValue<string>("Neo4jSettings:Password"));
+
         }
 
         public IGraphClient DatabaseClient { get;  }

@@ -1,0 +1,19 @@
+services:
+  relationsdb:
+    container_name: relationsdb
+    hostname: relationsdb
+    restart: always
+    ports:
+     - "7474:7474"
+     - "7687:7687"
+    volumes:
+      - neo4j_data:\data
+        
+  relations.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "Neo4jSettings:ConnectionString=bolt://relationsdb:7687"
+    ports:
+      - "8000:8080"
+    depends_on:
+      - relationsdb
