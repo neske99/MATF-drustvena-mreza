@@ -1,0 +1,9 @@
+services:
+  identityservice:
+    image: ${DOCKER_REGISTRY-}identityservice
+    build:
+      context: .
+      dockerfile: Security/IdentityServer/Dockerfile
+
+  identitydb:
+    image: mcr.microsoft.com/mssql/server:2022-latest
