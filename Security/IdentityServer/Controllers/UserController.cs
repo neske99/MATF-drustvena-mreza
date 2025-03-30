@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using IdentityServer.Entities;
 using IdentityService.DTOs;
+using IdentityService.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +27,8 @@ namespace IdentityService.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin, AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ProducesResponseType(typeof(IEnumerable<UserDetails>),StatusCodes.Status200OK)]
         public async Task<ActionResult> GetAllUsersAsync()
         {
             var users = _userManager.Users.ToListAsync();
@@ -33,7 +36,8 @@ namespace IdentityService.Controllers
         }
 
         [HttpGet("{username}")]
-        [Authorize(Roles = "Admin,Buyer")]
+        [Authorize(Roles = Roles.Admin + "," + Roles.Buyer,AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ProducesResponseType(typeof(IEnumerable<UserDetails>),StatusCodes.Status200OK)]
         public async Task<ActionResult> GetUserAsync(string username)
         {
             var user =await  _userManager.Users.FirstOrDefaultAsync(user => user.UserName == username);

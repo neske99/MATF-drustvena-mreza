@@ -2,8 +2,11 @@ using AutoMapper;
 using IdentityServer.Entities;
 using IdentityService.Controllers.Base;
 using IdentityService.DTOs;
+using IdentityService.Entities;
 using IdentityService.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -26,18 +29,24 @@ namespace IdentityServer.Controllers
         }
 
         [HttpPost("[action]")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> RegisterBuyer([FromBody] NewUserDto newUser)
         {
-            return await this.RegisterNewUserWithRoles(newUser, new string[] { "Buyer" });
+            return await this.RegisterNewUserWithRoles(newUser, new string[] { Roles.Buyer });
         }
 
         [HttpPost("[action]")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> RegisterAdministrator([FromBody] NewUserDto newUser)
         {
-            return await this.RegisterNewUserWithRoles(newUser, new string[] { "Admin" });
+            return await this.RegisterNewUserWithRoles(newUser, new string[] { Roles.Admin });
         }
 
         [HttpPost("[action]")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> Login([FromBody] UserCredentialsDto userCredentials)
         {
             var user = await _authenticationService.ValidateUser(userCredentials);
@@ -51,6 +60,8 @@ namespace IdentityServer.Controllers
         }
 
         [HttpPost("[action]")]
+        [ProducesResponseType(typeof(AutenticationModel),StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenModel refreshTokenModel)
         {
             var user = await _userManager.FindByNameAsync(refreshTokenModel.Username);
@@ -74,7 +85,10 @@ namespace IdentityServer.Controllers
             return Ok(await _authenticationService.CreateAutenticationModel(user));
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost("[action]")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Logout([FromBody] RefreshTokenModel refreshTokenModel)
         {
 

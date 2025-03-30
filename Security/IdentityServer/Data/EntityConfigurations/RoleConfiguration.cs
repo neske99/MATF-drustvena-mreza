@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using IdentityService.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,11 +11,11 @@ namespace IdentityService.Data.EntityConfigurations
         {
             builder.HasData(
                 new IdentityRole { 
-                    Name= "Buyer",
+                    Name= Roles.Buyer,
                     NormalizedName="BUYER"
                 },
                 new IdentityRole {
-                    Name= "Admin",
+                    Name= Roles.Admin,
                     NormalizedName="ADMIN"
                 });
         }
