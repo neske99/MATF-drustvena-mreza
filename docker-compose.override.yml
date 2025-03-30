@@ -3,7 +3,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
-      - "ConnectionStrings:IdentityConnectionString=Server=identitydb,8090;Database=IdentityDb;User Id=sa;Password=MATF12345678rs2;TrustServerCertificate=True;"
+      - "ConnectionStrings:IdentityConnectionString=Server=identitydb;Database=IdentityDb;User Id=sa;Password=MATF12345678rs2;TrustServerCertificate=True;"
     ports:
       - "8080"
     depends_on:
@@ -13,7 +13,7 @@ services:
     container_name: identitydb
     restart: always
     ports:
-      - "1433:1433"
+      - "8090:1433"
     environment:
       - SA_PASSWORD=MATF12345678rs2
       - ACCEPT_EULA=Y
@@ -21,7 +21,7 @@ services:
   post.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - "ConnectionStrings:mssql=Server=mssql;Database=PostDb;User Id=sa;Password=MATF12345678rs2;TrustServerCertificate=True;Encrypt=False;"
+      - "ConnectionStrings:mssql=Server=mssql;Database=PostDb;User Id=sa;Password=MATF12345678rs2;TrustServerCertificate=True;"
     ports:
       - "8080:8080"
     depends_on:
@@ -31,7 +31,7 @@ services:
     container_name: mssql
     restart: always
     ports:
-      - "1433:1433"
+      - "8091:1433"
     environment:
       - SA_PASSWORD=MATF12345678rs2
       - ACCEPT_EULA=Y

@@ -18,8 +18,8 @@ namespace Post.Infrastructure
         {
             services.AddScoped<IPostRepository,PostRepository>();
             services.AddDbContext<PostContext>(options =>{
-                //options.UseSqlServer(configuration.GetConnectionString("mssql"));
-                 options.UseSqlServer("Server=localhost;Database=PostDb;User Id=sa;Password=MATF12345678rs2;TrustServerCertificate=True;Encrypt=False;");
+                options.UseSqlServer(configuration.GetConnectionString("mssql"));
+                //options.UseSqlServer("Server=localhost,8091;Database=PostDb;User Id=sa;Password=MATF12345678rs2;TrustServerCertificate=True;");
             });
         }
         

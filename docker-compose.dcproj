@@ -5,7 +5,7 @@
     <DockerTargetOS>Linux</DockerTargetOS>
     <DockerPublishLocally>False</DockerPublishLocally>
     <ProjectGuid>204d7d73-1f5b-4713-bdd5-795b79b23de8</ProjectGuid>
-    <ProjectGuid>756d0d7a-facb-4494-a4b5-f28aeb0c0540</ProjectGuid>
+    <ProjectGuid>204d7d73-1f5b-4713-bdd5-795b79b23de8</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>
     <DockerServiceName>identityservice</DockerServiceName>

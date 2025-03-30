@@ -21,8 +21,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Post.Application", "Service
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Post.Domain", "Services\Post\Post.Domain\Post.Domain.csproj", "{78A99DD5-4AA6-4726-B332-C335D583840F}"
 EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{756D0D7A-FACB-4494-A4B5-F28AEB0C0540}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,8 +35,6 @@ Global
 		{204D7D73-1F5B-4713-BDD5-795B79B23DE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{204D7D73-1F5B-4713-BDD5-795B79B23DE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{204D7D73-1F5B-4713-BDD5-795B79B23DE8}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{6AE092F0-D2A1-4B6B-A910-3D1BBE619065}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6AE092F0-D2A1-4B6B-A910-3D1BBE619065}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6AE092F0-D2A1-4B6B-A910-3D1BBE619065}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -55,18 +51,12 @@ Global
 		{78A99DD5-4AA6-4726-B332-C335D583840F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78A99DD5-4AA6-4726-B332-C335D583840F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78A99DD5-4AA6-4726-B332-C335D583840F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{756D0D7A-FACB-4494-A4B5-F28AEB0C0540}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{756D0D7A-FACB-4494-A4B5-F28AEB0C0540}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{756D0D7A-FACB-4494-A4B5-F28AEB0C0540}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{756D0D7A-FACB-4494-A4B5-F28AEB0C0540}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{90BB97BE-A09D-41A8-A6E9-651DCD21E228} = {54A8F1EB-F034-4993-8DD8-C3C60E04249B}
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
 		{2B7CE22A-9DC4-4653-ABD3-095245A5ADDE} = {ED9E4104-71A1-45C2-B4FC-DB0EE4386A20}
 		{6AE092F0-D2A1-4B6B-A910-3D1BBE619065} = {2B7CE22A-9DC4-4653-ABD3-095245A5ADDE}
 		{CEE5E2EF-9097-4CCE-A705-881F9B771DF5} = {2B7CE22A-9DC4-4653-ABD3-095245A5ADDE}
