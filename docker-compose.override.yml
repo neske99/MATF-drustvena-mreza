@@ -3,7 +3,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
-      - "ConnectionStrings:IdentityConnectionString=Server=identitydb;Database=IdentityDb;User Id=sa;Password=MATF12345678rs2;TrustServerCertificate=True;"
+      - "ConnectionStrings:IdentityConnectionString=Server=identitydb,8090;Database=IdentityDb;User Id=sa;Password=MATF12345678rs2;TrustServerCertificate=True;"
     ports:
       - "8080"
     depends_on:
