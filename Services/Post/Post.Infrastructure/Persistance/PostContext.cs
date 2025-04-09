@@ -25,7 +25,7 @@ namespace Post.Infrastructure.Persistance
                 switch(entry.State)
                 {
                     case EntityState.Added:
-                        entry.Entity.CreatedById=entry.Entity.Id;
+                        //entry.Entity.CreatedById=entry.Entity.Id;
                         entry.Entity.CreatedDate=DateTime.Now;
                         break;
                     case EntityState.Modified:

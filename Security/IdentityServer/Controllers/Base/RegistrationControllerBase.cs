@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using EventBusMessages.Events;
 using IdentityServer.Controllers;
 using IdentityServer.Entities;
 using IdentityService.DTOs;
+using IdentityService.Entities;
+using MassTransit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,14 +15,16 @@ namespace IdentityService.Controllers.Base
         protected readonly ILogger<AuthenticationController> _logger;
         protected readonly IMapper _mapper;
         protected readonly UserManager<User> _userManager;
-        protected  readonly RoleManager<IdentityRole> _roleManager;
+        protected readonly RoleManager<IntRole> _roleManager;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public RegistrationControllerBase(ILogger<AuthenticationController> logger, IMapper mapper, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+        public RegistrationControllerBase(ILogger<AuthenticationController> logger, IMapper mapper, UserManager<User> userManager, RoleManager<IntRole> roleManager, IPublishEndpoint publishEndpoint)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
+            _publishEndpoint = publishEndpoint ?? throw new ArgumentNullException(nameof(publishEndpoint));
         }
 
         protected async Task<ActionResult> RegisterNewUserWithRoles(NewUserDto newUser, IEnumerable<string> roles)
@@ -55,6 +60,10 @@ namespace IdentityService.Controllers.Base
 
 
             }
+
+            var userCreatedEvent = new UserCreatedEvent() {UserId=user.Id, UserName = user.UserName, FirstName = user.FirstName, LastName = user.LastName };
+
+            await _publishEndpoint.Publish(userCreatedEvent);
             return StatusCode(StatusCodes.Status201Created);
         }
     }

@@ -16,10 +16,10 @@ namespace IdentityService.Controllers
     public class UserController: ControllerBase
     {
         private readonly UserManager<User> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly RoleManager<IntRole> _roleManager;
         private readonly IMapper _mapper;
 
-        public UserController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IMapper mapper)
+        public UserController(UserManager<User> userManager, RoleManager<IntRole> roleManager, IMapper mapper)
         {
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));

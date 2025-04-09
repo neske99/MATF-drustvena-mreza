@@ -43,5 +43,18 @@ namespace Post.Infrastructure.Repositories
         {
             return await postContext.Posts.Include(p=>p.Comments).Where(p=> p.UserId ==userId).ToListAsync();
         }
+
+        public async Task<bool> ReplicateUser(User userToReplicate)
+        {
+            string toExecute = "SET IDENTITY_INSERT [dbo].[Users] ON " +
+                $"INSERT INTO [dbo].[Users] (Id,Username,CreatedDate) VALUES ({userToReplicate.Id},'{userToReplicate.Username}','{userToReplicate.CreatedDate}')" +
+                " SET IDENTITY_INSERT [dbo].[Users] OFF";
+            var result= await postContext.Database.ExecuteSqlRawAsync(toExecute);
+
+            //postContext.Users.Add(userToReplicate);
+            //var result = await postContext.SaveChangesAsync()>0;
+
+            return result>0;
+        }
     }
 }

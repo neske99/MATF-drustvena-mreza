@@ -11,6 +11,7 @@ namespace Post.Application.Contracts
         Task<IEnumerable<Post.Domain.Entities.Post>> GetPostsForUser(int userId);
         Task<bool> CreatePostForUser(int userId,Post.Domain.Entities.Post post);
         Task<bool> AddCommentToPost(int postId,Comment comment);
+        public Task<bool> ReplicateUser(User userToReplicate);
         
     }
 }

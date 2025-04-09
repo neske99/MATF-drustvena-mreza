@@ -4,6 +4,7 @@ using IdentityService.Controllers.Base;
 using IdentityService.DTOs;
 using IdentityService.Entities;
 using IdentityService.Services;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -22,8 +23,8 @@ namespace IdentityServer.Controllers
     {
         private readonly IAuthentiactionService _authenticationService;
 
-        public AuthenticationController(ILogger<AuthenticationController> logger, IMapper mapper, UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IAuthentiactionService authenticationService)
-            : base(logger, mapper, userManager, roleManager)
+        public AuthenticationController(ILogger<AuthenticationController> logger, IMapper mapper, UserManager<User> userManager, RoleManager<IntRole> roleManager, IAuthentiactionService authenticationService,IPublishEndpoint publishEndpoint)
+            : base(logger, mapper, userManager, roleManager,publishEndpoint)
         {
             this._authenticationService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
         }

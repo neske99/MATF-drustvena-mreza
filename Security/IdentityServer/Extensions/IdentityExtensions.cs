@@ -1,5 +1,6 @@
 ﻿using IdentityServer.Entities;
 using IdentityService.Data;
+using IdentityService.Entities;
 using IdentityService.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -27,7 +28,7 @@ namespace IdentityService.Extensions
 
         public static IServiceCollection ConfigureIdentity(this IServiceCollection services)
         {
-            services.AddIdentity<User,IdentityRole>(options =>
+            services.AddIdentity<User,IntRole>(options =>
             {
                 options.Password.RequireDigit = true;
                 options.Password.RequireLowercase = false;

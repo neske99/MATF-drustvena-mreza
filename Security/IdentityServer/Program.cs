@@ -1,4 +1,5 @@
 using IdentityService.Extensions;
+using MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,15 @@ builder.Services.ConfigureJWT(builder.Configuration);
 builder.Services.ConfigurePersistence(builder.Configuration);
 builder.Services.ConfigureIdentity();
 builder.Services.ConfigureExtraStuff();
+builder.Services.AddMassTransit(config =>
+{
+    //TODO
+    config.UsingRabbitMq((ctx, cfg) =>
+    {
+        cfg.Host(builder.Configuration.GetValue<string>("EventBusSettings:HostAddress"));
+    });
+});
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
