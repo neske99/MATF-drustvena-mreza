@@ -1,18 +1,24 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+//import HelloWorld from './components/HelloWorld.vue'
+import { authStore } from './stores/auth';
+import { isTemplateExpression } from 'typescript';
+const auth=authStore()
+
 </script>
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
 
     <div class="wrapper">
-      <HelloWorld msg="You did it!" />
 
-      <nav>
+      <nav v-if="auth.isUserAuthenticated">
         <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
+        <label for="searchUser">Search: </label>
+        <input id="searchUser" type="text" placeholder="Search">
+        
+        <button>Signout</button>
+        
       </nav>
     </div>
   </header>
