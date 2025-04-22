@@ -3,9 +3,9 @@ import SignupView from '@/views/auth/SignupView.vue'
 import LoginView from '@/views/auth/LoginView.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
 import { authStore } from '@/stores/auth'
-import PostsView from '@/views/PostsView.vue'
 import UserDetailView from '@/views/UserDetailView.vue'
 import UserSearchView from '@/views/UserSearchView.vue'
+import PostsView from '@/views/PostsView.vue'
 
 const routes: RouteRecordRaw[] = [
   {
