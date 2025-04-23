@@ -22,12 +22,7 @@ export default defineComponent({
   name: 'TheNavbar',
   data() {
     return {
-      drawer: false,
-      links: [
-        { icon: 'dashboard', text: 'Dashboard', route: '/' },
-        { icon: 'folder', text: 'My Projects', route: '/projects' },
-        { icon: 'person', text: 'Team', route: '/team' },
-      ]
+
     }
   },
 })

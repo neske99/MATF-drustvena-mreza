@@ -1,5 +1,5 @@
 <template>
-  <v-app style="background-color:blue;">
+  <v-app>
     <TheNavbar></TheNavbar>
     <TheLeftSidebar></TheLeftSidebar>
     <v-main>

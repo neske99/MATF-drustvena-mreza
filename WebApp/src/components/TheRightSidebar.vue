@@ -1,7 +1,18 @@
 <template>
 
   <v-navigation-drawer app permanent location="right">
-    Sidebar content
+    Chat
+    <v-container>
+      <v-card-text>
+        Lorem ipsum
+      </v-card-text>
+      <v-divider></v-divider>
+      <v-card-actions>
+        <v-text-field placeholder="Type Message">
+        </v-text-field>
+        <v-btn>Send</v-btn>
+      </v-card-actions>
+    </v-container>
   </v-navigation-drawer>
 </template>
 
@@ -18,3 +29,5 @@ export default defineComponent({
   },
 })
 </script>
+
+<style scoped></style>
