@@ -4,9 +4,11 @@
 
     Chat
     <template v-slot:append>
-      <v-card-text>
-        Lorem ipsum
-      </v-card-text>
+      <MessageComponent></MessageComponent>
+      <MessageComponent></MessageComponent>
+      <MessageComponent></MessageComponent>
+      <MessageComponent></MessageComponent>
+
       <v-divider></v-divider>
       <v-card-actions>
         <v-text-field placeholder="Type Message">
@@ -19,10 +21,14 @@
 
 <script lang='ts'>
 import { defineComponent } from 'vue'
+import MessageComponent from './Chat/MessageComponent.vue';
 
 
 export default defineComponent({
   name: 'TheRightSidebar',
+  components: {
+    MessageComponent
+  },
   data() {
     return {
 
