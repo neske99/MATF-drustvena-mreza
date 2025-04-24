@@ -1,8 +1,9 @@
 <template>
 
   <v-navigation-drawer app permanent location="right">
+
     Chat
-    <v-container>
+    <template v-slot:append>
       <v-card-text>
         Lorem ipsum
       </v-card-text>
@@ -12,7 +13,7 @@
         </v-text-field>
         <v-btn>Send</v-btn>
       </v-card-actions>
-    </v-container>
+    </template>
   </v-navigation-drawer>
 </template>
 

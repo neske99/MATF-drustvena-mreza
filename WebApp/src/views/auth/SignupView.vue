@@ -1,26 +1,20 @@
 <template>
-    <div>
-        <h1>Sign up</h1>
-    </div>
+  <div>
+    <h1>Sign up</h1>
+  </div>
 
-    <div>
-        <form >
-            <div>
-                <label for="username">Username: </label>
-                <input id="username" type="text">
-            </div>
-            <div>
-                <label for="password">Password: </label>
-                <input id="password" type="password">
-            </div>
-        </form>
-    </div>
-    <p>Already have an account? <RouterLink to="/auth/login">Login</RouterLink>.</p>
+  <div>
+    <v-form>
+      <div>
+        <label for="username">Username: </label>
+        <v-text-field id="username" label="Username" />
+      </div>
+      <div>
+        <label for="password">Password: </label>
+        <v-text-field id="password" type="password" label="Password" />
+      </div>
+    </v-form>
+  </div>
+  <p>Already have an account? <RouterLink to="/auth/login">Login</RouterLink>.</p>
 
 </template>
-
-
-
-
-
-

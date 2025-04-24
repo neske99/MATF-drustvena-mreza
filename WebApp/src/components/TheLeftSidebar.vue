@@ -1,45 +1,44 @@
 <template>
 
-  <v-navigation-drawer app permanent>
+  <h1>
     Friends
-    <v-container>
-      <v-card outlined>
-        <v-card-actions>
-          <v-btn>Friend1</v-btn>
-        </v-card-actions>
-      </v-card>
-      <v-spacer></v-spacer>
-      <v-card outlined>
-        <v-card-actions>
-          <v-btn>Friend2</v-btn>
-        </v-card-actions>
-      </v-card>
-      <v-spacer></v-spacer>
-      <v-card outlined>
-        <v-card-actions>
-          <v-btn>Friend3</v-btn>
-        </v-card-actions>
-      </v-card>
+  </h1>
+  <v-navigation-drawer app permanent class="d-flex flex-column">
 
-      <v-spacer></v-spacer>
-      <v-card outlined>
-        <v-card-actions>
-          <v-btn>Friend4</v-btn>
-        </v-card-actions>
-      </v-card>
+    <template v-slot:append>
+      <v-list class="flex-grow-1">
+        <v-list-item router to="/home">
+          <v-list-item-title>Friend 1</v-list-item-title>
+        </v-list-item>
+        <v-list-item>
+          <v-list-item-title>Friend 2</v-list-item-title>
+        </v-list-item>
+        <v-list-item>
+          <v-list-item-title>Friend 3</v-list-item-title>
+        </v-list-item>
+        <v-list-item>
+          <v-list-item-title>Friend 4</v-list-item-title>
+        </v-list-item>
+        <v-list-item>
+          <v-list-item-title>Friend 5</v-list-item-title>
+        </v-list-item>
+        <v-list-item>
+          <v-list-item-title>Friend 6</v-list-item-title>
+        </v-list-item>
 
-      <v-spacer></v-spacer>
-      <v-card outlined>
-        <v-card-actions>
-          <v-btn>Friend5</v-btn>
-        </v-card-actions>
-      </v-card>
+      </v-list>
+      <v-card-actions>
+        <v-text-field placeholder="Type User">
+        </v-text-field>
+        <v-btn>Send</v-btn>
+      </v-card-actions>
 
-
-    </v-container>
-
+    </template>
   </v-navigation-drawer>
 </template>
+
+
+
 
 <script lang='ts'>
 import { defineComponent } from 'vue'
