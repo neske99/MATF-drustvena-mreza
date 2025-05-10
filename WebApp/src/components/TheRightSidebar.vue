@@ -2,7 +2,9 @@
 
   <v-navigation-drawer app permanent location="right">
     <template v-slot:append>
-      <MessageComponent v-for="message in messages" :message="message"></MessageComponent>
+      <MessageComponent v-for="message in messages" :message="message.message" :key="message.message"
+        :isSender="message.isSender">
+      </MessageComponent>
 
       <v-divider></v-divider>
       <v-card-actions>
@@ -26,7 +28,7 @@ export default defineComponent({
   },
   data() {
     return {
-      messages: ["Dobar dan", "Dobro jutro!", "Da li moze?", "Moze", "Hvala!"],
+      messages: [{ message: "Dobar dan", isSender: true }, { message: "Dobro jutro", isSender: false }, { message: "Da li moze?", isSender: true }, { message: "Moze", isSender: false }, { message: "Hvala!", isSender: true }],
       messageToSend: ""
     }
   },
