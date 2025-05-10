@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container fluid>
     <v-card outlined>
       <v-card-title>Card Title</v-card-title>
       <v-card-text>Lalalal

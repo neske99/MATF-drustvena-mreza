@@ -34,11 +34,8 @@ export default defineComponent({
   },
   computed: {
     filteredFriends() {
-      //if (this.searchedUser === "")
-      // return this.friends;
       return this.friends.filter(x => x.toLowerCase().includes(this.searchedUser.toLowerCase()));
     }
-
   },
   methods: {
     openChatWithFriend(friend: string) {

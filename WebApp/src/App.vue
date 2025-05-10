@@ -1,11 +1,14 @@
 <template>
   <v-app>
+    <!---->
     <TheNavbar></TheNavbar>
     <TheLeftSidebar></TheLeftSidebar>
-    <TheRightSidebar></TheRightSidebar>
+    <TheRightSidebar></TheRightSidebar><!---->
 
-    <v-main>
-      <router-view />
+    <v-main style="padding-left:0px;padding-right: 0px;">
+      <v-container fluid>
+        <router-view />
+      </v-container>
     </v-main>
 
   </v-app>
