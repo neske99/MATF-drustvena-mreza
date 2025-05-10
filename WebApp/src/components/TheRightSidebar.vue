@@ -19,7 +19,7 @@
 <script lang='ts'>
 import { defineComponent } from 'vue'
 import MessageComponent from './Chat/MessageComponent.vue';
-
+import { chatStore } from '../stores/chat.ts'
 
 export default defineComponent({
   name: 'TheRightSidebar',
@@ -28,9 +28,12 @@ export default defineComponent({
   },
   data() {
     return {
-      messages: [{ message: "Dobar dan", isSender: true }, { message: "Dobro jutro", isSender: false }, { message: "Da li moze?", isSender: true }, { message: "Moze", isSender: false }, { message: "Hvala!", isSender: true }],
+      messages: chatStore().getCurrentMessages,
       messageToSend: ""
     }
+  },
+  created() {
+
   },
   methods: {
     onSend() {

@@ -1,13 +1,10 @@
 <template>
   <v-container fluid>
     <v-card outlined>
-      <v-card-title>Card Title</v-card-title>
-      <v-card-text>Lalalal
-        Lalalal
-        Lalalal
-      </v-card-text>
+      <v-card-title>{{ title }}</v-card-title>
+
       <v-card-text>
-        Svasta nesto nesto
+        {{ text }}
       </v-card-text>
 
       <v-card-actions>
@@ -24,8 +21,10 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'PostComponent',
+  props: ['title', 'text'],
   data() {
     return {
+
 
     }
   },

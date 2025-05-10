@@ -7,7 +7,15 @@ export const authStore = defineStore('auth', () => {
   //getters
   const isUserAuthenticated = computed(() => isAuthenticated.value)
   //actions 
-  
+  const signup = function () {
+    //Todo
+  }
+  const login = function () {
+    //Todo
+  }
+  const logout = function () {
+    //Todo
+  }
 
-  return { isUserAuthenticated }
+  return { isUserAuthenticated, signup, login, logout }
 })

@@ -22,6 +22,7 @@
 
 <script lang='ts'>
 import { defineComponent } from 'vue'
+import { chatStore } from '../stores/chat.ts'
 
 
 export default defineComponent({
@@ -39,6 +40,7 @@ export default defineComponent({
   },
   methods: {
     openChatWithFriend(friend: string) {
+      chatStore().switchUserChat();
       console.log(friend);
     }
   }
