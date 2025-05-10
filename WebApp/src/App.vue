@@ -2,12 +2,12 @@
   <v-app>
     <TheNavbar></TheNavbar>
     <TheLeftSidebar></TheLeftSidebar>
+    <TheRightSidebar></TheRightSidebar>
 
     <v-main>
       <router-view />
     </v-main>
 
-    <TheRightSidebar></TheRightSidebar>
   </v-app>
 </template>
 

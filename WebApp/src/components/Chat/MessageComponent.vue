@@ -2,7 +2,7 @@
   <v-container>
     <v-card outlined>
       <v-card-text>
-        Svasta nesto nesto
+        {{ message }}
       </v-card-text>
     </v-card>
   </v-container>
@@ -13,6 +13,9 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'MessageComponent',
+  props: [
+    "message"
+  ],
   data() {
     return {
       //
