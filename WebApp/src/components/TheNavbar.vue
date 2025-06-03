@@ -10,13 +10,13 @@
 
     <v-spacer></v-spacer>
 
-    <v-btn to="/auth/login">Signout</v-btn>
+    <v-btn v-if="isAuthenticated" @click="onSignoutClick">Signout</v-btn>
   </v-app-bar>
 </template>
 
 <script lang='ts'>
 import { defineComponent } from 'vue'
-
+import { authStore } from '../stores/auth.ts'
 
 export default defineComponent({
   name: 'TheNavbar',
@@ -25,5 +25,21 @@ export default defineComponent({
 
     }
   },
+  computed: {
+    isAuthenticated() {
+      return authStore().isUserAuthenticated;
+    }
+  },
+  methods: {
+    async onSignoutClick() {
+      let auth = authStore();
+      try {
+        await auth.logout();
+      } catch (err) {
+
+      }
+    },
+
+  }
 })
 </script>

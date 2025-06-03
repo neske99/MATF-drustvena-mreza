@@ -53,6 +53,12 @@ namespace IdentityService.Extensions
             
             services.AddScoped<IAuthentiactionService, AutenticationService>();
 
+            services.AddCors(options=>{
+                options.AddPolicy("CorsPolicy",builder=>{
+                    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                    });
+                });
+
             return services;
         }
 
