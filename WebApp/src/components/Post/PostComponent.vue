@@ -1,7 +1,6 @@
 <template>
   <v-container fluid>
     <v-card outlined>
-      <v-card-title>{{ title }}</v-card-title>
 
       <v-card-text>
         {{ text }}
@@ -21,7 +20,7 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'PostComponent',
-  props: ['title', 'text'],
+  props: [/*'title',*/ 'text'],
   data() {
     return {
 

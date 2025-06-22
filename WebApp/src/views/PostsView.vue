@@ -1,7 +1,7 @@
 <template>
   <h1>Posts page</h1>
 
-  <PostComponent v-for="post in posts" :title="post.title" :text="post.text" :key="post.title"></PostComponent>
+  <PostComponent v-for="post in posts" :text="post.text" :key="post.text"></PostComponent>
 </template>
 
 <script lang="ts">
@@ -22,6 +22,11 @@ export default defineComponent({
       posts: postStore().getCurrentPosts
 
     };
+  },
+  async created() {
+    let self = this;
+    // console.log(await postStore().GetPosts());
+    self.posts = await postStore().GetPosts();
   }
 });
 </script>

@@ -1,12 +1,10 @@
-import axios from 'axios'
-import type { AxiosInstance } from 'axios'
+import axios, { AxiosError } from 'axios'
+import type { AxiosInstance, AxiosRequestConfig } from 'axios'
 import { authStore } from '@/stores/auth';
 
-const BASE_URL = 'https://api.example.com'; // Replace with your actual API base URL
-const auth = authStore();
-
+let isRefreshing = false;
+let failedRequests = [];
 const axiosAuthenticated: AxiosInstance = axios.create({
-  baseURL: BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -17,7 +15,8 @@ const axiosAuthenticated: AxiosInstance = axios.create({
 axiosAuthenticated.interceptors.request.use(
   (config) => {
     // For example, add auth token
-    const token = auth.isUserAuthenticated;
+    const auth = authStore();
+    const token = auth.accessToken;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -25,5 +24,34 @@ axiosAuthenticated.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+
+axiosAuthenticated.interceptors.response.use(
+  (response) => response,
+  async (Error: AxiosError) => {
+    const config = Error.config as AxiosRequestConfig & { _retry: boolean };
+    if (Error.response?.status == 401 && !config._retry) {
+      if (!isRefreshing) {
+
+        isRefreshing = true;
+        config._retry = true;
+        failedRequests.push(config);
+        const auth = authStore();
+        await auth.refresh();
+        isRefreshing = false;
+        failedRequests.forEach((config) => {
+          axiosAuthenticated(config);
+        })
+
+      } else {
+        config._retry = true;
+        failedRequests.push(config);
+      }
+    } else {
+      throw Error;
+    }
+  }
+);
+
+
 
 export default axiosAuthenticated;

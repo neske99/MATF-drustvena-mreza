@@ -18,6 +18,7 @@ export const authStore = defineStore('auth', () => {
   });
   //getters
   const isUserAuthenticated = computed(() => authenticationInformation.isAuthenticated);
+  const accessToken = computed(() => authenticationInformation.accessToken);
   //actions 
   const signup = async function (username: string, password: string) {
     //Todo
@@ -27,7 +28,7 @@ export const authStore = defineStore('auth', () => {
       console.log(response);
       router.push("/auth/login")
     } catch (err) {
-      //console.log(err.response);
+      alert(err);
       console.log(err);
     }
   };
@@ -43,8 +44,14 @@ export const authStore = defineStore('auth', () => {
       console.log(authenticationInformation);
       router.push('/home')
     } catch (err) {
-      //error 401
-      console.log(err);
+      if (axios.isAxiosError(err)
+        && err.status == 401) {
+        alert(err.message);
+      } else {
+        throw err;
+        console.log(err);
+      }
+
     }
     //console.log(response);
   };
@@ -58,25 +65,29 @@ export const authStore = defineStore('auth', () => {
           }
         });
       authenticationInformation.isAuthenticated = false;
-      console.log(response);
       router.push('/auth/login')
     } catch (err) {
       //error 401
-      console.log(err);
+      if (axios.isAxiosError(err))
+        alert(err.message);
+
     }
   };
   const refresh = async function () {
     try {
       let response = await axios.post(baseUrl + "Refresh", { username: authenticationInformation.username, refreshToken: authenticationInformation.refreshToken });
+      authenticationInformation.accessToken = response.data.accessToken;
+      authenticationInformation.refreshToken = response.data.refreshToken;
       console.log(response);
     } catch (err) {
-      //error 401
+      if (axios.isAxiosError(err))
+        alert(err.message + "\nRefresh flow failed");
       console.log(err);
     }
 
   }
 
-  return { isUserAuthenticated, signup, login, logout };
+  return { isUserAuthenticated, accessToken, refresh, signup, login, logout };
 },
   {
     persist: true

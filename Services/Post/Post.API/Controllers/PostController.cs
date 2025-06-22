@@ -15,27 +15,23 @@ public class PostController : ControllerBase
             this._postRepository = repository ?? throw new ArgumentNullException(nameof(repository));
     }
     
-    [HttpGet]
-    [Route("[action]")]
+    [HttpGet("[action]")]
     public async Task<ActionResult> GetPostsForUser([FromQuery] int userId){
         return Ok(await _postRepository.GetPostsForUser(userId));
     }
     
-    [HttpGet]
-    [Route("[action]")]
-    public async Task<ActionResult> CreatePostForUser(int userId,Post.Domain.Entities.Post post){
+    [HttpPost("[action]")]
+    public async Task<ActionResult> CreatePostForUser([FromQuery] int userId,[FromBody] Post.Domain.Entities.Post post){
         return Ok(await _postRepository.CreatePostForUser(userId,post));
     }
     
     
-    [HttpGet]
-    [Route("[action]")]
-    public async Task<ActionResult> AddCommentToPost(int postId,Comment comment){
+    [HttpPost("[action]")]
+    public async Task<ActionResult> AddCommentToPost([FromQuery] int postId,[FromBody] Comment comment){
         return Ok(await _postRepository.AddCommentToPost(postId,comment));
     }
     
-    [HttpGet]
-    [Route("[action]")]
+    [HttpGet("[action]")]
     public async Task<ActionResult> GetAllPosts(){
         return Ok(await _postRepository.GetAllAsync());
     }

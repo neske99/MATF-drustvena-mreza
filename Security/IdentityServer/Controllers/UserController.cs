@@ -12,7 +12,7 @@ namespace IdentityService.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    [Authorize]
+    //[Authorize]
     public class UserController: ControllerBase
     {
         private readonly UserManager<User> _userManager;
@@ -26,22 +26,24 @@ namespace IdentityService.Controllers
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        [HttpGet]
-        [Authorize(Roles = Roles.Admin, AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet("GetAllUsers/[action]")]
+        //[Authorize(Roles = Roles.Admin, AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(typeof(IEnumerable<UserDetails>),StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(int),  StatusCodes.Status200OK)]
         public async Task<ActionResult> GetAllUsersAsync()
         {
-            var users = _userManager.Users.ToListAsync();
+            var users =await _userManager.Users.ToListAsync();
+            //return Ok(users);
             return Ok(_mapper.Map<IEnumerable<UserDetails>>(users));
         }
 
-        [HttpGet("{username}")]
-        [Authorize(Roles = Roles.Admin + "," + Roles.Buyer,AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet("GetUser/{username}")]
+        //[Authorize(Roles = Roles.Admin + "," + Roles.Buyer,AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(typeof(IEnumerable<UserDetails>),StatusCodes.Status200OK)]
         public async Task<ActionResult> GetUserAsync(string username)
         {
             var user =await  _userManager.Users.FirstOrDefaultAsync(user => user.UserName == username);
-
+            //return Ok(user);
             return Ok(_mapper.Map<UserDetails>(user));
         
         }
