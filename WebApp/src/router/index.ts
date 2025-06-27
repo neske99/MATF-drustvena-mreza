@@ -14,7 +14,8 @@ const routes: RouteRecordRaw[] = [
     component: { template: '<div></div>' },
     beforeEnter: (to, from, next) => {
       const auth = authStore();
-      if (auth.isUserAuthenticated) {
+      console.log('router:' + auth.isAuthenticated);
+      if (auth.isAuthenticated) {
         next('/home')
       } else {
         next('/auth/login')
@@ -57,6 +58,23 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: routes,
-})
+});
+
+router.beforeEach((to, from, next) => {
+  const auth = authStore();
+  const publicPages = ['/auth/login', '/auth/signup'];
+  const authRequired = !publicPages.includes(to.path);
+
+  console.log(auth.isAuthenticated);
+  console.log(auth.accessToken);
+  console.log(auth.refreshToken);
+
+
+  if (authRequired && !auth.isAuthenticated) {
+    return next('/auth/login');
+  }
+
+  next();
+});
 
 export default router

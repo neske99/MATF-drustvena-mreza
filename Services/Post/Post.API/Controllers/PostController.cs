@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using Post.Application.Contracts;
 using Post.Domain.Entities;
 using Post.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Post.API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize(Roles = "Buyer")]
 public class PostController : ControllerBase
 {
     private readonly IPostRepository _postRepository;

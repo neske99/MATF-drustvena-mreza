@@ -37,7 +37,8 @@ export default defineComponent({
   computed: {
     isAuthenticated() {
       let auth = authStore();
-      return auth.isUserAuthenticated;
+      console.log(auth.isAuthenticated);
+      return auth.isAuthenticated;
     }
   }
 })

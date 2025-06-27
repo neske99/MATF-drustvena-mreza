@@ -27,7 +27,7 @@ export default defineComponent({
   },
   computed: {
     isAuthenticated() {
-      return authStore().isUserAuthenticated;
+      return authStore().isAuthenticated;
     }
   },
   methods: {

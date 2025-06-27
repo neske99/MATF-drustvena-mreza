@@ -3,22 +3,17 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 import router from '@/router'
 
-interface IAuthenticationInformation {
-  username: string;
-  accessToken: string;
-  refreshToken: string;
-  isAuthenticated: boolean;
-};
 export const authStore = defineStore('auth', () => {
   // state
 
   const baseUrl = "http://localhost:8094/api/v1/Authentication/";
-  let authenticationInformation: IAuthenticationInformation = reactive({
-    username: "", accessToken: "", refreshToken: "", isAuthenticated: false
-  });
+  let username = ref("");
+
+  let accessToken = ref("");
+  let refreshToken = ref("");
+  let isAuthenticated = ref(false);
   //getters
-  const isUserAuthenticated = computed(() => authenticationInformation.isAuthenticated);
-  const accessToken = computed(() => authenticationInformation.accessToken);
+  const isUserAuthenticated = computed(() => isAuthenticated);
   //actions 
   const signup = async function (username: string, password: string) {
     //Todo
@@ -29,27 +24,26 @@ export const authStore = defineStore('auth', () => {
       router.push("/auth/login")
     } catch (err) {
       alert(err);
-      console.log(err);
     }
   };
-  const login = async function (username: string, password: string) {
+  const login = async function (usrname: string, password: string) {
 
     try {
-      let response = await axios.post(baseUrl + "Login", { Username: username, Password: password });
-      authenticationInformation.username = username;
-      authenticationInformation.accessToken = response.data.accessToken;
-      authenticationInformation.refreshToken = response.data.refreshToken;
-      authenticationInformation.isAuthenticated = true;
+      let response = await axios.post(baseUrl + "Login", { Username: usrname, Password: password });
+      username.value = usrname;
+      accessToken.value = response.data.accessToken;
+      refreshToken.value = response.data.refreshToken;
+      isAuthenticated.value = true;
 
-      console.log(authenticationInformation);
+      console.log(isAuthenticated);
       router.push('/home')
     } catch (err) {
       if (axios.isAxiosError(err)
         && err.status == 401) {
         alert(err.message);
       } else {
+        //console.log(err);
         throw err;
-        console.log(err);
       }
 
     }
@@ -57,14 +51,16 @@ export const authStore = defineStore('auth', () => {
   };
   const logout = async function () {
     //Todo
+    console.log(username.value);
+    console.log(refreshToken.value);
     try {
-      let response = await axios.post(baseUrl + "Logout", { username: authenticationInformation.username, refreshToken: authenticationInformation.refreshToken },
+      let response = await axios.post(baseUrl + "Logout", { username: username.value, refreshToken: refreshToken.value },
         {
           headers: {
-            Authorization: "Bearer " + authenticationInformation.accessToken
+            Authorization: "Bearer " + accessToken.value
           }
         });
-      authenticationInformation.isAuthenticated = false;
+      isAuthenticated.value = false;
       router.push('/auth/login')
     } catch (err) {
       //error 401
@@ -72,22 +68,32 @@ export const authStore = defineStore('auth', () => {
         alert(err.message);
 
     }
+
+    username.value = "";
+    accessToken.value = "";
+    refreshToken.value = "";
+    isAuthenticated.value = false;
   };
   const refresh = async function () {
     try {
-      let response = await axios.post(baseUrl + "Refresh", { username: authenticationInformation.username, refreshToken: authenticationInformation.refreshToken });
-      authenticationInformation.accessToken = response.data.accessToken;
-      authenticationInformation.refreshToken = response.data.refreshToken;
+      let response = await axios.post(baseUrl + "Refresh", { username: username.value, refreshToken: refreshToken.value });
+      accessToken.value = response.data.accessToken;
+      refreshToken.value = response.data.refreshToken;
       console.log(response);
     } catch (err) {
-      if (axios.isAxiosError(err))
+      if (axios.isAxiosError(err)) {
         alert(err.message + "\nRefresh flow failed");
-      console.log(err);
+        username.value = "";
+        accessToken.value = "";
+        refreshToken.value = "";
+        isAuthenticated.value = false;
+      }
+
     }
 
   }
 
-  return { isUserAuthenticated, accessToken, refresh, signup, login, logout };
+  return { username, isAuthenticated, accessToken, refreshToken, refresh, signup, login, logout };
 },
   {
     persist: true
