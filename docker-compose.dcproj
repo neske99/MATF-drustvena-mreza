@@ -5,11 +5,11 @@
     <DockerTargetOS>Linux</DockerTargetOS>
     <DockerPublishLocally>False</DockerPublishLocally>
     <ProjectGuid>204d7d73-1f5b-4713-bdd5-795b79b23de8</ProjectGuid>
-    <ProjectGuid>204d7d73-1f5b-4713-bdd5-795b79b23de8</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>
     <DockerServiceName>identityservice</DockerServiceName>
     <DockerServiceName>post.api</DockerServiceName>
+    <DockerServiceName>relations.api</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">

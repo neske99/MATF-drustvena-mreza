@@ -21,3 +21,16 @@ services:
   rabbitmq:
     image: rabbitmq:3-management-alpine
 
+  relationsdb:
+    image: neo4j
+  relations.api:
+    image: ${DOCKER_REGISTRY-}relationsapi
+    build:
+      context: .
+      dockerfile: Services/Relations/Relations.API/Dockerfile
+
+volumes:
+    neo4j_data:
+
+
+
