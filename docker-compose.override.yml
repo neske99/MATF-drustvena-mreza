@@ -6,13 +6,17 @@ services:
     ports:
      - "7474:7474"
      - "7687:7687"
+    environment:
+      - NEO4J_AUTH=neo4j/12345678
     volumes:
       - neo4j_data:\data
         
   relations.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - "Neo4jSettings:ConnectionString=bolt://relationsdb:7687"
+      - "Neo4jSettings:ConnectionString=neo4j://relationsdb:7687"
+      - "Neo4jSettings:Username=neo4j"
+      - "Neo4jSettings:Password=12345678"
     ports:
       - "8000:8080"
     depends_on:
