@@ -25,7 +25,6 @@ export default defineComponent({
   },
   async created() {
     let self = this;
-    // console.log(await postStore().GetPosts());
     self.posts = await postStore().GetPosts();
   }
 });

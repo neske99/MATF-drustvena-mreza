@@ -28,9 +28,10 @@ const routes: RouteRecordRaw[] = [
     component: PostsView,
   },
   {
-    path: '/userDetail',
+    path: '/userDetail/:username',
     name: 'userDetail',
     component: UserDetailView,
+    props: true
   },
   {
     path: '/userSearch',

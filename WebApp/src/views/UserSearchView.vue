@@ -3,23 +3,8 @@
     User Search Page
   </h1>
   <v-container>
+    <userCardComponent v-for="x in currentSearchedUsers" :text="x"></userCardComponent>
 
-    <v-card>
-      Example friend
-    </v-card>
-
-    <v-card>
-      Example friend
-    </v-card>
-    <v-card>
-      Example friend
-    </v-card>
-    <v-card>
-      Example friend
-    </v-card>
-    <v-card>
-      Example friend
-    </v-card>
 
   </v-container>
 </template>
@@ -28,24 +13,24 @@
 import PostComponent from '@/components/Post/PostComponent.vue';
 import { defineComponent } from 'vue';
 import { authStore } from '../stores/auth.ts'
+import { userStore } from '../stores/user.ts'
+import userCardComponent from '@/components/UserSearch/UserCard.vue'
 
 // Components
 
 
 export default defineComponent({
-  name: 'UserSearchComponent',
+  name: 'UserSearchView',
   components: {
+    userCardComponent
   },
   data() {
-
+    return { currentSearchedUsers: [] }
   },
-  mounted() {
+  async mounted() {
     let self = this;
-    let auth = authStore();
-    console.log("from Usersearcha");
-    console.log(auth.isAuthenticated);
-    console.log(auth.accessToken);
-    console.log(auth.refreshToken);
+    let userstore = userStore();
+    self.currentSearchedUsers = await userstore.GetUsers()
   }
 });
 </script>

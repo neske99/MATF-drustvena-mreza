@@ -12,7 +12,6 @@ namespace IdentityService.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    //[Authorize]
     public class UserController: ControllerBase
     {
         private readonly UserManager<User> _userManager;
@@ -26,7 +25,7 @@ namespace IdentityService.Controllers
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        [HttpGet("GetAllUsers/[action]")]
+        [HttpGet("GetAllUsers")]
         //[Authorize(Roles = Roles.Admin, AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(typeof(IEnumerable<UserDetails>),StatusCodes.Status200OK)]
         //[ProducesResponseType(typeof(int),  StatusCodes.Status200OK)]
