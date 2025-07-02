@@ -1,6 +1,8 @@
 import { computed, reactive } from 'vue'
 import { defineStore } from 'pinia'
 import axiosAuthenticated from '@/plugin/axios';
+import type { UserPreviewDTO } from '@/dtos/user/userPreviewDTO';
+import type { UserDetailDTO } from '@/dtos/user/userDetailDTO';
 
 export const userStore = defineStore('user', () => {
   // state
@@ -9,12 +11,24 @@ export const userStore = defineStore('user', () => {
   const getSearchedUsers = computed(() => currentUsers);
   //actions
   const GetUsers = async function () {
-    return (await axiosAuthenticated.get("http://localhost:8094/api/v1/User/GetAllUsers")).data;
+    let result: [UserPreviewDTO];
+
+    result = (await axiosAuthenticated.get("http://localhost:8094/api/v1/User/GetAllUsers")).data;
+    return result;
+  };
+
+  const GetSearchedUsers = async function (username: string) {
+    let result: [UserPreviewDTO];
+
+    result = (await axiosAuthenticated.get(`http://localhost:8094/api/v1/User/GetSearchedUsers?username=${username}`)).data;
+    return result;
   };
 
   const GetUser = async function (username: string) {
-    return (await axiosAuthenticated.get(`http://localhost:8094/api/v1/User/GetUser/${username}`)).data;
+    let result: UserDetailDTO;
+    result = (await axiosAuthenticated.get(`http://localhost:8094/api/v1/User/GetUser/${username}`)).data;
+    return result;
   };
 
-  return { getSearchedUsers, GetUsers,GetUser };
+  return { getSearchedUsers, GetUsers, GetSearchedUsers, GetUser };
 })

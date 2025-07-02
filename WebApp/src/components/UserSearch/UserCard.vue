@@ -1,9 +1,12 @@
 <template>
   <v-container fluid>
-    <v-card outlined>
+    <v-card :to="`/userdetail/${text}`" outlined>
 
-      <v-card-text>
+      <v-card-text to="'/userdetail/'+text">
         {{ text }}
+      </v-card-text>
+      <v-card-text>
+        {{ firstName }} {{ lastName }}
       </v-card-text>
 
       <v-card-actions>
@@ -20,7 +23,7 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'UserSearchCardComponent',
-  props: [/*'title',*/ 'text'],
+  props: [/*'title',*/ 'text', 'firstName', 'lastName', 'userId'],
   data() {
     return {
 

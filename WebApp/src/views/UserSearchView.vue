@@ -3,7 +3,9 @@
     User Search Page
   </h1>
   <v-container>
-    <userCardComponent v-for="x in currentSearchedUsers" :text="x"></userCardComponent>
+    <userCardComponent v-for="x in currentSearchedUsers" :text="x.username" :firstName="x.firstName"
+      :lastName="x.lastName" :userId="x.id">
+    </userCardComponent>
 
 
   </v-container>
@@ -15,22 +17,44 @@ import { defineComponent } from 'vue';
 import { authStore } from '../stores/auth.ts'
 import { userStore } from '../stores/user.ts'
 import userCardComponent from '@/components/UserSearch/UserCard.vue'
+import type { UserPreviewDTO } from '@/dtos/user/userPreviewDTO.ts';
 
 // Components
 
 
 export default defineComponent({
   name: 'UserSearchView',
+  props: ['userSearchName'],
   components: {
     userCardComponent
   },
   data() {
-    return { currentSearchedUsers: [] }
+    return {
+      currentSearchedUsers:
+        [] as UserPreviewDTO[],
+    }
+  },
+  created() {
+    let self = this;
+
+
+    console.log("usersearchName:" + self.userSearchName);
   },
   async mounted() {
     let self = this;
     let userstore = userStore();
-    self.currentSearchedUsers = await userstore.GetUsers()
+
+    self.currentSearchedUsers =
+      await userstore.GetSearchedUsers(self.userSearchName);
+  },
+  watch: {
+    '$route.params.userSearchName': async function (newValue) {
+      let self = this;
+      let userstore = userStore();
+
+      self.currentSearchedUsers =
+        await userstore.GetSearchedUsers(newValue);
+    }
   }
 });
 </script>

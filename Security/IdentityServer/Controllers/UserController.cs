@@ -36,6 +36,19 @@ namespace IdentityService.Controllers
             return Ok(_mapper.Map<IEnumerable<UserDetails>>(users));
         }
 
+        [HttpGet("GetSearchedUsers")]
+        //[Authorize(Roles = Roles.Admin, AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ProducesResponseType(typeof(IEnumerable<UserDetails>),StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(int),  StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetSearchedUsersAsync([FromQuery] string username)
+        {
+            var users =await _userManager.Users.Where(x=>x.UserName.Contains(username)).ToListAsync();
+            //return Ok(users);
+            return Ok(_mapper.Map<IEnumerable<UserDetails>>(users));
+        }
+
+
+
         [HttpGet("GetUser/{username}")]
         //[Authorize(Roles = Roles.Admin + "," + Roles.Buyer,AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [ProducesResponseType(typeof(IEnumerable<UserDetails>),StatusCodes.Status200OK)]
@@ -46,5 +59,7 @@ namespace IdentityService.Controllers
             return Ok(_mapper.Map<UserDetails>(user));
         
         }
+
+
     }
 }

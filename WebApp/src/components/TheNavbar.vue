@@ -6,7 +6,8 @@
     <v-spacer></v-spacer>
 
     <!-- Center the text field and increase its width -->
-    <v-text-field placeholder="Search" dense class="search-field"></v-text-field>
+    <v-text-field placeholder="Search" dense class="search-field" v-model="searchText"></v-text-field>
+    <v-btn @click="search" to="/usersearc/${searchText}">Search</v-btn>
 
     <v-spacer></v-spacer>
 
@@ -17,18 +18,19 @@
 <script lang='ts'>
 import { defineComponent } from 'vue'
 import { authStore } from '../stores/auth.ts'
+import { userStore } from '../stores/user.ts'
 
 export default defineComponent({
   name: 'TheNavbar',
   data() {
     return {
-
+      searchText: "" as string
     }
   },
   computed: {
     isAuthenticated() {
       return authStore().isAuthenticated;
-    }
+    },
   },
   methods: {
     async onSignoutClick() {
@@ -39,6 +41,10 @@ export default defineComponent({
 
       }
     },
+    async search() {
+      let self = this;
+      this.$router.push(`/usersearch/${self.searchText}`);
+    }
 
   }
 })

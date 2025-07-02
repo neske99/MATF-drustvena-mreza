@@ -34,9 +34,10 @@ const routes: RouteRecordRaw[] = [
     props: true
   },
   {
-    path: '/userSearch',
+    path: '/userSearch/:userSearchName',
     name: 'userSearch',
     component: UserSearchView,
+    props: true
   },
   {
     path: '/auth/signup',
