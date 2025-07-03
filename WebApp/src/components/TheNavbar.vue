@@ -6,8 +6,8 @@
     <v-spacer></v-spacer>
 
     <!-- Center the text field and increase its width -->
-    <v-text-field placeholder="Search" dense class="search-field" v-model="searchText"></v-text-field>
-    <v-btn @click="search" to="/usersearc/${searchText}">Search</v-btn>
+    <v-text-field placeholder="Search" dense class="search-field" v-model.trim="searchText"></v-text-field>
+    <v-btn @click="search">Search</v-btn>
 
     <v-spacer></v-spacer>
 
@@ -41,9 +41,10 @@ export default defineComponent({
 
       }
     },
-    async search() {
+    search() {
       let self = this;
-      this.$router.push(`/usersearch/${self.searchText}`);
+      if (self.searchText !== "")
+        this.$router.push(`/usersearch/${self.searchText}`);
     }
 
   }
