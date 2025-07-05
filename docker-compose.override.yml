@@ -65,6 +65,7 @@ services:
       - "Neo4jSettings:ConnectionString=neo4j://relationsdb:7687"
       - "Neo4jSettings:Username=neo4j"
       - "Neo4jSettings:Password=12345678"
+      - "EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672"
     ports:
       - "8000:8080"
     depends_on:

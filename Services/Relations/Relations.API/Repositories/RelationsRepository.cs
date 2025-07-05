@@ -33,7 +33,7 @@ namespace Relations.API.Repositories
         }
           
 
-        public async Task<Boolean> DeleteUser(string userId)
+        public async Task<Boolean> DeleteUser(int userId)
         {
             await _context.DatabaseClient.ConnectAsync();
             await _context.DatabaseClient.Cypher
@@ -45,7 +45,7 @@ namespace Relations.API.Repositories
             return true;
         }
 
-        public async Task<IEnumerable<User>> GetUserFriends(string userId)
+        public async Task<IEnumerable<User>> GetUserFriends(int userId)
         {
             await _context.DatabaseClient.ConnectAsync();
             return await _context.DatabaseClient.Cypher
@@ -55,7 +55,7 @@ namespace Relations.API.Repositories
                 .ResultsAsync;
         }
 
-        public async Task<IEnumerable<User>> GetBlockedUsers(string userId)
+        public async Task<IEnumerable<User>> GetBlockedUsers(int userId)
         {
             await _context.DatabaseClient.ConnectAsync();
             return await _context.DatabaseClient.Cypher
@@ -65,7 +65,7 @@ namespace Relations.API.Repositories
                 .ResultsAsync;
         }
 
-        public async Task<bool> RemoveFriendship(string sourceUserId, string targetUserId)
+        public async Task<bool> RemoveFriendship(int sourceUserId, int targetUserId)
         {
             await _context.DatabaseClient.ConnectAsync();
             await _context.DatabaseClient.Cypher
@@ -77,7 +77,7 @@ namespace Relations.API.Repositories
 
             return true;
         }
-        public async Task<bool> BlockUser(string sourceUserId, string targetUserId)
+        public async Task<bool> BlockUser(int sourceUserId, int targetUserId)
         {
             await _context.DatabaseClient.ConnectAsync();
             await _context.DatabaseClient.Cypher
@@ -97,7 +97,7 @@ namespace Relations.API.Repositories
             return true;
         }
 
-        public async Task<bool> UnblockUser(string sourceUserId, string targetUserId)
+        public async Task<bool> UnblockUser(int sourceUserId, int targetUserId)
         {
             await _context.DatabaseClient.ConnectAsync();
             await _context.DatabaseClient.Cypher
@@ -110,7 +110,7 @@ namespace Relations.API.Repositories
             return true;
         }
 
-        public async Task<IEnumerable<User>> GetSentFriendRequests(string userId)
+        public async Task<IEnumerable<User>> GetSentFriendRequests(int userId)
         {
             await _context.DatabaseClient.ConnectAsync();
             return await _context.DatabaseClient.Cypher
@@ -120,7 +120,7 @@ namespace Relations.API.Repositories
                 .ResultsAsync;
         }
 
-        public async Task<bool> SendFriendRequest(string sourceUserId, string targetUserId)
+        public async Task<bool> SendFriendRequest(int sourceUserId, int targetUserId)
         {
             await _context.DatabaseClient.ConnectAsync();
             await _context.DatabaseClient.Cypher
@@ -133,7 +133,7 @@ namespace Relations.API.Repositories
             return true;
         }
 
-        public async Task<bool> UnsendFriendRequest(string sourceUserId, string targetUserId)
+        public async Task<bool> UnsendFriendRequest(int sourceUserId, int targetUserId)
         {
             await _context.DatabaseClient.ConnectAsync();
             await _context.DatabaseClient.Cypher
@@ -146,7 +146,7 @@ namespace Relations.API.Repositories
             return true;
         }
 
-        public async Task<IEnumerable<User>> GetReceivedFriendRequests(string userId)
+        public async Task<IEnumerable<User>> GetReceivedFriendRequests(int userId)
         {
             await _context.DatabaseClient.ConnectAsync();
             return await _context.DatabaseClient.Cypher
@@ -156,7 +156,7 @@ namespace Relations.API.Repositories
                 .ResultsAsync;
         }
 
-        public async Task<bool> AcceptFriendRequest(string sourceUserId, string targetUserId)
+        public async Task<bool> AcceptFriendRequest(int sourceUserId, int targetUserId)
         {
             await _context.DatabaseClient.ConnectAsync();
             await _context.DatabaseClient.Cypher
@@ -171,7 +171,7 @@ namespace Relations.API.Repositories
             return true;
         }
 
-        public async Task<bool> DeclineFriendRequest(string sourceUserId, string targetUserId)
+        public async Task<bool> DeclineFriendRequest(int sourceUserId, int targetUserId)
         {
             await _context.DatabaseClient.ConnectAsync();
             await _context.DatabaseClient.Cypher

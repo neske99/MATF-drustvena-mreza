@@ -34,7 +34,7 @@ namespace Relations.API.Controllers
         [HttpDelete("users")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<User>> DeleteUser([FromBody] string userId)
+        public async Task<ActionResult<User>> DeleteUser([FromBody] int userId)
         {
             var result = await _repository.DeleteUser(userId);
             if (!result)
@@ -44,7 +44,7 @@ namespace Relations.API.Controllers
 
         [HttpGet("friends/{userId}")]
         [ProducesResponseType(typeof(IEnumerable<User>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<User>>> GetUserFriends(string userId)
+        public async Task<ActionResult<IEnumerable<User>>> GetUserFriends(int userId)
         {
             var friends = await _repository.GetUserFriends(userId);
             return Ok(friends);
@@ -52,7 +52,7 @@ namespace Relations.API.Controllers
 
         [HttpDelete("friends/{sourceUserId}/{targetUserId}")]
         [ProducesResponseType(typeof(IEnumerable<User>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<User>>> RemoveFriendship(string sourceUserId, string targetUserId)
+        public async Task<ActionResult<IEnumerable<User>>> RemoveFriendship(int sourceUserId, int targetUserId)
         {
             var result = await _repository.RemoveFriendship(sourceUserId, targetUserId);
             if (!result)
@@ -62,7 +62,7 @@ namespace Relations.API.Controllers
 
         [HttpGet("blocked/{userId}")]
         [ProducesResponseType(typeof(IEnumerable<User>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<User>>> GetBlockedUsers(string userId)
+        public async Task<ActionResult<IEnumerable<User>>> GetBlockedUsers(int userId)
         {
             var blockedUsers = await _repository.GetBlockedUsers(userId);
             return Ok(blockedUsers);
@@ -71,7 +71,7 @@ namespace Relations.API.Controllers
         [HttpPut("blocked/{sourceUserId}/{targetUserId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<User>> BlockUser(string sourceUserId, string targetUserId)
+        public async Task<ActionResult<User>> BlockUser(int sourceUserId, int targetUserId)
         {
             var result = await _repository.BlockUser(sourceUserId, targetUserId);
             if (!result)
@@ -82,7 +82,7 @@ namespace Relations.API.Controllers
         [HttpDelete("blocked/{sourceUserId}/{targetUserId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<User>> UnblockUser(string sourceUserId, string targetUserId)
+        public async Task<ActionResult<User>> UnblockUser(int sourceUserId, int targetUserId)
         {
             var result = await _repository.UnblockUser(sourceUserId, targetUserId);
             if (!result)
@@ -93,7 +93,7 @@ namespace Relations.API.Controllers
 
         [HttpGet("sent/{userId}")]
         [ProducesResponseType(typeof(IEnumerable<User>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<User>>> GetSentFriendRequests(string userId)
+        public async Task<ActionResult<IEnumerable<User>>> GetSentFriendRequests(int userId)
         {
             var sentFriendRequests = await _repository.GetSentFriendRequests(userId);
             return Ok(sentFriendRequests);
@@ -102,7 +102,7 @@ namespace Relations.API.Controllers
         [HttpPut("sent/{sourceUserId}/{targetUserId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<User>> SendFriendRequest(string sourceUserId, string targetUserId)
+        public async Task<ActionResult<User>> SendFriendRequest(int sourceUserId, int targetUserId)
         {
             var result = await _repository.SendFriendRequest(sourceUserId, targetUserId);
             if (!result)
@@ -113,7 +113,7 @@ namespace Relations.API.Controllers
         [HttpDelete("sent/{sourceUserId}/{targetUserId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<User>> UnsendFriendRequest(string sourceUserId, string targetUserId)
+        public async Task<ActionResult<User>> UnsendFriendRequest(int sourceUserId, int targetUserId)
         {
             var result = await _repository.UnsendFriendRequest(sourceUserId, targetUserId);
             if (!result)
@@ -125,7 +125,7 @@ namespace Relations.API.Controllers
 
         [HttpGet("received/{userId}")]
         [ProducesResponseType(typeof(IEnumerable<User>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<User>>> GetReceivedFriendRequests(string userId)
+        public async Task<ActionResult<IEnumerable<User>>> GetReceivedFriendRequests(int userId)
         {
             var receivedFriendRequests = await _repository.GetReceivedFriendRequests(userId);
             return Ok(receivedFriendRequests);
@@ -134,7 +134,7 @@ namespace Relations.API.Controllers
         [HttpPut("received/accept/{sourceUserId}/{targetUserId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<User>> AcceptFriendRequest(string sourceUserId, string targetUserId)
+        public async Task<ActionResult<User>> AcceptFriendRequest(int sourceUserId, int targetUserId)
         {
             var result = await _repository.AcceptFriendRequest(sourceUserId, targetUserId);
             if (!result)
@@ -145,19 +145,13 @@ namespace Relations.API.Controllers
         [HttpDelete("received/decline/{sourceUserId}/{targetUserId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<User>> DeclineFriendRequest(string sourceUserId, string targetUserId)
+        public async Task<ActionResult<User>> DeclineFriendRequest(int sourceUserId, int targetUserId)
         {
             var result = await _repository.DeclineFriendRequest(sourceUserId, targetUserId);
             if (!result)
                 return NotFound(null);
             return Ok();
         }
-
-
-
-
-
-
 
 
     }

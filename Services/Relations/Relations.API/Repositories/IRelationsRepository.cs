@@ -8,28 +8,28 @@ namespace Relations.API.Repositories
 
         Task<User> CreateUser(User user);
 
-        Task<Boolean> DeleteUser(string userId);
+        Task<Boolean> DeleteUser(int userId);
 
-        Task<IEnumerable<User>> GetUserFriends(string userId);
+        Task<IEnumerable<User>> GetUserFriends(int userId);
 
-        Task<Boolean> RemoveFriendship(string sourceUserId, string targetUserId);
+        Task<Boolean> RemoveFriendship(int sourceUserId, int targetUserId);
 
-        Task<IEnumerable<User>> GetBlockedUsers(string userId);
+        Task<IEnumerable<User>> GetBlockedUsers(int userId);
 
-        Task<Boolean> BlockUser(string sourceUserId, string targetUserId);
+        Task<Boolean> BlockUser(int sourceUserId, int targetUserId);
 
-        Task<Boolean> UnblockUser(string sourceUserId, string targetUserId);
+        Task<Boolean> UnblockUser(int sourceUserId, int targetUserId);
 
-        Task<IEnumerable<User>> GetSentFriendRequests(string userId);
+        Task<IEnumerable<User>> GetSentFriendRequests(int userId);
 
-        Task<Boolean> SendFriendRequest(string sourceUserId, string targetUserId);
+        Task<Boolean> SendFriendRequest(int sourceUserId, int targetUserId);
 
-        Task<Boolean> UnsendFriendRequest(string sourceUserId, string targetUserId);
+        Task<Boolean> UnsendFriendRequest(int sourceUserId, int targetUserId);
 
-        Task<IEnumerable<User>> GetReceivedFriendRequests(string userId);
+        Task<IEnumerable<User>> GetReceivedFriendRequests(int userId);
 
-        Task<Boolean> AcceptFriendRequest(string sourceUserId, string targetUserId);
+        Task<Boolean> AcceptFriendRequest(int sourceUserId, int targetUserId);
 
-        Task<Boolean> DeclineFriendRequest(string sourceUserId, string targetUserId);
+        Task<Boolean> DeclineFriendRequest(int sourceUserId, int targetUserId);
     }
 }
