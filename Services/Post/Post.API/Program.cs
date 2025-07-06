@@ -5,12 +5,21 @@ using Post.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Relations.GRPC;
+using Post.API.GrpcServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.RegisterInfrastructureService(builder.Configuration);
+
+builder.Services.AddGrpcClient<Greeter.GreeterClient>(o=>
+{
+    o.Address = new Uri(builder.Configuration.GetValue<string>("GrpcSettings:RelationsUrl"));
+});
+builder.Services.AddScoped<GreeterService>();
+
 builder.Services.AddMassTransit(config => {
     config.AddConsumer<UserCreatedConsumer>();
     config.UsingRabbitMq((ctx, cfg) =>

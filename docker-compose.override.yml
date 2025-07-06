@@ -25,11 +25,13 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - "ConnectionStrings:mssql=Server=mssql;Database=PostDb;User Id=sa;Password=MATF12345678rs2;TrustServerCertificate=True;"
       - "EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672"
+      - "GrpcSettings:RelationsUrl=http://relations.grpc:8080"
     ports:
       - "8080:8080"
     depends_on:
       - mssql
       - rabbitmq 
+      - relations.grpc
 
   mssql:
     container_name: mssql
@@ -70,3 +72,13 @@ services:
       - "8000:8080"
     depends_on:
       - relationsdb
+
+  relations.grpc:
+    container_name: relations.grpc
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - relationsdb
+    ports:
+      - "8003:8080"
+

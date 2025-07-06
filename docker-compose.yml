@@ -29,6 +29,12 @@ services:
       context: .
       dockerfile: Services/Relations/Relations.API/Dockerfile
 
+  relations.grpc:
+    image: relations.grpc
+    build:
+      context: .
+      dockerfile: Services/Relations/Relations.GRPC/Dockerfile
+
 volumes:
     neo4j_data:
 
