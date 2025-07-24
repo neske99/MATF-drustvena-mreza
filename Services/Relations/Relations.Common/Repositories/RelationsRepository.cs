@@ -12,6 +12,21 @@ namespace Relations.Common.Repositories
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
+        public async Task<string> GetRelation(int sourceUserId, int targetUserId)
+        {
+            await _context.DatabaseClient.ConnectAsync();
+
+            var relation = await _context.DatabaseClient.Cypher
+                .Match("(a:User)-[r]-(b:User)")
+                .Where((User a) => a.Id == sourceUserId)
+                .AndWhere((User b) => b.Id == targetUserId)
+                .Return(r => r.Type())
+                .ResultsAsync;
+
+            // Return the first found relationship type, or empty string if none
+            return relation.FirstOrDefault("NONE");
+        }
+
         public async Task<IEnumerable<User>> GetUsers()
         {
             await _context.DatabaseClient.ConnectAsync();

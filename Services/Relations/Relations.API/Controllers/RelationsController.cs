@@ -14,6 +14,14 @@ namespace Relations.API.Controllers
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
+        [HttpGet("relations/{sourceUserId}/{targetUserId}")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<User>>> GetRelation(int sourceUserId, int targetUserId)
+        {
+            var result = await _repository.GetRelation(sourceUserId, targetUserId);
+            return Ok(result);
+        }
+
         [HttpGet("users")]
         [ProducesResponseType(typeof(IEnumerable<User>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()

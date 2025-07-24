@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+option csharp_namespace = "Relations.GRPC";
+
+
+service RelationsProtoService {
+  rpc GetFriends(GetFriendsRequest) returns (GetFriendsResponse);
+  rpc GetRelationsWith(GetRelationsWithRequest) returns (GetRelationsWithResponse);
+}
+
+message User {
+	int32 id = 1;
+}
+
+message Relation {
+	string relation = 1;
+}
+
+message GetFriendsRequest { 
+	User user = 1; 
+}
+
+
+message GetFriendsResponse { 
+	repeated User friends = 1;
+	int32 numberOfFriends = 2;
+}
+
+message GetRelationsWithRequest {
+	User user = 1;
+	repeated User target_users = 2;
+}
+
+message GetRelationsWithResponse {
+	repeated Relation relations = 1;
+}

@@ -4,6 +4,8 @@ namespace Relations.Common.Repositories
 {
     public interface IRelationsRepository
     {
+        Task<string> GetRelation(int sourceUserId, int targetUserId);
+
         Task<IEnumerable<User>> GetUsers();
 
         Task<User> CreateUser(User user);
