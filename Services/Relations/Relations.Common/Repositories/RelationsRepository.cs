@@ -1,7 +1,7 @@
-﻿using Relations.API.Data;
-using Relations.API.Entities;
+﻿using Relations.Common.Data;
+using Relations.Common.Entities;
 
-namespace Relations.API.Repositories
+namespace Relations.Common.Repositories
 {
     public class RelationsRepository : IRelationsRepository
     {

@@ -1,7 +1,7 @@
 using EventBusMessages.Events;
 using MassTransit;
-using Relations.API.Entities;
-using Relations.API.Repositories;
+using Relations.Common.Entities;
+using Relations.Common.Repositories;
 
 namespace Relations.API.EventBsConsumers
 {

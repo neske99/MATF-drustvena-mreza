@@ -1,7 +1,6 @@
-﻿using Relations.API.Entities;
-using Relations.API.Repositories;
+﻿using Relations.Common.Entities;
+using Relations.Common.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Relations.API.Controllers
 {

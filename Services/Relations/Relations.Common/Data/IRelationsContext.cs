@@ -1,6 +1,6 @@
 ﻿using Neo4jClient;
 
-namespace Relations.API.Data
+namespace Relations.Common.Data
 {
     public interface IRelationsContext
     {

@@ -1,8 +1,7 @@
-using Relations.API.Data;
-using Relations.API.Repositories;
 using EventBusMessages.Constants;
 using MassTransit;
 using Relations.API.EventBsConsumers;
+using Relations.Common.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,8 +21,7 @@ builder.Services.AddMassTransit(config => {
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<IRelationsContext, RelationsContext>();
-builder.Services.AddScoped<IRelationsRepository, RelationsRepository>();
+builder.Services.AddRelationsCommonServices();
 builder.Services.AddControllers();
 
 var app = builder.Build();

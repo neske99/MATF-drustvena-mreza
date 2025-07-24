@@ -1,4 +1,4 @@
-﻿namespace Relations.API.Entities
+﻿namespace Relations.Common.Entities
 {
     public class User
     {

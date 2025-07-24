@@ -1,6 +1,6 @@
-﻿using Relations.API.Entities;
+﻿using Relations.Common.Entities;
 
-namespace Relations.API.Repositories
+namespace Relations.Common.Repositories
 {
     public interface IRelationsRepository
     {
