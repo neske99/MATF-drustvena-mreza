@@ -50,7 +50,6 @@ public class PostController : ControllerBase
     public async Task<ActionResult> TestGrpc()
     {
 
-        
         return Ok(/*_greeterService.SayHello()*/);
     }
 

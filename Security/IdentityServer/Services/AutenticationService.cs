@@ -24,7 +24,7 @@ namespace IdentityService.Services
             _dbcontext = applicationContext ?? throw new ArgumentNullException(nameof(applicationContext));
         }
 
-       
+
         public async Task<AutenticationModel> CreateAutenticationModel(User user)
         {
             var accessToken = await CreateToken(user);
@@ -33,7 +33,7 @@ namespace IdentityService.Services
             user.RefreshTokens.Add(refreshToken);
             await _userManager.UpdateAsync(user);
 
-            return new AutenticationModel { AccessToken=accessToken,RefreshToken=refreshToken.Token };
+            return new AutenticationModel { UserId=user.Id,AccessToken=accessToken,RefreshToken=refreshToken.Token };
         }
 
         private async Task<RefreshToken> CreateRefreshToken()

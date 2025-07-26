@@ -8,13 +8,14 @@ export const authStore = defineStore('auth', () => {
 
   const baseUrl = "http://localhost:8094/api/v1/Authentication/";
   let username = ref("");
+  let userId=ref(0);
 
   let accessToken = ref("");
   let refreshToken = ref("");
   let isAuthenticated = ref(false);
   //getters
   const isUserAuthenticated = computed(() => isAuthenticated);
-  //actions 
+  //actions
   const signup = async function (username: string, password: string) {
     //Todo
     try {
@@ -33,6 +34,7 @@ export const authStore = defineStore('auth', () => {
       username.value = usrname;
       accessToken.value = response.data.accessToken;
       refreshToken.value = response.data.refreshToken;
+      userId.value= response.data.userId;
       isAuthenticated.value = true;
 
       console.log(isAuthenticated);
@@ -72,6 +74,7 @@ export const authStore = defineStore('auth', () => {
     username.value = "";
     accessToken.value = "";
     refreshToken.value = "";
+    userId.value= 0;
     isAuthenticated.value = false;
   };
   const refresh = async function () {
@@ -86,14 +89,13 @@ export const authStore = defineStore('auth', () => {
         username.value = "";
         accessToken.value = "";
         refreshToken.value = "";
+        userId.value= 0;
         isAuthenticated.value = false;
       }
-
     }
-
   }
 
-  return { username, isAuthenticated, accessToken, refreshToken, refresh, signup, login, logout };
+  return { username, isAuthenticated, accessToken, refreshToken,userId, refresh, signup, login, logout };
 },
   {
     persist: true
