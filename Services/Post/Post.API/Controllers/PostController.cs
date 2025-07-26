@@ -13,18 +13,18 @@ namespace Post.API.Controllers;
 public class PostController : ControllerBase
 {
     private readonly IPostRepository _postRepository;
-    private readonly GreeterService _greeterService;
+    private readonly RelationsService   _relationsService;
 
-    public PostController(IPostRepository repository, GreeterService greeterService)
+    public PostController(IPostRepository repository , RelationsService greeterService)
     {
         this._postRepository = repository ?? throw new ArgumentNullException(nameof(repository));
-        this._greeterService = greeterService ?? throw new ArgumentException(nameof(greeterService));
+        this._relationsService = greeterService ?? throw new ArgumentException(nameof(greeterService));
     }
 
     [HttpGet("[action]")]
     public async Task<ActionResult> GetPostsForUser([FromQuery] int userId)
     {
-        return Ok(await _postRepository.GetPostsForUser(userId));
+        return Ok(await _postRepository.GetPostsForUser(userId,_relationsService.GetFriends(userId)));
     }
 
     [HttpPost("[action]")]
@@ -49,7 +49,9 @@ public class PostController : ControllerBase
     [HttpGet("[action]")]
     public async Task<ActionResult> TestGrpc()
     {
-        return Ok(_greeterService.SayHello());
+
+        
+        return Ok(/*_greeterService.SayHello()*/);
     }
 
 }

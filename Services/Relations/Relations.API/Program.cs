@@ -10,7 +10,7 @@ builder.Services.AddMassTransit(config => {
     config.UsingRabbitMq((ctx, cfg) =>
     {
         cfg.Host(builder.Configuration.GetValue<string>("EventBusSettings:HostAddress") );
-        cfg.ReceiveEndpoint(EventBusConstants.UserCreatedQueue, c =>
+        cfg.ReceiveEndpoint(EventBusConstants.UserCreatedReplicationToRelationServiceQueue, c =>
         {
             c.ConfigureConsumer<UserCreatedConsumer>(ctx);
         });

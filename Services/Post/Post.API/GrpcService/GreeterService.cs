@@ -1,21 +1,34 @@
 using Relations.GRPC;
 namespace Post.API.GrpcServices;
 
-public class GreeterService
+public class RelationsService
 {
-    private readonly Greeter.GreeterClient _greeterService;
+    //privete readonly Greeter.GreeterClient _greeterService;
+    private readonly RelationsProtoService.RelationsProtoServiceClient _grpcService;
 
-
-    public GreeterService(Greeter.GreeterClient greeterService)
+    public RelationsService(RelationsProtoService.RelationsProtoServiceClient greeterService)
     {
-        _greeterService = greeterService ?? throw new ArgumentNullException(nameof(greeterService));
+
+        _grpcService = greeterService ?? throw new ArgumentNullException(nameof(greeterService));
     }
-    public string SayHello()
+    public List<int> GetFriends(int userId)
     {
-        HelloRequest x = new HelloRequest() {Name="lalal" };
+        GetFriendsRequest request = new GetFriendsRequest();
+        var usr = new User();
+        usr.Id = userId;
+        request.User = usr;
 
-        var response =_greeterService.SayHello(x);
-        return response.Message;
+        var response = _grpcService.GetFriends(request);
+        return response.Friends.Select(u => u.Id).ToList();
+
+    }
+
+    public List<string> GetRelationShips(int userId)
+    {
+        GetRelationsWithRequest request = new GetRelationsWithRequest();
+        request.User.Id = userId;
+        var response = _grpcService.GetRelationsWith(request);
+        return response.Relations.Select(r=>r.Relation_).ToList();
     }
 
 

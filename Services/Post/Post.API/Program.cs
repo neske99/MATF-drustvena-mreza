@@ -14,11 +14,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.RegisterInfrastructureService(builder.Configuration);
 
-builder.Services.AddGrpcClient<Greeter.GreeterClient>(o=>
+builder.Services.AddGrpcClient<RelationsProtoService.RelationsProtoServiceClient>(o=>
 {
     o.Address = new Uri(builder.Configuration.GetValue<string>("GrpcSettings:RelationsUrl"));
 });
-builder.Services.AddScoped<GreeterService>();
+builder.Services.AddScoped<RelationsService>();
 
 builder.Services.AddMassTransit(config => {
     config.AddConsumer<UserCreatedConsumer>();

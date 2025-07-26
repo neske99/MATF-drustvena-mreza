@@ -8,8 +8,8 @@ services:
     ports:
       - "8094:8080"
     depends_on:
-    - identitydb   
-    - rabbitmq 
+    - identitydb
+    - rabbitmq
 
   identitydb:
     container_name: identitydb
@@ -23,6 +23,7 @@ services:
   post.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
       - "ConnectionStrings:mssql=Server=mssql;Database=PostDb;User Id=sa;Password=MATF12345678rs2;TrustServerCertificate=True;"
       - "EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672"
       - "GrpcSettings:RelationsUrl=http://relations.grpc:8080"
@@ -30,7 +31,7 @@ services:
       - "8080:8080"
     depends_on:
       - mssql
-      - rabbitmq 
+      - rabbitmq
       - relations.grpc
 
   mssql:
@@ -41,13 +42,13 @@ services:
     environment:
       - SA_PASSWORD=MATF12345678rs2
       - ACCEPT_EULA=Y
-  
+
   rabbitmq:
     container_name: rabbitmq
     restart: always
     ports:
       - 5672:5672
-      - 15672:15672 
+      - 15672:15672
 
   relationsdb:
     container_name: relationsdb
@@ -60,10 +61,11 @@ services:
       - NEO4J_AUTH=neo4j/12345678
     volumes:
       - neo4j_data:\data
-        
+
   relations.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
       - "Neo4jSettings:ConnectionString=neo4j://relationsdb:7687"
       - "Neo4jSettings:Username=neo4j"
       - "Neo4jSettings:Password=12345678"
@@ -72,11 +74,16 @@ services:
       - "8000:8080"
     depends_on:
       - relationsdb
+      - rabbitmq
 
   relations.grpc:
     container_name: relations.grpc
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - "Neo4jSettings:ConnectionString=neo4j://relationsdb:7687"
+      - "Neo4jSettings:Username=neo4j"
+      - "Neo4jSettings:Password=12345678"
+      - ASPNETCORE_HTTP_PORTS=8080
     depends_on:
       - relationsdb
     ports:

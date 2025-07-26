@@ -27,8 +27,8 @@
   </ItemGroup>
 
     <ItemGroup>
-        <Protobuf Include="..\..\Relations\Relations.GRPC\Protos\greet.proto" GrpcServices="Client" >
-            <Link>Protos\greet.proto</Link>
+        <Protobuf Include="..\..\Relations\Relations.GRPC\Protos\relations.proto" GrpcServices="Client" OutputDir="Generated">
+            <Link>Protos\relations.proto</Link>
         </Protobuf>
     </ItemGroup>
 
