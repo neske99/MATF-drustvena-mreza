@@ -28,7 +28,7 @@ public class RelationsService
         GetRelationsWithRequest request = new GetRelationsWithRequest();
         request.User.Id = userId;
         var response = _grpcService.GetRelationsWith(request);
-        return response.Relations.Select(r=>r.Relation_).ToList();
+        return response.Relations.Select(r => r.Relation_).ToList();
     }
 
 

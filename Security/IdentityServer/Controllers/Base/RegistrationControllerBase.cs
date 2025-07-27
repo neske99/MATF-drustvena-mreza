@@ -61,7 +61,7 @@ namespace IdentityService.Controllers.Base
 
             }
 
-            var userCreatedEvent = new UserCreatedEvent() {UserId=user.Id, UserName = user.UserName, FirstName = user.FirstName, LastName = user.LastName };
+            var userCreatedEvent = new UserCreatedEvent() { UserId = user.Id, UserName = user.UserName, FirstName = user.FirstName, LastName = user.LastName };
 
             await _publishEndpoint.Publish(userCreatedEvent);
             return StatusCode(StatusCodes.Status201Created);

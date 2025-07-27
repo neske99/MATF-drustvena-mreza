@@ -9,7 +9,7 @@ namespace Relations.API.EventBsConsumers
     {
         private readonly IRelationsRepository _relationsRepository;
 
-        public UserCreatedConsumer(IRelationsRepository  relationRepository)
+        public UserCreatedConsumer(IRelationsRepository relationRepository)
         {
             _relationsRepository = relationRepository ?? throw new ArgumentNullException(nameof(relationRepository));
         }
@@ -19,7 +19,7 @@ namespace Relations.API.EventBsConsumers
             //TODO user replication
             try
             {
-              var userCreated=context.Message;
+                var userCreated = context.Message;
                 var newUser = new User()
                 {
                     Id = userCreated.UserId
@@ -30,7 +30,7 @@ namespace Relations.API.EventBsConsumers
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
     }

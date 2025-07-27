@@ -13,7 +13,7 @@ namespace Post.Infrastructure.Persistance.EntityConfigurations
         public void Configure(EntityTypeBuilder<User> builder)
         {
             builder.ToTable("Users");
-            builder.HasKey(x=>x.Id);
+            builder.HasKey(x => x.Id);
         }
     }
 }

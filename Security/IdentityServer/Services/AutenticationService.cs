@@ -17,7 +17,7 @@ namespace IdentityService.Services
         private readonly IConfiguration _configuration;
         private readonly ApplicationContext _dbcontext;
 
-        public AutenticationService(UserManager<User> userManager, IConfiguration configuration,ApplicationContext applicationContext)
+        public AutenticationService(UserManager<User> userManager, IConfiguration configuration, ApplicationContext applicationContext)
         {
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
@@ -33,7 +33,7 @@ namespace IdentityService.Services
             user.RefreshTokens.Add(refreshToken);
             await _userManager.UpdateAsync(user);
 
-            return new AutenticationModel { UserId=user.Id,AccessToken=accessToken,RefreshToken=refreshToken.Token };
+            return new AutenticationModel { UserId = user.Id, AccessToken = accessToken, RefreshToken = refreshToken.Token };
         }
 
         private async Task<RefreshToken> CreateRefreshToken()
@@ -58,7 +58,7 @@ namespace IdentityService.Services
         {
             var signingCredentials = GetSigningCredentials();
             var claims = await GetClaims(user);
-            var token = GenerateTokenOptions(signingCredentials,claims);
+            var token = GenerateTokenOptions(signingCredentials, claims);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
@@ -69,11 +69,11 @@ namespace IdentityService.Services
 
             var token = new JwtSecurityToken
             (
-                issuer : jwtSettings.GetSection("validIssuer").Value,
-                audience : jwtSettings.GetSection("validAudience").Value,
-                claims : claims,
+                issuer: jwtSettings.GetSection("validIssuer").Value,
+                audience: jwtSettings.GetSection("validAudience").Value,
+                claims: claims,
                 expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtSettings.GetSection("expires").Value)),
-                signingCredentials : signingCredentials
+                signingCredentials: signingCredentials
             );
 
             return token;
@@ -90,7 +90,7 @@ namespace IdentityService.Services
             var roles = await _userManager.GetRolesAsync(user);
             foreach (var role in roles)
             {
-                claims.Add(new Claim(ClaimTypes.Role,role));
+                claims.Add(new Claim(ClaimTypes.Role, role));
             }
 
             return claims;
@@ -107,7 +107,7 @@ namespace IdentityService.Services
         public async Task<User> ValidateUser(UserCredentialsDto userCredentials)
         {
             var user = await _userManager.FindByNameAsync(userCredentials.Username);
-            if(user == null || !await _userManager.CheckPasswordAsync(user,userCredentials.Password))
+            if (user == null || !await _userManager.CheckPasswordAsync(user, userCredentials.Password))
             {
                 return null;
             }
@@ -119,7 +119,7 @@ namespace IdentityService.Services
             user.RefreshTokens.RemoveAll(r => r.Token == refreshToken);
             await _userManager.UpdateAsync(user);
 
-            var token = _dbcontext.RefreshTokens.FirstOrDefault(r=> r.Token ==refreshToken) ;
+            var token = _dbcontext.RefreshTokens.FirstOrDefault(r => r.Token == refreshToken);
             if (token == null)
             {
                 return;

@@ -13,8 +13,8 @@ public class IntegrationBaseEvent
     public IntegrationBaseEvent()
     {
         Id = Guid.NewGuid();
-        CreationDate  = DateTime.Now;
-        
+        CreationDate = DateTime.Now;
+
     }
 
 }

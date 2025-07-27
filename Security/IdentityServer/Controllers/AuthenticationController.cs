@@ -23,8 +23,8 @@ namespace IdentityServer.Controllers
     {
         private readonly IAuthentiactionService _authenticationService;
 
-        public AuthenticationController(ILogger<AuthenticationController> logger, IMapper mapper, UserManager<User> userManager, RoleManager<IntRole> roleManager, IAuthentiactionService authenticationService,IPublishEndpoint publishEndpoint)
-            : base(logger, mapper, userManager, roleManager,publishEndpoint)
+        public AuthenticationController(ILogger<AuthenticationController> logger, IMapper mapper, UserManager<User> userManager, RoleManager<IntRole> roleManager, IAuthentiactionService authenticationService, IPublishEndpoint publishEndpoint)
+            : base(logger, mapper, userManager, roleManager, publishEndpoint)
         {
             this._authenticationService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
         }
@@ -61,7 +61,7 @@ namespace IdentityServer.Controllers
         }
 
         [HttpPost("[action]")]
-        [ProducesResponseType(typeof(AutenticationModel),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AutenticationModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenModel refreshTokenModel)
         {
@@ -77,7 +77,7 @@ namespace IdentityServer.Controllers
                 _logger.LogWarning($"{nameof(Refresh)}: Refreshing token failed. The refresh token is not found.");
                 return Unauthorized();
             }
-            if(refreshToken.ExpiryTime < DateTime.Now)
+            if (refreshToken.ExpiryTime < DateTime.Now)
             {
                 _logger.LogWarning($"{nameof(Refresh)}: Refreshing token failed. The refresh token is not valid.");
                 return Unauthorized();
@@ -100,7 +100,7 @@ namespace IdentityServer.Controllers
                 return Forbid();
             }
 
-            await _authenticationService.RemoveRefreshToken(user,refreshTokenModel.RefreshToken);
+            await _authenticationService.RemoveRefreshToken(user, refreshTokenModel.RefreshToken);
             return Accepted();
         }
     }

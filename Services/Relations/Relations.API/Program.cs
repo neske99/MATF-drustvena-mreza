@@ -5,11 +5,12 @@ using Relations.Common.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddMassTransit(config => {
+builder.Services.AddMassTransit(config =>
+{
     config.AddConsumer<UserCreatedConsumer>();
     config.UsingRabbitMq((ctx, cfg) =>
     {
-        cfg.Host(builder.Configuration.GetValue<string>("EventBusSettings:HostAddress") );
+        cfg.Host(builder.Configuration.GetValue<string>("EventBusSettings:HostAddress"));
         cfg.ReceiveEndpoint(EventBusConstants.UserCreatedReplicationToRelationServiceQueue, c =>
         {
             c.ConfigureConsumer<UserCreatedConsumer>(ctx);

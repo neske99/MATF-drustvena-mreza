@@ -46,7 +46,7 @@ namespace Relations.Common.Repositories
 
             return user;
         }
-          
+
 
         public async Task<Boolean> DeleteUser(int userId)
         {

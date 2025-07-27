@@ -32,9 +32,9 @@ namespace Post.API.EventBsConsumers
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
-            
+
 
 
         }

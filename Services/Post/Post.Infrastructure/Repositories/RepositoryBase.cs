@@ -10,7 +10,7 @@ using Post.Infrastructure.Persistance.EntityConfigurations;
 
 namespace Post.Infrastructure.Repositories
 {
-    public class RepositoryBase<T>: IAsyncRepository<T> where T:Aggregate
+    public class RepositoryBase<T> : IAsyncRepository<T> where T : Aggregate
     {
         protected PostContext postContext;
         public RepositoryBase(PostContext postContext)
@@ -44,7 +44,7 @@ namespace Post.Infrastructure.Repositories
 
         public async Task UpdateAsync(T item)
         {
-            postContext.Entry(item).State =EntityState.Modified;
+            postContext.Entry(item).State = EntityState.Modified;
             await postContext.SaveChangesAsync();
         }
     }

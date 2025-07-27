@@ -6,9 +6,9 @@ using Post.Domain.Common;
 
 namespace Post.Domain.Entities
 {
-    public class User:Aggregate
+    public class User : Aggregate
     {
-        public string Username { get; set; }=string.Empty;
-        
+        public string Username { get; set; } = string.Empty;
+
     }
 }

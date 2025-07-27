@@ -15,8 +15,8 @@ namespace IdentityService.Extensions
 {
     public static class IdentityExtensions
     {
-        
-        public static IServiceCollection ConfigurePersistence(this IServiceCollection services,IConfiguration configuration) 
+
+        public static IServiceCollection ConfigurePersistence(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<ApplicationContext>(options =>
             {
@@ -28,7 +28,7 @@ namespace IdentityService.Extensions
 
         public static IServiceCollection ConfigureIdentity(this IServiceCollection services)
         {
-            services.AddIdentity<User,IntRole>(options =>
+            services.AddIdentity<User, IntRole>(options =>
             {
                 options.Password.RequireDigit = true;
                 options.Password.RequireLowercase = false;
@@ -50,19 +50,21 @@ namespace IdentityService.Extensions
         {
 
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
-            
+
             services.AddScoped<IAuthentiactionService, AutenticationService>();
 
-            services.AddCors(options=>{
-                options.AddPolicy("CorsPolicy",builder=>{
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy", builder =>
+                {
                     builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
-                    });
                 });
+            });
 
             return services;
         }
 
-        public static IServiceCollection ConfigureJWT(this IServiceCollection services,IConfiguration configuration)
+        public static IServiceCollection ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
         {
             var jwtSettings = configuration.GetSection("JwtSettings");
             var secretKey = jwtSettings.GetSection("secretKey").Value;
@@ -92,6 +94,6 @@ namespace IdentityService.Extensions
             return services;
         }
 
-        
+
     }
 }

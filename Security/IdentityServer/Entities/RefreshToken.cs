@@ -8,8 +8,8 @@
 
         public RefreshToken()
         {
-            this.Id= Guid.NewGuid();
-            
+            this.Id = Guid.NewGuid();
+
         }
     }
 }

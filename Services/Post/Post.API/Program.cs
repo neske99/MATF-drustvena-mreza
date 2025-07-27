@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Relations.GRPC;
 using Post.API.GrpcServices;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,28 +15,34 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.RegisterInfrastructureService(builder.Configuration);
 
-builder.Services.AddGrpcClient<RelationsProtoService.RelationsProtoServiceClient>(o=>
+
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+builder.Services.AddGrpcClient<RelationsProtoService.RelationsProtoServiceClient>(o =>
 {
     o.Address = new Uri(builder.Configuration.GetValue<string>("GrpcSettings:RelationsUrl"));
 });
 builder.Services.AddScoped<RelationsService>();
 
-builder.Services.AddMassTransit(config => {
+builder.Services.AddMassTransit(config =>
+{
     config.AddConsumer<UserCreatedConsumer>();
     config.UsingRabbitMq((ctx, cfg) =>
     {
-        cfg.Host(builder.Configuration.GetValue<string>("EventBusSettings:HostAddress") );
+        cfg.Host(builder.Configuration.GetValue<string>("EventBusSettings:HostAddress"));
         cfg.ReceiveEndpoint(EventBusConstants.UserCreatedQueue, c =>
         {
             c.ConfigureConsumer<UserCreatedConsumer>(ctx);
         });
     });
 });
-builder.Services.AddCors(options=>{
-                options.AddPolicy("CorsPolicy",builder=>{
-                    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
-                    });
-                });
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", builder =>
+    {
+        builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+    });
+});
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings.GetValue<string>("secretKey");
 

@@ -13,10 +13,11 @@ namespace Post.Infrastructure.Persistance.EntityConfigurations
         public void Configure(EntityTypeBuilder<Comment> builder)
         {
             builder.ToTable("Comments");
-            builder.HasKey(x=>x.Id);
-            builder.Property(c=>c.Id).UseHiLo("postseqcomment");
-            
-            builder.HasOne<Post.Domain.Entities.Post>().WithMany(p=>p.Comments).HasForeignKey(c=>c.PostId).OnDelete(DeleteBehavior.Cascade);
+            builder.HasKey(x => x.Id);
+            builder.Property(c => c.Id).UseHiLo("postseqcomment");
+
+            builder.HasOne<Post.Domain.Entities.Post>().WithMany(p => p.Comments).HasForeignKey(c => c.PostId).OnDelete(DeleteBehavior.Cascade);
+            builder.HasOne(c=>c.User).WithMany().HasForeignKey(c => c.UserId).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

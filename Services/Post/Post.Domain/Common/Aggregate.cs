@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace Post.Domain.Common
 {
-    public class Aggregate: EntityBase
+    public class Aggregate : EntityBase
     {
-        
+
     }
 }

@@ -10,15 +10,17 @@ namespace IdentityService.Data.EntityConfigurations
         public void Configure(EntityTypeBuilder<IntRole> builder)
         {
             builder.HasData(
-                new IntRole { 
-                    Id=1,
-                    Name= Roles.Buyer,
-                    NormalizedName="BUYER"
+                new IntRole
+                {
+                    Id = 1,
+                    Name = Roles.Buyer,
+                    NormalizedName = "BUYER"
                 },
-                new IntRole {
-                    Id=2,
-                    Name= Roles.Admin,
-                    NormalizedName="ADMIN"
+                new IntRole
+                {
+                    Id = 2,
+                    Name = Roles.Admin,
+                    NormalizedName = "ADMIN"
                 });
         }
     }

@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 namespace IdentityService.Data
 {
-    public class ApplicationContext:IdentityDbContext<User,IntRole,int>
+    public class ApplicationContext : IdentityDbContext<User, IntRole, int>
     {
         public DbSet<RefreshToken> RefreshTokens { get; set; }
-        public ApplicationContext( DbContextOptions options) :base(options)
+        public ApplicationContext(DbContextOptions options) : base(options)
         {
-            
+
         }
         protected override void OnModelCreating(ModelBuilder builder)
         {

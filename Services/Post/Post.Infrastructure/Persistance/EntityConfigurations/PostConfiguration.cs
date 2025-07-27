@@ -14,8 +14,8 @@ namespace Post.Infrastructure.Persistance.EntityConfigurations
         {
             builder.ToTable("Posts");
             builder.Property(p => p.Id).UseHiLo("postseq");
-            
-            builder.HasOne<User>().WithMany().HasForeignKey(p=>p.UserId);
+
+            builder.HasOne(p=>p.User).WithMany().HasForeignKey(p => p.UserId);
         }
     }
 }

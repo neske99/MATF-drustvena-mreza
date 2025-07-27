@@ -6,8 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddScoped<IRelationsContext,RelationsContext>();
-builder.Services.AddScoped<IRelationsRepository,RelationsRepository>();
+builder.Services.AddScoped<IRelationsContext, RelationsContext>();
+builder.Services.AddScoped<IRelationsRepository, RelationsRepository>();
 builder.Services.AddGrpc();
 
 var app = builder.Build();

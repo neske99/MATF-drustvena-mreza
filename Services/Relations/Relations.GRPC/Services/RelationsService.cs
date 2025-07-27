@@ -17,7 +17,7 @@ public class RelationsService : RelationsProtoService.RelationsProtoServiceBase
     {
         var friends = await _relationsRepository.GetUserFriends(request.User.Id);
         var response = new GetFriendsResponse();
-        response.Friends.AddRange(friends.Where(x=>x !=null).Select(x=> new Relations.GRPC.User(){Id=x.Id}));
+        response.Friends.AddRange(friends.Where(x => x != null).Select(x => new Relations.GRPC.User() { Id = x.Id }));
         response.NumberOfFriends = response.Friends.Count;
 
         return response;
