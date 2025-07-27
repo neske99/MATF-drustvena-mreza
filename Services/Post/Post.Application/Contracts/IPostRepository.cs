@@ -14,6 +14,7 @@ namespace Post.Application.Contracts
         public Task<bool> ReplicateUser(User userToReplicate);
         public Task<IEnumerable<Post.Domain.Entities.Post>> GetAllPostsAsync();
         public Task<List<User>> GetUsers();
+        Task<IEnumerable<Post.Domain.Entities.Post>> GetPostsCreatedByUser(int userId);
 
     }
 }

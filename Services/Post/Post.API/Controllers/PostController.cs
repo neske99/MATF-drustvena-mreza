@@ -58,6 +58,13 @@ public class PostController : ControllerBase
         return Ok(_mapper.Map<IEnumerable<GetUserDTO>>(await _postRepository.GetUsers()));
     }
 
+    [HttpGet("[action]")]
+    public async Task<ActionResult> GetPostsCreatedByUser([FromQuery] int userId)
+    {
+
+        return Ok(_mapper.Map<IEnumerable<GetPostDTO>>(await _postRepository.GetPostsCreatedByUser(userId)));
+    }
+
 
     /*[HttpGet("[action]")]
     public async Task<ActionResult> TestGrpc()

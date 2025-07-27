@@ -76,6 +76,15 @@ namespace Post.Infrastructure.Repositories
             return await postContext.Users.ToListAsync();
         }
 
+    public async Task<IEnumerable<Domain.Entities.Post>> GetPostsCreatedByUser(int userId)
+    {       return await postContext.Posts.
+                Include(p => p.User).
+                Include(p => p.Comments).
+                ThenInclude(c => c.User).
+                Where(p => p.CreatedDate.AddMonths(3) > DateTime.Now && p.UserId==userId).
+                ToListAsync();
+
 
     }
+  }
 }
