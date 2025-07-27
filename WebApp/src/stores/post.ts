@@ -11,9 +11,28 @@ export const postStore = defineStore('post', () => {
   //actions
   const GetPosts = async function () {
     let userId=authStore().userId;
-    return (await axiosAuthenticated.get(`http://localhost:8080/Post/GetPostsForUser?userId=${userId}`)).data;
+    let result = (await axiosAuthenticated.get(`http://localhost:8080/Post/GetPostsForUser?userId=${userId}`)).data;
+
+    return result;
   };
 
+  const AddComment = async function (text: string, postId: number) {
+    let result = await axiosAuthenticated.post(`http://localhost:8080/Post/AddCommentToPost?postId=${postId}`, {
+      text:text,
+      userId: authStore().userId
+    });
+  }
 
-  return { getCurrentPosts, GetPosts };
+  const UploadPost = async function (newPost: string, userId: number) {
+    let result = await axiosAuthenticated.post(`http://localhost:8080/Post/CreatePostForUser?userId=${userId}`, {
+      text:newPost,
+      userId: authStore().userId,
+      picture:'picture',
+      comments:[]
+
+    });
+  }
+
+
+  return { getCurrentPosts,UploadPost,AddComment, GetPosts };
 })
