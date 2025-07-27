@@ -24,7 +24,7 @@
       </v-list>
 
       <v-text-field
-        v-model="newComment"
+        v-model.trim="newComment"
         label="Add a comment"
         outlined
         dense
@@ -54,12 +54,9 @@ export default defineComponent({
   },
   methods:{
     addComment: async function(){
-      await postStore().AddComment(this.newComment, this.id);
-
-
-
+      if(this.newComment!=='')
+        await postStore().AddComment(this.newComment, this.id);
     }
-
   }
 })
 </script>

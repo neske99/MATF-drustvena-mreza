@@ -23,12 +23,17 @@ public class RelationsService
 
     }
 
-    public List<string> GetRelationShips(int userId)
+    public List<string> GetRelationShips(int userId,List<int>userIdList)
     {
         GetRelationsWithRequest request = new GetRelationsWithRequest();
-        request.User.Id = userId;
+        var user = new User();
+        user.Id = userId;
+        request.User = user;
+
+        request.TargetUsers.AddRange(userIdList.Select(id => new User { Id = id }));
+
         var response = _grpcService.GetRelationsWith(request);
-        return response.Relations.Select(r => r.Relation_).ToList();
+        return response.Relations.Select(r=>r.ToString()).ToList();
     }
 
 

@@ -66,11 +66,10 @@ public class PostController : ControllerBase
     }
 
 
-    /*[HttpGet("[action]")]
-    public async Task<ActionResult> TestGrpc()
+    [HttpGet("[action]")]
+    public async Task<ActionResult> TestGrpc([FromQuery] int userId,[FromQuery] List<int> userIdList)
     {
-
-        return Ok();
-    }*/
+        return Ok(_relationsService.GetRelationShips(userId,userIdList));
+    }
 
 }

@@ -2,9 +2,8 @@
   <v-container fluid>
     <v-card outlined>
 
-
       <v-text-field
-        v-model="newPost"
+        v-model.trim="newPost"
         label="Upload a post"
         outlined
         dense
@@ -24,7 +23,6 @@ import { authStore } from '@/stores/auth';
 import { postStore } from '@/stores/post';
 import { defineComponent } from 'vue'
 
-
 export default defineComponent({
   name: 'PostComponent',
   props: [],
@@ -35,13 +33,11 @@ export default defineComponent({
   },
   methods:{
     uploadPost: async function(){
-      let userId= authStore().userId;
-      await postStore().UploadPost(this.newPost, userId);
-
-
-
+      if(this.newPost!==''){
+        let userId= authStore().userId;
+        await postStore().UploadPost(this.newPost, userId);
+      }
     }
-
   }
 })
 </script>
