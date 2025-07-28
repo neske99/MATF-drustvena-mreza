@@ -30,5 +30,17 @@ export const userStore = defineStore('user', () => {
     return result;
   };
 
-  return { getSearchedUsers, GetUsers, GetSearchedUsers, GetUser };
+  const GetRelation = async function (userId: number, friendId: number) {
+    return (await axiosAuthenticated.get(`http://localhost:8000/api/v1/Relations/relations/${userId}/${friendId}`)).data;
+  }
+
+  const SendFriendRequest = async function (userId: number, friendId: number) {
+    await axiosAuthenticated.put(`http://localhost:8000/api/v1/Relations/sent/${userId}/${friendId}`);
+  }
+
+  const AcceptFriendRequest = async function (userId: number, friendId: number) {
+    await axiosAuthenticated.put(`http://localhost:8000/api/v1/Relations/received/accept/${userId}/${friendId}`);
+  }
+
+  return { getSearchedUsers, GetRelation,GetUsers, GetSearchedUsers, GetUser,SendFriendRequest,AcceptFriendRequest  };
 })
