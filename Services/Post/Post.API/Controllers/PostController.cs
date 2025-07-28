@@ -28,7 +28,60 @@ public class PostController : ControllerBase
     [HttpGet("[action]")]
     public async Task<ActionResult> GetPostsForUser([FromQuery] int userId)
     {
-        return Ok(_mapper.Map<IEnumerable<GetPostDTO>>(await _postRepository.GetPostsForUser(userId,_relationsService.GetFriends(userId))));
+        var userFriends= _relationsService.GetFriends(userId);
+
+        Dictionary<int, string> userIdToRelationsDict=new Dictionary<int, string>();
+/*        for(int i=0;i<userFriends.Count;i++)
+        {
+            userIdToRelationsDict.Add(userFriends[i], userRelations[i]);
+        }*/
+
+       var result= _mapper.Map<IEnumerable<GetPostDTO>>(await _postRepository.GetPostsForUser(userId, userFriends ));
+
+       foreach (var post in result)
+        {
+            if (post.User != null)
+            {
+                if(!userIdToRelationsDict.ContainsKey(post.User.Id))
+                    userIdToRelationsDict.Add(post.User.Id,"Nesto   je");
+
+                foreach (var comment in post.Comments)
+                {
+                    if (comment.User != null )
+                    {
+                        if(!userIdToRelationsDict.ContainsKey(comment.User.Id))
+                            userIdToRelationsDict.Add(comment.User.Id, "Nesto    je ");
+                    }
+                }
+            }
+
+        }
+
+        var userIdList = userIdToRelationsDict.Keys.ToList();
+        var userRelations = _relationsService.GetRelationShips(userId, userIdList);
+        for(int i=0;i<userIdList.Count;i++)
+        {
+            userIdToRelationsDict[userIdList[i]] = userRelations[i];
+        }
+
+       foreach (var post in result)
+            {
+                if (post.User != null)
+                {
+                    post.User.Relation = userIdToRelationsDict[post.User.Id];
+
+                    foreach (var comment in post.Comments)
+                    {
+                        if (comment.User != null)
+                        {
+                            comment.User.Relation = userIdToRelationsDict[comment.User.Id];
+                        }
+                    }
+                }
+
+            }
+
+        return Ok(_mapper.Map<IEnumerable<GetPostDTO>>(result));
     }
 
     [HttpPost("[action]")]

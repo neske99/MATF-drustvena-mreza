@@ -2,8 +2,10 @@
   <v-container fluid>
     <v-card outlined>
 
-      <v-card-title>
-        {{ username }}
+      <v-card-title >
+        <router-link :to="'/userdetail/' + username">
+          {{ username }}
+        </router-link>
       </v-card-title>
 
       <v-card-text>
@@ -16,7 +18,7 @@
       <v-list dense>
         <v-list-item v-for="comment in comments" :key="comment.id">
             <v-list-item-title>{{ comment.text }}</v-list-item-title>
-            <v-list-item-subtitle v-if="comment.user">{{ comment.user.username }}</v-list-item-subtitle>
+            <v-list-item-subtitle v-if="comment.user"><router-link :to="'/userdetail/'+ comment.user.username">{{ comment.user.username }} </router-link></v-list-item-subtitle>
         </v-list-item>
         <v-list-item v-if="comments.length === 0">
             <v-list-item-title class="text--disabled">No comments yet.</v-list-item-title>
