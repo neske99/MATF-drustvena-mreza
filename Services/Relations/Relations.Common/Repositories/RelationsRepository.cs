@@ -107,6 +107,7 @@ namespace Relations.Common.Repositories
                     .Where((User sourceUser) => sourceUser.Id == sourceUserId)
                     .AndWhere((User targetUser) => targetUser.Id == targetUserId)
                     .Create("(sourceUser)-[:BLOCKED]->(targetUser)")
+                    .Create("(targetUser)-[:BLOCKED_BY]->(sourceUser)")
                     .ExecuteWithoutResultsAsync();
 
             return true;
@@ -117,6 +118,12 @@ namespace Relations.Common.Repositories
             await _context.DatabaseClient.ConnectAsync();
             await _context.DatabaseClient.Cypher
                     .Match("(sourceUser:User)-[r:BLOCKED]->(targetUser:User)")
+                    .Where((User sourceUser) => sourceUser.Id == sourceUserId)
+                    .AndWhere((User targetUser) => targetUser.Id == targetUserId)
+                    .Delete("r")
+                    .ExecuteWithoutResultsAsync();
+            await _context.DatabaseClient.Cypher
+                    .Match("(targetUser:User)-[r:BLOCKED_BY]->(sourceUser:User)")
                     .Where((User sourceUser) => sourceUser.Id == sourceUserId)
                     .AndWhere((User targetUser) => targetUser.Id == targetUserId)
                     .Delete("r")
@@ -143,6 +150,7 @@ namespace Relations.Common.Repositories
                     .Where((User sourceUser) => sourceUser.Id == sourceUserId)
                     .AndWhere((User targetUser) => targetUser.Id == targetUserId)
                     .Merge("(sourceUser)-[:REQUESTED_FRIENDSHIP_WITH]->(targetUser)")
+                    .Merge("(targetUser)-[:RECEIVED_FRIENDSHIP_REQUEST_FROM]->(sourceUser)")
                     .ExecuteWithoutResultsAsync();
 
             return true;
@@ -157,7 +165,12 @@ namespace Relations.Common.Repositories
                     .AndWhere((User targetUser) => targetUser.Id == targetUserId)
                     .Delete("r")
                     .ExecuteWithoutResultsAsync();
-
+            await _context.DatabaseClient.Cypher
+                    .Match("(targetUser)-[r:RECEIVED_FRIENDSHIP_REQUEST_FROM]->(sourceUser)")
+                    .Where((User sourceUser) => sourceUser.Id == sourceUserId)
+                    .AndWhere((User targetUser) => targetUser.Id == targetUserId)
+                    .Delete("r")
+                    .ExecuteWithoutResultsAsync();
             return true;
         }
 
@@ -175,7 +188,7 @@ namespace Relations.Common.Repositories
         {
             await _context.DatabaseClient.ConnectAsync();
             await _context.DatabaseClient.Cypher
-                    .Match("(sourceUser:User)<-[r:REQUESTED_FRIENDSHIP_WITH]-(targetUser:User)")
+                    .Match("(sourceUser:User)-[r]-(targetUser:User)")
                     .Where((User sourceUser) => sourceUser.Id == sourceUserId)
                     .AndWhere((User targetUser) => targetUser.Id == targetUserId)
                     .Merge("(sourceUser)-[:FRIEND_WITH]->(targetUser)")
@@ -190,7 +203,7 @@ namespace Relations.Common.Repositories
         {
             await _context.DatabaseClient.ConnectAsync();
             await _context.DatabaseClient.Cypher
-                    .Match("(sourceUser:User)<-[r:REQUESTED_FRIENDSHIP_WITH]-(targetUser:User)")
+                    .Match("(sourceUser:User)-[r]-(targetUser:User)")
                     .Where((User sourceUser) => sourceUser.Id == sourceUserId)
                     .AndWhere((User targetUser) => targetUser.Id == targetUserId)
                     .Delete("r")
