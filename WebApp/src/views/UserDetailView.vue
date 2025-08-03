@@ -1,6 +1,6 @@
 <template>
-  <v-btn v-if="relation==='NONE'" @click="sendRequest">{{relation}}</v-btn>
-  <v-btn v-if="relation==='REQUESTED_FRIENDSHIP_WITH'" @click="acceptRequest">{{relation}}</v-btn>
+  <v-btn v-if="relation==='NONE' && !friendshipButtonClicked" @click="sendRequest">Send friend request</v-btn>
+  <v-btn v-if="relation==='RECEIVED_FRIENDSHIP_REQUEST_FROM' && !friendshipButtonClicked" @click="acceptRequest">Accept friend request</v-btn>
   <h1>User Detail Page</h1>
   <h1>Username: {{ userDetail.username }}</h1>
   <h1>Firest name: {{ userDetail.firstName }}</h1>
@@ -27,7 +27,8 @@ export default defineComponent({
   data() {
     return {
       userDetail: {} as UserDetailDTO,
-      relation:''
+      relation:'',
+      friendshipButtonClicked:false
     };
   },
   async mounted() {
@@ -42,11 +43,13 @@ export default defineComponent({
       let userId=authStore().userId;
       let userstore = userStore();
       await userstore.SendFriendRequest(userId, this.userDetail.id);
+      this.friendshipButtonClicked=true;
     },
     async acceptRequest() {
       let userId=authStore().userId;
       let userstore = userStore();
       await userstore.AcceptFriendRequest(userId, this.userDetail.id);
+      this.friendshipButtonClicked=true;
     }
   },
 });

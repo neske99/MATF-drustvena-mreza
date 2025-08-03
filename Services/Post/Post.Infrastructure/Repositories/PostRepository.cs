@@ -50,12 +50,14 @@ namespace Post.Infrastructure.Repositories
 
         public async Task<IEnumerable<Domain.Entities.Post>> GetPostsForUser(int userId, List<int> friendIdList)
         {
-            return await postContext.Posts.
+            var result = await postContext.Posts.
                 Include(p => p.User).
                 Include(p => p.Comments).
                 ThenInclude(c => c.User).
                 Where(p => p.CreatedDate.AddMonths(3) > DateTime.Now && friendIdList.Contains(p.UserId)).
                 ToListAsync();
+
+            return result;
         }
 
         public async Task<bool> ReplicateUser(User userToReplicate)
@@ -83,7 +85,6 @@ namespace Post.Infrastructure.Repositories
                 ThenInclude(c => c.User).
                 Where(p => p.CreatedDate.AddMonths(3) > DateTime.Now && p.UserId==userId).
                 ToListAsync();
-
 
     }
   }
