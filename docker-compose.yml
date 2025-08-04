@@ -11,7 +11,7 @@ services:
 
   mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
-  
+
   post.api:
     image: ${DOCKER_REGISTRY-}postapi
     build:
@@ -34,6 +34,13 @@ services:
     build:
       context: .
       dockerfile: Services/Relations/Relations.GRPC/Dockerfile
+
+
+  chat.api:
+    image: ${DOCKER_REGISTRY-}chatapi
+    build:
+      context: .
+      dockerfile: Services/Chat/Chat.API/Dockerfile
 
 volumes:
     neo4j_data:

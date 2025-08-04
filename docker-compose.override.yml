@@ -89,3 +89,12 @@ services:
     ports:
       - "8003:8080"
 
+
+  chat.api:
+    container_name: chat.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+    ports:
+      - "8095:8080"
+
