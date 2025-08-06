@@ -20,6 +20,9 @@
 import { defineComponent } from 'vue'
 import MessageComponent from './Chat/MessageComponent.vue';
 import { chatStore } from '../stores/chat.ts'
+import { startSignalRConnection,getSignalRConnection,stopSignalRConnection} from '../plugin/signalr.ts'
+import type { HubConnection } from '@microsoft/signalr';
+import { authStore } from '@/stores/auth.ts';
 
 export default defineComponent({
   name: 'TheRightSidebar',
@@ -29,15 +32,20 @@ export default defineComponent({
   data() {
     return {
       messages: chatStore().getCurrentMessages,
-      messageToSend: ""
+      messageToSend: "",
+      connection:null as HubConnection | null
     }
   },
-  created() {
-
+  async created() {
+    this.connection =  await startSignalRConnection();
+    this.connection.on("ReceiveMessage", (username: string, message: string) => {
+      this.messages.push({ message:message, isSender: username === authStore().username });
+    });
   },
   methods: {
     onSend() {
       console.log(this.messageToSend);
+      this.connection?.invoke("SendMessage",authStore().username,this.messageToSend)
       this.messageToSend = "";
     }
   }

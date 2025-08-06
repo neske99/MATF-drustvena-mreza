@@ -1,20 +1,29 @@
-import { HubConnectionBuilder } from '@microsoft/signalr';
-import type { App } from 'vue';
+import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 
-export default {
-  install:(app:App, options?: any) => {
-    const connection = new HubConnectionBuilder()
-    .withUrl("http://localhost:8095/chathub")
-    .withAutomaticReconnect()
-    .build();
+let connection: HubConnection | null = null;
 
-    connection.on("ReceiveMessage", (user, message) => {
-      console.log(`${user}: ${message}`);
-    });
+export async function startSignalRConnection(){
+        if(!connection) {
+          connection = new HubConnectionBuilder()
+            .withUrl('http://localhost:8095/chathub')
+            .withAutomaticReconnect()
+            .build();
+          await connection.start();
+        }
 
-    connection.start().then(() => {
-      console.log("Connected to SignalR hub.");
-      connection.invoke("SendMessage", "TerminalUser", "Hello from terminal!");
-    });
+        return connection;
+}
+
+export function getSignalRConnection(): HubConnection | null {
+    if (!connection) {
+      return null;
+   }
+    return connection;
+}
+
+export function stopSignalRConnection() {
+  if(connection) {
+    connection.stop();
+    connection = null;
   }
 }

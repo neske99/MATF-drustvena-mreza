@@ -23,6 +23,8 @@
 <script lang='ts'>
 import { defineComponent } from 'vue'
 import { chatStore } from '../stores/chat.ts'
+import type { HubConnection } from '@microsoft/signalr';
+import { startSignalRConnection } from '@/plugin/signalr.ts';
 
 
 export default defineComponent({
@@ -30,8 +32,12 @@ export default defineComponent({
   data() {
     return {
       friends: ["Mika", "Zika", "Pera"],
-      searchedUser: ""
+      searchedUser: "",
+      connection:null as HubConnection | null
     }
+  },
+  created: async function(){
+    this.connection = await startSignalRConnection();
   },
   computed: {
     filteredFriends() {
