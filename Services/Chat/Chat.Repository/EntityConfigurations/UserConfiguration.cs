@@ -7,6 +7,10 @@ namespace Post.Infrastructure.Persistance.EntityConfigurations
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
+            builder.ToTable("User");
+            builder.HasKey(u => u.Id);
+
+
             /*
             builder.ToTable("Comments");
             builder.HasKey(x => x.Id);

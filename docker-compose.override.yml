@@ -95,6 +95,18 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
+      - "ConnectionStrings:chatdb=Server=chatdb;Database=ChatDb;User Id=sa;Password=MATF12345678rs2;TrustServerCertificate=True;"
+      - "EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672"
     ports:
       - "8095:8080"
+    depends_on:
+      - chatdb
 
+  chatdb:
+    container_name: chatdb
+    restart: always
+    ports:
+      - "8096:1433"
+    environment:
+      - SA_PASSWORD=MATF12345678rs2
+      - ACCEPT_EULA=Y

@@ -13,6 +13,9 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Services/Chat/Chat.API/Chat.API.csproj", "Services/Chat/Chat.API/"]
+COPY ["Services/Chat/Chat.Repository/Chat.Repository.csproj", "Services/Chat/Chat.Repository/"]
+COPY ["Services/Chat/Chat.Service/Chat.Service.csproj", "Services/Chat/Chat.Service/"]
+COPY ["Services/Chat/Chat.Model/Chat.Model.csproj", "Services/Chat/Chat.Model/"]
 RUN dotnet restore "./Services/Chat/Chat.API/Chat.API.csproj"
 COPY . .
 WORKDIR "/src/Services/Chat/Chat.API"

@@ -8,7 +8,18 @@ namespace Post.Infrastructure.Persistance.EntityConfigurations
     {
         public void Configure(EntityTypeBuilder<ChatUser> builder)
         {
+
+            builder.ToTable("ChatUser");
+            builder.HasKey(cu => cu.Id);
+            builder.Property(cu => cu.Id).UseHiLo("postseqcomment");
+
+
+            builder.HasOne<ChatGroup>().WithMany(cu=>cu.ChatUsers).HasForeignKey(cu => cu.ChatGroupId);
+            builder.HasOne(cu=>cu.User).WithMany().HasForeignKey(cu=>cu.UserId);
+
             /*
+
+
             builder.ToTable("Comments");
             builder.HasKey(x => x.Id);
             builder.Property(c => c.Id).UseHiLo("postseqcomment");

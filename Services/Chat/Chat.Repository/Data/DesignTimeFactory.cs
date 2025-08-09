@@ -8,7 +8,7 @@ namespace Chat.Repository.Data
         public ChatContext CreateDbContext(string[] args)
         {
             var builder = new DbContextOptionsBuilder<ChatContext>();
-            //builder.UseSqlServer("Server=localhost,8091;Database=PostDb;User Id=sa;Password=MATF12345678rs2;TrustServerCertificate=True;Encrypt=False;");
+            builder.UseSqlServer("Server=localhost,8096;Database=ChatDb;User Id=sa;Password=MATF12345678rs2;TrustServerCertificate=True;Encrypt=False;");
             return new ChatContext(builder.Options);
         }
     }

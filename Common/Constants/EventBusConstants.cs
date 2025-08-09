@@ -10,5 +10,6 @@ namespace EventBusMessages.Constants
     {
         public const string UserCreatedQueue = "usercreated-queue";
         public const string UserCreatedReplicationToRelationServiceQueue = "usercreated-repl-queue";
+        public const string UserCreatedReplicationToChatServiceQueue = "usercreated-chat-queue";
     }
 }

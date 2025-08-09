@@ -42,6 +42,11 @@ services:
       context: .
       dockerfile: Services/Chat/Chat.API/Dockerfile
 
+  chatdb:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+
+
+
 volumes:
     neo4j_data:
 

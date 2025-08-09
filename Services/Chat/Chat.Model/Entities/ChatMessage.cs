@@ -1,3 +1,5 @@
+using Services.Chat.Chat.Model.Entities.Common;
+
 namespace Services.Chat.Chat.Model.Entities;
 public class ChatMessage:EntityBase
 {
