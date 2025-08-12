@@ -1,5 +1,8 @@
-import { computed, reactive } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { defineStore } from 'pinia'
+import axiosAuthenticated from '@/plugin/axios';
+import { authStore } from './auth';
+import type { ChatGroupDTO } from '@/dtos/chat/chatGroupDTO';
 
 export const chatStore = defineStore('chat', () => {
   // state
@@ -12,16 +15,22 @@ export const chatStore = defineStore('chat', () => {
   //getters
   const getCurrentMessages = computed(() => currentChatMessages)
   //actions
-  const switchUserChat = function () {
-    currentChatMessages.splice(0, currentChatMessages.length,
-      ...[{ message: "Dobar dan", isSender: true },
-      { message: "Dobro jutro", isSender: false },
-      { message: "Da li moze?", isSender: true }, { message: "Moze", isSender: false },
-      { message: "##$%!!@#$%^^&*!", isSender: true }])
+  const switchUserChat = async function (chatGroup: ChatGroupDTO) {
+    let messages=(await axiosAuthenticated.get(`http://localhost:8095/api/v1/Chat/MessagesByChatGroup?userId=${authStore().userId}&chatGroupId=${chatGroup.chatId}`)).data;
+    currentChatMessages.splice(0);
+    currentChatMessages.splice(0, messages.length,
+      ...messages);
+      currentChatGroupId.value = chatGroup.chatId;
   }
   const refreshChat = function () {
     //TODO
   }
+  let currentChatGroupId= ref(0);
 
-  return { getCurrentMessages, switchUserChat, refreshChat }
+  const getChatGroupsForUser=async function (){
+    return (await axiosAuthenticated.get("http://localhost:8095/api/v1/Chat/ChatGroupForUser?userId=" + authStore().userId)).data;
+
+  }
+
+  return {currentChatGroupId, getCurrentMessages,getChatGroupsForUser, switchUserChat, refreshChat }
 })

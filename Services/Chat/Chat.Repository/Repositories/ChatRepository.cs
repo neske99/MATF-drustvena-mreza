@@ -1,3 +1,4 @@
+using Chat.Model.DTOs;
 using Chat.Repository.Data;
 using Microsoft.EntityFrameworkCore;
 using Services.Chat.Chat.Model.Entities;
@@ -19,19 +20,32 @@ namespace Chat.Repository.Repositories.Contracts
         .ToListAsync();
     }
 
-    public async Task<List<ChatGroup>> GetChatGroupForUserAsync(int userId)
+    public async Task<List<ChatGroupDTO>> GetChatGroupForUserAsync(int userId)
     {
       return await _chatContext.ChatGroups
         .Include(cg => cg.ChatUsers)
         .ThenInclude(cu => cu.User)
         .Where(cg => cg.ChatUsers.Any(cu => cu.UserId == userId))
+        .Select(cg=> new ChatGroupDTO{
+          ChatId = cg.Id,
+          UserId = cg.ChatUsers.FirstOrDefault(cu=> cu.UserId == userId).UserId ,
+          Username = cg.ChatUsers.FirstOrDefault(cu => cu.UserId != userId).User.Username ?? string.Empty
+        })
         .ToListAsync();
     }
 
-    public async Task<List<ChatMessage>> GetMessagesForGroupAsync(int userId, int chatGroupId)
+    public async Task<List<ChatMessageDTO>> GetMessagesForGroupAsync(int userId, int chatGroupId)
     {
       return await _chatContext.ChatMessages
+        //.Include(cm => cm.UserId)
         .Where(cm => cm.ChatGroupId == chatGroupId)
+        .OrderByDescending(cm => cm.CreatedDate)
+        .Take(100)
+        .Select(cm => new ChatMessageDTO
+        {
+          IsSender = cm.UserId == userId,
+          Message = cm.Text
+        })
         .ToListAsync();
     }
 
@@ -45,12 +59,49 @@ namespace Chat.Repository.Repositories.Contracts
 
     public async Task<bool> ReplicateUser(User userToReplicate)
     {
-          string toExecute = "SET IDENTITY_INSERT [dbo].[User] ON " +
-                $"INSERT INTO [dbo].[User] (Id,Username,CreatedDate) VALUES ({userToReplicate.Id},'{userToReplicate.Username}','{userToReplicate.CreatedDate}')" +
-                " SET IDENTITY_INSERT [dbo].[User] OFF";
-            var result = await _chatContext.Database.ExecuteSqlRawAsync(toExecute);
+      string toExecute = "SET IDENTITY_INSERT [dbo].[User] ON " +
+            $"INSERT INTO [dbo].[User] (Id,Username,CreatedDate) VALUES ({userToReplicate.Id},'{userToReplicate.Username}','{userToReplicate.CreatedDate}')" +
+            " SET IDENTITY_INSERT [dbo].[User] OFF";
+      var result = await _chatContext.Database.ExecuteSqlRawAsync(toExecute);
 
-            return result > 0;
+      return result > 0;
+    }
+
+    public async Task<bool> CreateMessageForChatGroupAsync(int userId, int chatGroupId, string message)
+    {
+      var newMessage = new ChatMessage
+      {
+        UserId = userId,
+        ChatGroupId = chatGroupId,
+        CreatedDate = DateTime.UtcNow,
+        Text = message
+      };
+      _chatContext.ChatMessages.Add(newMessage);
+      var result = await _chatContext.SaveChangesAsync();
+      return result > 0;
+    }
+
+    public async Task<ChatGroup> CreateChatGroupAsync(int userAId, int userBId)
+    {
+      var chatGroup = new ChatGroup
+      {
+        CreatedDate = DateTime.UtcNow,
+        ChatUsers = new List<ChatUser>
+        {
+          new ChatUser { UserId = userAId },
+          new ChatUser { UserId = userBId }
+        }
+      };
+
+      _chatContext.ChatGroups.Add(chatGroup);
+      var result = await _chatContext.SaveChangesAsync();
+
+      return await _chatContext.ChatGroups
+        .Include(cg => cg.ChatUsers)
+        .ThenInclude(cu => cu.User).
+        FirstOrDefaultAsync(cg => cg.Id==chatGroup.Id );
+;
+
     }
   }
 }

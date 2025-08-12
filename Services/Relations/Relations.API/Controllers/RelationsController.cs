@@ -1,6 +1,9 @@
 ﻿using Relations.Common.Entities;
 using Relations.Common.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using MassTransit;
+using EventBusMessages.Events;
 
 namespace Relations.API.Controllers
 {
@@ -9,12 +12,14 @@ namespace Relations.API.Controllers
     public class RelationsController : ControllerBase
     {
         readonly IRelationsRepository _repository;
-        public RelationsController(IRelationsRepository repository)
-        {
-            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        }
+        private readonly IPublishEndpoint _publishEndpoint;
+    public RelationsController(IRelationsRepository repository, IPublishEndpoint publishEndpoint)
+    {
+      _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+      _publishEndpoint = publishEndpoint ?? throw new ArgumentNullException(nameof(publishEndpoint));
+    }
 
-        [HttpGet("relations/{sourceUserId}/{targetUserId}")]
+    [HttpGet("relations/{sourceUserId}/{targetUserId}")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<User>>> GetRelation(int sourceUserId, int targetUserId)
         {
@@ -144,8 +149,15 @@ namespace Relations.API.Controllers
         public async Task<ActionResult<User>> AcceptFriendRequest(int sourceUserId, int targetUserId)
         {
             var result = await _repository.AcceptFriendRequest(sourceUserId, targetUserId);
+
             if (!result)
                 return NotFound(null);
+
+            await _publishEndpoint.Publish(new RelationCreatedEvent
+            {
+                UserAId = sourceUserId,
+                UserBId = targetUserId
+            });
             return Ok();
         }
 

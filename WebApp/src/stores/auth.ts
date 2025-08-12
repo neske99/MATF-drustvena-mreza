@@ -2,6 +2,7 @@ import { ref, computed, reactive } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import router from '@/router'
+import { startSignalRConnection, stopSignalRConnection } from '@/plugin/signalr';
 
 export const authStore = defineStore('auth', () => {
   // state
@@ -37,6 +38,8 @@ export const authStore = defineStore('auth', () => {
       userId.value= response.data.userId;
       isAuthenticated.value = true;
 
+       await startSignalRConnection();
+
       console.log(isAuthenticated);
       router.push('/home')
     } catch (err) {
@@ -64,6 +67,8 @@ export const authStore = defineStore('auth', () => {
         });
       isAuthenticated.value = false;
       router.push('/auth/login')
+
+      await stopSignalRConnection();
     } catch (err) {
       //error 401
       if (axios.isAxiosError(err))
@@ -100,3 +105,5 @@ export const authStore = defineStore('auth', () => {
   {
     persist: true
   });
+
+

@@ -1,3 +1,4 @@
+#!/bin/bash
 
 REPOSITORY_PATH=./IdentityServer.csproj
 

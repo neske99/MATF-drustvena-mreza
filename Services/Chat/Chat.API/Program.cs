@@ -5,6 +5,9 @@ using Chat.Service;
 using EventBusMessages.Constants;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,16 +16,61 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR();
 builder.Services.RegisterChatServices(builder.Configuration);
 
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var secretKey = jwtSettings.GetValue<string>("secretKey");
+
+builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+
+                        ValidIssuer = jwtSettings.GetSection("validIssuer").Value,
+                        ValidAudience = jwtSettings.GetSection("validAudience").Value,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+                    };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+            // Check if the request is for the SignalR hubs
+                {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+
+                        if (!string.IsNullOrEmpty(accessToken) &&
+                            path.StartsWithSegments("/chathub"))  // <-- your hub route here
+        {
+            context.Token = accessToken;
+        }
+
+        return Task.CompletedTask;
+    }
+};
+
+
+                });
+
 builder.Services.AddControllers();
 builder.Services.AddMassTransit(config =>
 {
     config.AddConsumer<UserCreatedConsumer>();
+    config.AddConsumer<RelationCreatedConsumer>();
     config.UsingRabbitMq((ctx, cfg) =>
     {
         cfg.Host(builder.Configuration.GetValue<string>("EventBusSettings:HostAddress"));
         cfg.ReceiveEndpoint(EventBusConstants.UserCreatedReplicationToChatServiceQueue, c =>
         {
             c.ConfigureConsumer<UserCreatedConsumer>(ctx);
+            c.ConfigureConsumer<RelationCreatedConsumer>(ctx);
         });
     });
 });
@@ -54,6 +102,7 @@ if (app.Environment.IsDevelopment())
 
 //app.UseHttpsRedirection();
 
+//app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

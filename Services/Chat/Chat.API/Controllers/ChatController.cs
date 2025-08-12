@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Chat.API.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/v1/[controller]")]
 public class ChatController : ControllerBase
 {
   private readonly IChatService _chatService;
@@ -20,8 +20,8 @@ public class ChatController : ControllerBase
   }
 
 
-  [HttpGet("ChatGroupForGroup")]
-  public async Task<ActionResult> GetUserForGroupAsync([FromQuery] int userId, [FromQuery] int chatGroupId)
+  [HttpGet("ChatGroupForUser")]
+  public async Task<ActionResult> GetChatGroupForUser([FromQuery] int userId )
   {
     return Ok(await _chatService.GetChatGroupForGroupAsync(userId));
   }

@@ -37,15 +37,23 @@ export default defineComponent({
     }
   },
   async created() {
-    this.connection =  await startSignalRConnection();
-    this.connection.on("ReceiveMessage", (username: string, message: string) => {
-      this.messages.push({ message:message, isSender: username === authStore().username });
-    });
+    this.connection =  await getSignalRConnection();
+    if(this.connection) {
+   /*   this.connection.on("ReceiveMessage", (username: string, message: string) => {
+        //this.messages.push({ message:message, isSender: username === authStore().username });
+      });*/
+      this.connection.on("ReceiveMessageReal", (userId: number, message: string) => {
+        this.messages.push({ message:message, isSender: userId === authStore().userId });
+      });
+    }
   },
   methods: {
     onSend() {
       console.log(this.messageToSend);
-      this.connection?.invoke("SendMessage",authStore().username,this.messageToSend)
+      //this.connection?.invoke("SendMessage",authStore().username,this.messageToSend)
+
+      console.log(chatStore().currentChatGroupId);
+      this.connection?.invoke("SendMessageToGroup",chatStore().currentChatGroupId,this.messageToSend);
       this.messageToSend = "";
     }
   }
