@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import axiosAuthenticated from '@/plugin/axios';
 import type { UserPreviewDTO } from '@/dtos/user/userPreviewDTO';
 import type { UserDetailDTO } from '@/dtos/user/userDetailDTO';
+import { authStore } from './auth';
 
 export const userStore = defineStore('user', () => {
   // state
@@ -20,7 +21,7 @@ export const userStore = defineStore('user', () => {
   const GetSearchedUsers = async function (username: string) {
     let result: [UserPreviewDTO];
 
-    result = (await axiosAuthenticated.get(`http://localhost:8094/api/v1/User/GetSearchedUsers?username=${username}`)).data;
+    result = (await axiosAuthenticated.get(`http://localhost:8094/api/v1/User/GetSearchedUsers?userId=${authStore().userId}&username=${username}`)).data;
     return result;
   };
 

@@ -1,4 +1,5 @@
 ﻿using IdentityServer.Entities;
+using IdentityServer.GrpcServices;
 using IdentityService.Data;
 using IdentityService.Entities;
 using IdentityService.Services;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Relations.GRPC;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -28,7 +30,7 @@ namespace IdentityService.Extensions
 
         public static IServiceCollection ConfigureIdentity(this IServiceCollection services)
         {
-            services.AddIdentity<User, IntRole>(options =>
+            services.AddIdentity<IdentityServer.Entities.User, IntRole>(options =>
             {
                 options.Password.RequireDigit = true;
                 options.Password.RequireLowercase = false;
@@ -46,7 +48,7 @@ namespace IdentityService.Extensions
             return services;
         }
 
-        public static IServiceCollection ConfigureExtraStuff(this IServiceCollection services)
+        public static IServiceCollection ConfigureExtraStuff(this IServiceCollection services,IConfiguration configuration)
         {
 
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
@@ -60,6 +62,12 @@ namespace IdentityService.Extensions
                     builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
                 });
             });
+            services.AddGrpcClient<RelationsProtoService.RelationsProtoServiceClient>(o =>
+            {
+                o.Address = new Uri(configuration.GetValue<string>("GrpcSettings:RelationsUrl"));
+            });
+
+            services.AddScoped<RelationsService>();
 
             return services;
         }

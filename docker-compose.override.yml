@@ -5,6 +5,7 @@ services:
       - ASPNETCORE_HTTP_PORTS=8080
       - "ConnectionStrings:IdentityConnectionString=Server=identitydb;Database=IdentityDb;User Id=sa;Password=MATF12345678rs2;TrustServerCertificate=True;"
       - "EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672"
+      - "GrpcSettings:RelationsUrl=http://relations.grpc:8080"
     ports:
       - "8094:8080"
     depends_on:

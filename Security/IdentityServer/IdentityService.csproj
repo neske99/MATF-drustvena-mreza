@@ -28,7 +28,18 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="Grpc" Version="2.46.6" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.67.0" />
+    <PackageReference Include="Grpc.Core" Version="2.46.6" />
   </ItemGroup>
+
+  <ItemGroup>
+        <Protobuf Include="..\..\Services\Relations\Relations.GRPC\Protos\relations.proto" GrpcServices="Client" OutputDir="GeneratedGrpc">
+            <Link>Protos\relations.proto</Link>
+        </Protobuf>
+    </ItemGroup>
+
+
 
   <ItemGroup>
     <ProjectReference Include="..\..\Common\EventBusMessages.csproj" />

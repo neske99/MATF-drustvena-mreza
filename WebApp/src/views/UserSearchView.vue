@@ -4,7 +4,7 @@
   </h1>
   <v-container>
     <userCardComponent v-for="x in currentSearchedUsers" :text="x.username" :firstName="x.firstName"
-      :lastName="x.lastName" :userId="x.id">
+      :lastName="x.lastName" :userId="x.id" :relation="x.relation">
     </userCardComponent>
 
 
@@ -54,6 +54,7 @@ export default defineComponent({
 
       self.currentSearchedUsers =
         await userstore.GetSearchedUsers(newValue);
+        console.log(self.currentSearchedUsers);
     }
   }
 });
