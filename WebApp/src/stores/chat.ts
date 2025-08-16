@@ -3,15 +3,12 @@ import { defineStore } from 'pinia'
 import axiosAuthenticated from '@/plugin/axios';
 import { authStore } from './auth';
 import type { ChatGroupDTO } from '@/dtos/chat/chatGroupDTO';
+import type { ChatMessageDTO } from '@/dtos/chat/chatMessageDTO';
 
 export const chatStore = defineStore('chat', () => {
   // state
-  const currentChatMessages = reactive([{ message: "Dobar dan", isSender: false },
-  { message: "Dobar dan", isSender: true },
-  { message: "Da li znate da ste nepropisno parkirani?", isSender: false },
-  { message: "Znamo znamo :)", isSender: true },
-  { message: "I?!", isSender: false },
-  { message: "Sta i?!!!", isSender: true }]);
+  const currentChatMessages = reactive([] as ChatMessageDTO[]);
+  let currentChatGroups = reactive([] as ChatGroupDTO[]);
   //getters
   const getCurrentMessages = computed(() => currentChatMessages)
   //actions
@@ -28,9 +25,10 @@ export const chatStore = defineStore('chat', () => {
   let currentChatGroupId= ref(0);
 
   const getChatGroupsForUser=async function (){
-    return (await axiosAuthenticated.get("http://localhost:8095/api/v1/Chat/ChatGroupForUser?userId=" + authStore().userId)).data;
+    currentChatGroups.splice(0,currentChatGroups.length,...(await axiosAuthenticated.get("http://localhost:8095/api/v1/Chat/ChatGroupForUser?userId=" + authStore().userId)).data);  ;
+    return currentChatGroups;
 
   }
 
-  return {currentChatGroupId, getCurrentMessages,getChatGroupsForUser, switchUserChat, refreshChat }
+  return {currentChatGroupId, getCurrentMessages,currentChatGroups,getChatGroupsForUser, switchUserChat, refreshChat }
 })

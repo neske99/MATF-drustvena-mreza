@@ -10,7 +10,7 @@
       <v-card-actions>
         <v-text-field placeholder="Type Message" v-model="messageToSend">
         </v-text-field>
-        <v-btn v-on:click="onSend">Send</v-btn>
+        <v-btn v-on:click="onSend" :disabled="isSendMessageDisabled">Send</v-btn>
       </v-card-actions>
     </template>
   </v-navigation-drawer>
@@ -33,7 +33,7 @@ export default defineComponent({
     return {
       messages: chatStore().getCurrentMessages,
       messageToSend: "",
-      connection:null as HubConnection | null
+      connection:null as HubConnection | null,
     }
   },
   async created() {
@@ -42,8 +42,19 @@ export default defineComponent({
    /*   this.connection.on("ReceiveMessage", (username: string, message: string) => {
         //this.messages.push({ message:message, isSender: username === authStore().username });
       });*/
-      this.connection.on("ReceiveMessageReal", (userId: number, message: string) => {
-        this.messages.push({ message:message, isSender: userId === authStore().userId });
+      this.connection.on("ReceiveMessageReal", (userId: number, message: string,chatGroupId:number) => {
+        if(chatStore().currentChatGroupId === chatGroupId) {
+          this.messages.push({ message:message, isSender: userId === authStore().userId });
+        }
+        let chGroup = chatStore().currentChatGroups.find(x => x.chatId === chatGroupId)!;
+        chGroup.hasNewMessages = userId !== authStore().userId;
+        if(chGroup.hasNewMessages){
+          let index=chatStore().currentChatGroups.indexOf(chGroup);
+          chatStore().currentChatGroups.splice(index,1);
+          chatStore().currentChatGroups.push(chGroup);
+        }
+
+
       });
     }
   },
@@ -52,9 +63,14 @@ export default defineComponent({
       console.log(this.messageToSend);
       //this.connection?.invoke("SendMessage",authStore().username,this.messageToSend)
 
-      console.log(chatStore().currentChatGroupId);
       this.connection?.invoke("SendMessageToGroup",chatStore().currentChatGroupId,this.messageToSend);
       this.messageToSend = "";
+
+    }
+  },
+  computed:{
+    isSendMessageDisabled: function(){
+      return chatStore().currentChatGroupId === 0 ;
     }
   }
 })

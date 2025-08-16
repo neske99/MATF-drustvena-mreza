@@ -3,8 +3,8 @@
 
     <template v-slot:append>
       <v-list class="flex-grow-1">
-        <v-list-item v-for="friend in filteredFriends" :key="friend.chatId" v-on:click="openChatWithFriend(friend)">
-          <v-list-item-title>{{ friend.username }}</v-list-item-title>
+        <v-list-item v-for="friend in filteredFriends" :key="friend.chatId" v-on:click="openChatWithFriend(friend)" :style="friend.chatId === currentChatGroupId ? 'background-color: #aef2e0;' : ''">
+          <v-list-item-title :style="{fontWeight: friend.hasNewMessages ? 'bold' : 'normal' }"> {{ friend.username }} </v-list-item-title>
         </v-list-item>
 
       </v-list>
@@ -32,20 +32,20 @@ export default defineComponent({
   name: 'TheLeftNavbar',
   data() {
     return {
-      friends: [] as ChatGroupDTO[],
       searchedUser: "",
       connection:null as HubConnection | null
     }
   },
   created: async function(){
     let self=this;
-    this.friends= await chatStore().getChatGroupsForUser();
 
+    await chatStore().getChatGroupsForUser();
+    console.log(self.friends);
 
     this.connection =  await getSignalRConnection();
     if(this.connection) {
       this.connection.on("ReceiveMessage", (chatGroupId: number, userId: number,username:string) => {
-        self.friends.push({username:username,chatId:chatGroupId,userId:userId});
+        self.friends.push({username:username,chatId:chatGroupId,userId:userId, hasNewMessages:true});
         self.connection?.invoke("RegisterToGroup",chatGroupId);
 
       });
@@ -54,11 +54,18 @@ export default defineComponent({
   computed: {
     filteredFriends() {
       return this.friends.filter(x => x.username.toLowerCase().includes(this.searchedUser.toLowerCase()));
+    },
+    friends(){
+      return chatStore().currentChatGroups;
+    },
+    currentChatGroupId() {
+      return chatStore().currentChatGroupId;
     }
   },
   methods: {
     openChatWithFriend(friend: ChatGroupDTO) {
       chatStore().switchUserChat(friend);
+      friend.hasNewMessages = false; // Reset new messages flag
     }
   }
 })
