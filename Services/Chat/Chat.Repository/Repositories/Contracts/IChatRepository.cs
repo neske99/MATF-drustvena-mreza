@@ -17,5 +17,7 @@ namespace Chat.Repository.Repositories.Contracts
         Task<bool> CreateMessageForChatGroupAsync(int userId, int chatGroupId, string message);
 
         Task<ChatGroup> CreateChatGroupAsync(int userAId, int userBId);
+
+        Task SetChatUsersHasNewMessagesAsync(int chatGroupId, int userId);
     }
 }

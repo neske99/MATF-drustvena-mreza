@@ -37,7 +37,10 @@ namespace Chat.Service.Services
 
     public async Task<bool> CreateMessageForChatGroupAsync(int userId, int chatGroupId,string message)
     {
-        return await _chatRepository.CreateMessageForChatGroupAsync(userId, chatGroupId,message);
+
+        var result=await _chatRepository.CreateMessageForChatGroupAsync(userId, chatGroupId,message);
+        await _chatRepository.SetChatUsersHasNewMessagesAsync(chatGroupId, userId);
+        return result;
     }
 
     public async Task<ChatGroup> CreateChatGroupAsync(int userAId, int userBId)

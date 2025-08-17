@@ -26,11 +26,14 @@ namespace Chat.Repository.Repositories.Contracts
         .Include(cg => cg.ChatUsers)
         .ThenInclude(cu => cu.User)
         .Where(cg => cg.ChatUsers.Any(cu => cu.UserId == userId))
-        .Select(cg=> new ChatGroupDTO{
+        .Select(cg=> new ChatGroupDTO
+        {
           ChatId = cg.Id,
-          UserId = cg.ChatUsers.FirstOrDefault(cu=> cu.UserId == userId).UserId ,
-          Username = cg.ChatUsers.FirstOrDefault(cu => cu.UserId != userId).User.Username ?? string.Empty
-        })
+          UserId = cg.ChatUsers.FirstOrDefault(cu => cu.UserId == userId).UserId,
+          Username = cg.ChatUsers.FirstOrDefault(cu => cu.UserId != userId).User.Username ?? string.Empty,
+          HasNewMessages = cg.ChatUsers.FirstOrDefault(cu => cu.UserId == userId).hasNewMessages
+
+        }).OrderBy(cg=> cg.HasNewMessages==true ?0 :1)
         .ToListAsync();
     }
 
@@ -78,6 +81,17 @@ namespace Chat.Repository.Repositories.Contracts
         Text = message
       };
       _chatContext.ChatMessages.Add(newMessage);
+      var users=_chatContext.ChatUsers.Where(cu => cu.ChatGroupId == chatGroupId ).ToList();
+
+      foreach (var user in users)
+      {
+        if(user.UserId != userId)
+        {
+          user.hasNewMessages = true;
+        }else
+          user.hasNewMessages = false;
+      }
+
       var result = await _chatContext.SaveChangesAsync();
       return result > 0;
     }
@@ -102,6 +116,19 @@ namespace Chat.Repository.Repositories.Contracts
         .ThenInclude(cu => cu.User).
         FirstOrDefaultAsync(cg => cg.Id==chatGroup.Id );
 ;
+
+    }
+
+    public async Task SetChatUsersHasNewMessagesAsync(int chatGroupId, int userId)
+    {
+
+      await _chatContext.ChatUsers
+        .Where(cu => cu.ChatGroupId == chatGroupId && cu.UserId == userId)
+        .ExecuteUpdateAsync(cu => cu.SetProperty(c => c.hasNewMessages, false));
+
+      await _chatContext.ChatUsers
+        .Where(cu => cu.ChatGroupId == chatGroupId && cu.UserId != userId)
+        .ExecuteUpdateAsync(cu => cu.SetProperty(c => c.hasNewMessages, true));
 
     }
   }

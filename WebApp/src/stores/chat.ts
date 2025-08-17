@@ -25,7 +25,9 @@ export const chatStore = defineStore('chat', () => {
   let currentChatGroupId= ref(0);
 
   const getChatGroupsForUser=async function (){
-    currentChatGroups.splice(0,currentChatGroups.length,...(await axiosAuthenticated.get("http://localhost:8095/api/v1/Chat/ChatGroupForUser?userId=" + authStore().userId)).data);  ;
+    let result=(await axiosAuthenticated.get("http://localhost:8095/api/v1/Chat/ChatGroupForUser?userId=" + authStore().userId)).data;
+    console.log(result);
+    currentChatGroups.splice(0,currentChatGroups.length,...result);  ;
     return currentChatGroups;
 
   }
