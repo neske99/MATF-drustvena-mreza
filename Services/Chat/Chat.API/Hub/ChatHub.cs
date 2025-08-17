@@ -74,6 +74,8 @@ namespace Chat.Chat.API
         var res=await _chatService.CreateMessageForChatGroupAsync(userId, chatGroupId, message);
 
         await Clients.Group(chatGroupId.ToString()).SendAsync("ReceiveMessageReal", userId,message,chatGroupId,res.Id);
+
+        await Clients.Group(chatGroupId.ToString()).SendAsync("ReceiveMessageReal", userId,message,chatGroupId);
         //await Clients.Group(chatGroup).SendAsync("ReceiveMessageReal", userId,chatGroup,message);
       }
 

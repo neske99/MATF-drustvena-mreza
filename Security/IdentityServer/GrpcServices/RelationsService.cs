@@ -24,7 +24,7 @@ public class RelationsService
 
     }
 
-    public List<string> GetRelationShips(int userId,List<int>userIdList)
+    public List<string> GetRelationShips(int userId, List<int> userIdList)
     {
         GetRelationsWithRequest request = new GetRelationsWithRequest();
         var user = new User();
@@ -34,8 +34,14 @@ public class RelationsService
         request.TargetUsers.AddRange(userIdList.Select(id => new User { Id = id }));
 
         var response = _grpcService.GetRelationsWith(request);
-        return response.Relations.Select(r=>r.ToString()).ToList();
+        return response.Relations.Select(r => r.ToString()).ToList();
     }
 
+    public List<int> GetFriendRequestUserIdList(int userId)
+    {
+
+        return _grpcService.GetFriendRequests(new GetFriendRequestsRequests { User = new User { Id = userId } })
+            .Users.Select(u => u.Id).ToList();
+    }
 
 }

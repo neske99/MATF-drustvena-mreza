@@ -8,6 +8,7 @@
     <!-- Center the text field and increase its width -->
     <v-text-field placeholder="Search" dense class="search-field" v-model.trim="searchText"></v-text-field>
     <v-btn @click="search">Search</v-btn>
+    <v-btn to="/friendRequests">Friend Requests</v-btn>
 
     <v-spacer></v-spacer>
 

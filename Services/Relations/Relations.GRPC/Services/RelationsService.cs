@@ -41,4 +41,17 @@ public class RelationsService : RelationsProtoService.RelationsProtoServiceBase
 
         return response;
     }
+
+    public override async Task<GetFriendRequestsResponse> GetFriendRequests(GetFriendRequestsRequests request, ServerCallContext context)
+    {
+        GetFriendRequestsResponse response = new GetFriendRequestsResponse();
+        var userList = await _relationsRepository.GetReceivedFriendRequests(request.User.Id);
+        foreach (var user in userList)
+        {
+            response.Users.Add(new Relations.GRPC.User { Id = user.Id});
+        }
+
+        return response;
+  }
+
 }

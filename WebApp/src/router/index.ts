@@ -6,6 +6,7 @@ import { authStore } from '@/stores/auth'
 import UserDetailView from '@/views/UserDetailView.vue'
 import UserSearchView from '@/views/UserSearchView.vue'
 import PostsView from '@/views/PostsView.vue'
+import FriendRequestsView from '@/views/FriendRequestsView.vue'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -38,6 +39,11 @@ const routes: RouteRecordRaw[] = [
     name: 'userSearch',
     component: UserSearchView,
     props: true
+  },
+  {
+    path: '/friendRequests',
+    name: 'friendRequests',
+    component: FriendRequestsView
   },
   {
     path: '/auth/signup',
