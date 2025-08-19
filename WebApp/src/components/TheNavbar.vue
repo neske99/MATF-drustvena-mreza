@@ -8,8 +8,9 @@
     <!-- Center the text field and increase its width -->
     <v-text-field placeholder="Search" dense class="search-field" v-model.trim="searchText"></v-text-field>
     <v-btn @click="search">Search</v-btn>
-    <v-btn to="/friendRequests">Friend Requests</v-btn>
-
+    <v-btn to="/friendRequests">Friend Requests
+        {{ numFriendRequests}}
+    </v-btn>
     <v-spacer></v-spacer>
 
     <v-btn v-if="isAuthenticated" @click="onSignoutClick">Signout</v-btn>
@@ -20,6 +21,7 @@
 import { defineComponent } from 'vue'
 import { authStore } from '../stores/auth.ts'
 import { userStore } from '../stores/user.ts'
+import { chatStore } from '@/stores/chat.ts'
 
 export default defineComponent({
   name: 'TheNavbar',
@@ -32,6 +34,10 @@ export default defineComponent({
     isAuthenticated() {
       return authStore().isAuthenticated;
     },
+
+    numFriendRequests() {
+      return userStore().numFriendRequests;
+    }
   },
   methods: {
     async onSignoutClick() {

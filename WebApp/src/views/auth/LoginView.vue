@@ -21,6 +21,8 @@
 
 import { defineComponent } from 'vue';
 import { authStore } from '../../stores/auth.ts'
+import { chatStore } from '@/stores/chat.ts';
+import { userStore } from '@/stores/user.ts';
 // Components
 
 export default defineComponent({
@@ -35,7 +37,9 @@ export default defineComponent({
     async onLoginClick() {
       try {
         let store = authStore();
-        await store.login(this.username, this.password);
+        store.login(this.username, this.password).then( async ()=>{
+          await userStore().GetFriendRequests();
+        });
       } catch (err) {
 
       }

@@ -1,4 +1,4 @@
-import { computed, reactive } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { defineStore } from 'pinia'
 import axiosAuthenticated from '@/plugin/axios';
 import type { UserPreviewDTO } from '@/dtos/user/userPreviewDTO';
@@ -8,6 +8,8 @@ import { authStore } from './auth';
 export const userStore = defineStore('user', () => {
   // state
   const currentUsers = reactive([{ title: 'Naslov', text: 'Tekst' }, { title: 'Naslov!', text: 'Tekst!' }, { title: 'Naslov!!', text: 'Tekst!!' }]);
+  const numFriendRequests = ref(0);
+
   //getters
   const getSearchedUsers = computed(() => currentUsers);
   //actions
@@ -28,6 +30,7 @@ export const userStore = defineStore('user', () => {
   const GetFriendRequests = async function (){
 
     let result = (await axiosAuthenticated.get(`http://localhost:8094/api/v1/User/GetFriendRequests?userId=${authStore().userId}`)).data;
+    numFriendRequests.value = result.length;
     return result;
   };
 
@@ -49,5 +52,7 @@ export const userStore = defineStore('user', () => {
     await axiosAuthenticated.put(`http://localhost:8000/api/v1/Relations/received/accept/${userId}/${friendId}`);
   }
 
-  return { getSearchedUsers,GetFriendRequests, GetRelation,GetUsers, GetSearchedUsers, GetUser,SendFriendRequest,AcceptFriendRequest  };
+
+
+  return { getSearchedUsers,numFriendRequests,GetFriendRequests, GetRelation,GetUsers, GetSearchedUsers, GetUser,SendFriendRequest,AcceptFriendRequest  };
 })
