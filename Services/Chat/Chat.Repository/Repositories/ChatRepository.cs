@@ -47,6 +47,7 @@ namespace Chat.Repository.Repositories.Contracts
         .OrderBy(cm=> cm.CreatedDate)
         .Select(cm => new ChatMessageDTO
         {
+          Id=cm.Id,
           IsSender = cm.UserId == userId,
           Message = cm.Text
         })
@@ -71,7 +72,7 @@ namespace Chat.Repository.Repositories.Contracts
       return result > 0;
     }
 
-    public async Task<bool> CreateMessageForChatGroupAsync(int userId, int chatGroupId, string message)
+    public async Task<ChatMessage> CreateMessageForChatGroupAsync(int userId, int chatGroupId, string message)
     {
       var newMessage = new ChatMessage
       {
@@ -93,7 +94,7 @@ namespace Chat.Repository.Repositories.Contracts
       }
 
       var result = await _chatContext.SaveChangesAsync();
-      return result > 0;
+      return newMessage;
     }
 
     public async Task<ChatGroup> CreateChatGroupAsync(int userAId, int userBId)

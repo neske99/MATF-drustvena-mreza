@@ -2,7 +2,7 @@
   <v-navigation-drawer app permanent class="d-flex flex-column">
 
     <template v-slot:append>
-      <v-list class="flex-grow-1">
+      <v-list class="flex-grow-1" style="overflow-y:auto;max-height: 90vh;flex-direction:column-reverse;display:flex;">
         <v-list-item v-for="friend in filteredFriends" :key="friend.chatId" v-on:click="openChatWithFriend(friend)" :style="friend.chatId === currentChatGroupId ? 'background-color: #aef2e0;' : ''">
           <v-list-item-title :style="{fontWeight: friend.hasNewMessages ? 'bold' : 'normal' }"> {{ friend.username }} </v-list-item-title>
         </v-list-item>

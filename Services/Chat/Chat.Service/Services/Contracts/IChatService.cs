@@ -12,7 +12,7 @@ namespace Chat.Service.Services.Contracts
         Task<List<ChatGroupDTO>> GetChatGroupForGroupAsync(int userId);
         Task<List<User>> GetAllUsers();
 
-        Task<bool> CreateMessageForChatGroupAsync(int userId, int chatGroupId, string message);
+        Task<ChatMessage> CreateMessageForChatGroupAsync(int userId, int chatGroupId, string message);
 
         Task<ChatGroup> CreateChatGroupAsync(int userAId, int userBId);
     }
