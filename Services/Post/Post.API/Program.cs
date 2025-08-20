@@ -24,11 +24,12 @@ builder.Services.AddGrpcClient<RelationsProtoService.RelationsProtoServiceClient
 });
 builder.Services.AddScoped<RelationsService>();
 
-// Add simple logger middleware
+// Add logger with Action<LoggerOptions> configuration
 builder.Services.AddLogger(options =>
 {
-    options.LogBodies = true; // Can include post content
-    options.LogHeaders = true;
+    options.LogDirectory = "logs/post-api";
+    options.EnableFileLogging = true;
+    options.ExcludedPaths.Add("/api/posts/upload");
 });
 
 builder.Services.AddMassTransit(config =>

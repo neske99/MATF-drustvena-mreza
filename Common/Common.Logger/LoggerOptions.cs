@@ -12,5 +12,9 @@ namespace Common.Logger
             "/swagger",
             "/favicon.ico"
         };
+
+        public bool EnableFileLogging { get; set; } = true;
+
+        public string LogDirectory { get; set; } = "logs";
     }
 }

@@ -19,11 +19,11 @@ builder.Services.AddMassTransit(config =>
     });
 });
 
-// Add simple logger middleware
+// Add logger with Action<LoggerOptions> configuration
 builder.Services.AddLogger(options =>
 {
-    options.LogBodies = true;
-    options.LogHeaders = true;
+    options.LogDirectory = "logs/relations-api";
+    options.EnableFileLogging = true;
 });
 
 builder.Services.AddCors(options =>

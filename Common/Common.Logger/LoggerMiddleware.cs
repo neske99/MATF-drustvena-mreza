@@ -10,12 +10,14 @@ namespace Common.Logger
         private readonly RequestDelegate _next;
         private readonly ILogger<LoggerMiddleware> _logger;
         private readonly LoggerOptions _options;
+        private readonly IFileLogger _fileLogger;
 
-        public LoggerMiddleware(RequestDelegate next, ILogger<LoggerMiddleware> logger, IOptions<LoggerOptions> options)
+        public LoggerMiddleware(RequestDelegate next, ILogger<LoggerMiddleware> logger, IOptions<LoggerOptions> options, IFileLogger fileLogger)
         {
             _next = next ?? throw new ArgumentNullException(nameof(next));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _options = options?.Value ?? new LoggerOptions();
+            _fileLogger = fileLogger ?? throw new ArgumentNullException(nameof(fileLogger));
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -68,9 +70,20 @@ namespace Common.Logger
 
         private void LogException(HttpContext context, long elapsedMs, Exception exception)
         {
+            // Console/standard logging
             _logger.LogError("[!] {Method} {Path} - {ErrorMessage} ({ElapsedMs}ms)", 
                 context.Request.Method, context.Request.Path.Value, 
                 exception.Message, elapsedMs);
+
+            // File logging for critical errors (if enabled)
+            if (_options.EnableFileLogging)
+            {
+                _fileLogger.LogException(
+                    context.Request.Method, 
+                    context.Request.Path.Value ?? "", 
+                    exception, 
+                    elapsedMs);
+            }
         }
     }
 }
