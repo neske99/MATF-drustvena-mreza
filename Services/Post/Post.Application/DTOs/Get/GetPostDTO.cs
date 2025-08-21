@@ -1,4 +1,3 @@
-
 namespace Post.Application.DTOs
 {
     public class GetPostDTO
@@ -9,5 +8,6 @@ namespace Post.Application.DTOs
         public GetUserDTO? User { get; set; }
         public string Picture { get; set; } = string.Empty;
         public List<GetCommentDTO> Comments { get; set; } = new List<GetCommentDTO>();
+        public List<GetLikeDTO> Likes { get; set; } = new List<GetLikeDTO>();
     }
 }

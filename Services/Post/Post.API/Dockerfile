@@ -13,7 +13,8 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Services/Post/Post.API/Post.API.csproj", "Services/Post/Post.API/"]
-COPY ["Common/EventBusMessages.csproj", "Common/"]
+COPY ["Common/Common.EventBus/Common.EventBus.csproj", "Common/Common.EventBus/"]
+COPY ["Common/Common.Logger/Common.Logger.csproj", "Common/Common.Logger/"]
 COPY ["Services/Post/Post.Infrastructure/Post.Infrastructure.csproj", "Services/Post/Post.Infrastructure/"]
 COPY ["Services/Post/Post.Application/Post.Application.csproj", "Services/Post/Post.Application/"]
 COPY ["Services/Post/Post.Domain/Post.Domain.csproj", "Services/Post/Post.Domain/"]

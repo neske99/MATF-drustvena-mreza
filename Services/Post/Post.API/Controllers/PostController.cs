@@ -53,6 +53,16 @@ public class PostController : ControllerBase
                             userIdToRelationsDict.Add(comment.User.Id, "Nesto    je ");
                     }
                 }
+
+                // Add like users to the relations dictionary
+                foreach (var like in post.Likes)
+                {
+                    if (like.User != null)
+                    {
+                        if (!userIdToRelationsDict.ContainsKey(like.User.Id))
+                            userIdToRelationsDict.Add(like.User.Id, "Nesto je");
+                    }
+                }
             }
 
         }
@@ -77,6 +87,15 @@ public class PostController : ControllerBase
                             comment.User.Relation = userIdToRelationsDict[comment.User.Id];
                         }
                     }
+
+                    // Set relations for like users
+                    foreach (var like in post.Likes)
+                    {
+                        if (like.User != null)
+                        {
+                            like.User.Relation = userIdToRelationsDict[like.User.Id];
+                        }
+                    }
                 }
 
             }
@@ -95,6 +114,18 @@ public class PostController : ControllerBase
     public async Task<ActionResult> AddCommentToPost([FromQuery] int postId, [FromBody] CreateCommentDTO comment)
     {
         return Ok(await _postRepository.AddCommentToPost(postId, _mapper.Map<Comment>( comment)));
+    }
+
+    [HttpPost("[action]")]
+    public async Task<ActionResult> AddLikeToPost([FromQuery] int postId, [FromBody] CreateLikeDTO like)
+    {
+        return Ok(await _postRepository.AddLikeToPost(postId, _mapper.Map<Like>(like)));
+    }
+
+    [HttpDelete("[action]")]
+    public async Task<ActionResult> RemoveLikeFromPost([FromQuery] int postId, [FromQuery] int userId)
+    {
+        return Ok(await _postRepository.RemoveLikeFromPost(postId, userId));
     }
 
     [HttpGet("[action]")]

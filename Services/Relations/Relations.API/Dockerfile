@@ -12,6 +12,9 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Services/Relations/Relations.API/Relations.API.csproj", "Services/Relations/Relations.API/"]
+COPY ["Common/Common.EventBus/Common.EventBus.csproj", "Common/Common.EventBus/"]
+COPY ["Common/Common.Logger/Common.Logger.csproj", "Common/Common.Logger/"]
+COPY ["Services/Relations/Relations.Common/Relations.Common.csproj", "Services/Relations/Relations.Common/"]
 RUN dotnet restore "./Services/Relations/Relations.API/Relations.API.csproj"
 COPY . .
 WORKDIR "/src/Services/Relations/Relations.API"

@@ -24,7 +24,7 @@ import { postStore } from '@/stores/post';
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'PostComponent',
+  name: 'UploadPostComponent',
   props: [],
   data() {
     return {
@@ -36,6 +36,9 @@ export default defineComponent({
       if(this.newPost!==''){
         let userId= authStore().userId;
         await postStore().UploadPost(this.newPost, userId);
+        this.newPost = '';
+        // Emit event to parent to refresh posts
+        this.$emit('post-uploaded');
       }
     }
   }

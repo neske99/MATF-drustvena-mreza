@@ -21,6 +21,19 @@ export const postStore = defineStore('post', () => {
       text:text,
       userId: authStore().userId
     });
+    return result;
+  }
+
+  const AddLike = async function (postId: number) {
+    let result = await axiosAuthenticated.post(`http://localhost:8080/Post/AddLikeToPost?postId=${postId}`, {
+      userId: authStore().userId
+    });
+    return result;
+  }
+
+  const RemoveLike = async function (postId: number) {
+    let result = await axiosAuthenticated.delete(`http://localhost:8080/Post/RemoveLikeFromPost?postId=${postId}&userId=${authStore().userId}`);
+    return result;
   }
 
   const UploadPost = async function (newPost: string, userId: number) {
@@ -29,10 +42,10 @@ export const postStore = defineStore('post', () => {
       userId: authStore().userId,
       picture:'picture',
       comments:[]
-
     });
+    return result;
   }
 
 
-  return { getCurrentPosts,UploadPost,AddComment, GetPosts };
+  return { getCurrentPosts,UploadPost,AddComment, AddLike, RemoveLike, GetPosts };
 })

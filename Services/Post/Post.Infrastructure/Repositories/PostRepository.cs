@@ -31,6 +31,40 @@ namespace Post.Infrastructure.Repositories
             return result > 0;
         }
 
+        public async Task<bool> AddLikeToPost(int postId, Like like)
+        {
+            var post = await postContext.Posts.Where(p => p.Id == postId).FirstOrDefaultAsync();
+
+            if (post == null)
+                return false;
+
+            // Check if user already liked this post
+            var existingLike = await postContext.Likes
+                .Where(l => l.PostId == postId && l.UserId == like.UserId)
+                .FirstOrDefaultAsync();
+
+            if (existingLike != null)
+                return false; // User already liked this post
+
+            post.Likes.Add(like);
+            var result = await postContext.SaveChangesAsync();
+            return result > 0;
+        }
+
+        public async Task<bool> RemoveLikeFromPost(int postId, int userId)
+        {
+            var like = await postContext.Likes
+                .Where(l => l.PostId == postId && l.UserId == userId)
+                .FirstOrDefaultAsync();
+
+            if (like == null)
+                return false; // Like doesn't exist
+
+            postContext.Likes.Remove(like);
+            var result = await postContext.SaveChangesAsync();
+            return result > 0;
+        }
+
         public async Task<bool> CreatePostForUser(int userId, Domain.Entities.Post post)
         {
             post.UserId = userId;
@@ -45,6 +79,8 @@ namespace Post.Infrastructure.Repositories
             Include(p => p.User).
             Include(p => p.Comments).
             ThenInclude(c => c.User).
+            Include(p => p.Likes).
+            ThenInclude(l => l.User).
             ToListAsync();
         }
 
@@ -54,6 +90,8 @@ namespace Post.Infrastructure.Repositories
                 Include(p => p.User).
                 Include(p => p.Comments).
                 ThenInclude(c => c.User).
+                Include(p => p.Likes).
+                ThenInclude(l => l.User).
                 Where(p => p.CreatedDate.AddMonths(3) > DateTime.Now && friendIdList.Contains(p.UserId)).
                 ToListAsync();
 
@@ -78,14 +116,16 @@ namespace Post.Infrastructure.Repositories
             return await postContext.Users.ToListAsync();
         }
 
-    public async Task<IEnumerable<Domain.Entities.Post>> GetPostsCreatedByUser(int userId)
-    {       return await postContext.Posts.
+        public async Task<IEnumerable<Domain.Entities.Post>> GetPostsCreatedByUser(int userId)
+        {       
+            return await postContext.Posts.
                 Include(p => p.User).
                 Include(p => p.Comments).
                 ThenInclude(c => c.User).
+                Include(p => p.Likes).
+                ThenInclude(l => l.User).
                 Where(p => p.CreatedDate.AddMonths(3) > DateTime.Now && p.UserId==userId).
                 ToListAsync();
-
+        }
     }
-  }
 }
