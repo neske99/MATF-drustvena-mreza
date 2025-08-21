@@ -26,10 +26,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
-
-
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Common\EventBusMessages.csproj" />
+    <ProjectReference Include="..\..\..\Common\Common.EventBus\Common.EventBus.csproj" />
+    <ProjectReference Include="..\..\..\Common\Common.Logger\Common.Logger.csproj" />
     <ProjectReference Include="..\Relations.Common\Relations.Common.csproj" />
   </ItemGroup>
 

@@ -8,13 +8,13 @@ using System.Text;
 using Relations.GRPC;
 using Post.API.GrpcServices;
 using System.Reflection;
+using Common.Logger.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.RegisterInfrastructureService(builder.Configuration);
-
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
@@ -23,6 +23,14 @@ builder.Services.AddGrpcClient<RelationsProtoService.RelationsProtoServiceClient
     o.Address = new Uri(builder.Configuration.GetValue<string>("GrpcSettings:RelationsUrl"));
 });
 builder.Services.AddScoped<RelationsService>();
+
+// Add logger with Action<LoggerOptions> configuration
+builder.Services.AddLogger(options =>
+{
+    options.LogDirectory = "logs/post-api";
+    options.EnableFileLogging = true;
+    options.ExcludedPaths.Add("/api/posts/upload");
+});
 
 builder.Services.AddMassTransit(config =>
 {
@@ -66,13 +74,15 @@ builder.Services.AddAuthentication(options =>
                     };
                 });
 
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// Add logger middleware early in the pipeline
+app.UseLogger();
 
 app.UseCors("CorsPolicy");
 // Configure the HTTP request pipeline.

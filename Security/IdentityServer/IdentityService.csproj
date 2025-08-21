@@ -39,10 +39,9 @@
         </Protobuf>
     </ItemGroup>
 
-
-
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\EventBusMessages.csproj" />
+    <ProjectReference Include="..\..\Common\Common.EventBus\Common.EventBus.csproj" />
+    <ProjectReference Include="..\..\Common\Common.Logger\Common.Logger.csproj" />
   </ItemGroup>
 
 </Project>

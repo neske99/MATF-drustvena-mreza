@@ -1,7 +1,6 @@
 ﻿using Relations.Common.Entities;
 using Relations.Common.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using MassTransit;
 using EventBusMessages.Events;
 
