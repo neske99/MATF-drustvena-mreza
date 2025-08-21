@@ -45,7 +45,7 @@ export default defineComponent({
     this.connection =  await getSignalRConnection();
     if(this.connection) {
       this.connection.on("ReceiveMessage", (chatGroupId: number, userId: number,username:string) => {
-        self.friends.push({username:username,chatId:chatGroupId,userId:userId, hasNewMessages:true});
+        self.friends.unshift({username:username,chatId:chatGroupId,userId:userId, hasNewMessages:true});
         self.connection?.invoke("RegisterToGroup",chatGroupId);
 
       });
