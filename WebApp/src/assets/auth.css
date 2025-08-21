@@ -1,0 +1,323 @@
+/* MATF University Social Network Authentication Styles - Enhanced Serbian Support */
+
+/* Critical Serbian Latin font support and typography */
+.v-application {
+  font-family: 'Noto Sans', 'Inter', 'Open Sans', 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'DejaVu Sans', 'Liberation Sans', Arial, sans-serif !important;
+  font-feature-settings: "liga" 1, "kern" 1, "clig" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-variant-ligatures: common-ligatures contextual;
+  font-synthesis: none;
+  font-optical-sizing: auto;
+}
+
+/* Force font inheritance for all Vuetify components */
+.v-application *,
+.v-application *::before,
+.v-application *::after {
+  font-family: inherit !important;
+  text-rendering: optimizeLegibility !important;
+  font-variant-ligatures: common-ligatures !important;
+}
+
+/* Enhanced button styles with Serbian font support */
+.v-btn {
+  font-weight: 600 !important;
+  letter-spacing: 0.5px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 8px !important;
+  font-family: 'Noto Sans', 'Inter', 'Open Sans', system-ui, sans-serif !important;
+  text-rendering: optimizeLegibility !important;
+}
+
+.v-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 0, 0, 0.3);
+}
+
+/* University-themed form field styles */
+.v-text-field .v-field {
+  border-radius: 8px !important;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.v-text-field .v-field input,
+.v-text-field .v-field textarea {
+  font-family: 'Noto Sans', 'Inter', 'Open Sans', system-ui, sans-serif !important;
+  text-rendering: optimizeLegibility !important;
+  font-variant-ligatures: common-ligatures !important;
+}
+
+.v-text-field .v-field:hover {
+  box-shadow: 0 2px 12px rgba(139, 0, 0, 0.15);
+}
+
+.v-text-field--focused .v-field {
+  border-color: #8B0000;
+}
+
+/* Fix for Serbian text in form labels and hints */
+.v-label,
+.v-messages,
+.v-field-label,
+.v-input__details {
+  font-family: 'Noto Sans', 'Inter', 'Open Sans', system-ui, sans-serif !important;
+  text-rendering: optimizeLegibility !important;
+}
+
+/* MATF Red color utilities */
+.matf-red--text {
+  color: #8B0000 !important;
+}
+
+.matf-red {
+  background-color: #8B0000 !important;
+  color: white !important;
+}
+
+.matf-dark-red--text {
+  color: #660000 !important;
+}
+
+.matf-dark-red {
+  background-color: #660000 !important;
+  color: white !important;
+}
+
+.matf-light-red--text {
+  color: #A52A2A !important;
+}
+
+.matf-light-red {
+  background-color: #A52A2A !important;
+  color: white !important;
+}
+
+/* Academic gold accent */
+.academic-gold--text {
+  color: #FFB300 !important;
+}
+
+.academic-gold {
+  background-color: #FFB300 !important;
+  color: white !important;
+}
+
+/* University card styling */
+.auth-card {
+  box-shadow: 0 8px 32px rgba(139, 0, 0, 0.12) !important;
+  border: 1px solid rgba(139, 0, 0, 0.08);
+}
+
+/* Academic loading animations */
+.v-btn--loading {
+  pointer-events: none;
+  background: linear-gradient(135deg, #8B0000 0%, #660000 100%) !important;
+}
+
+/* University-themed snackbar */
+.v-snackbar {
+  border-radius: 12px !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.v-snackbar *,
+.v-snackbar .v-snackbar__wrapper,
+.v-snackbar .v-snackbar__content {
+  font-family: 'Noto Sans', 'Inter', 'Open Sans', system-ui, sans-serif !important;
+  text-rendering: optimizeLegibility !important;
+}
+
+.v-snackbar.v-snackbar--color-success {
+  background: linear-gradient(135deg, #2E7D32 0%, #388E3C 100%) !important;
+}
+
+.v-snackbar.v-snackbar--color-error {
+  background: linear-gradient(135deg, #C62828 0%, #D32F2F 100%) !important;
+}
+
+/* Avatar improvements with university styling */
+.v-avatar {
+  box-shadow: 0 4px 16px rgba(139, 0, 0, 0.2);
+  border: 3px solid rgba(255, 255, 255, 0.8);
+}
+
+/* University logo styling */
+.university-logo .logo-container {
+  transition: all 0.3s ease;
+}
+
+.university-logo .logo-container:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Academic stats and features */
+.stat-item, .feature-item {
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.feature-item:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Serbian text improvements - ENHANCED with better font stack */
+h1, h2, h3, h4, h5, h6, 
+.v-btn, 
+.v-text-field label,
+.text-h1, .text-h2, .text-h3, .text-h4, .text-h5, .text-h6,
+.display-1, .display-2, .display-3, .display-4,
+.text-body-1, .text-body-2,
+.text-caption,
+.v-card-title,
+.v-card-subtitle,
+.v-list-item-title,
+.v-list-item-subtitle {
+  font-family: 'Noto Sans', 'Inter', 'Open Sans', 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'DejaVu Sans', Arial, sans-serif !important;
+  font-variant-ligatures: common-ligatures;
+  text-rendering: optimizeLegibility;
+}
+
+/* Special handling for white text to ensure visibility of Serbian characters */
+.text-white {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  font-family: 'Noto Sans', 'Inter', 'Open Sans', system-ui, sans-serif !important;
+  text-rendering: optimizeLegibility !important;
+  font-weight: 400;
+}
+
+/* Enhanced Serbian text class with fallback fonts */
+.serbian-text {
+  font-family: 'Noto Sans', 'Inter', 'Open Sans', 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'DejaVu Sans', 'Liberation Sans', Arial, sans-serif !important;
+  text-rendering: optimizeLegibility !important;
+  font-variant-ligatures: common-ligatures !important;
+  font-feature-settings: "liga", "kern", "clig", "calt";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Responsive typography for university content */
+@media (max-width: 600px) {
+  .display-1 {
+    font-size: 2rem !important;
+    line-height: 1.2;
+  }
+  
+  .text-h4 {
+    font-size: 1.5rem !important;
+  }
+  
+  .text-h5 {
+    font-size: 1.25rem !important;
+  }
+  
+  .university-logo .logo-container {
+    padding: 1rem;
+  }
+}
+
+/* University-specific animations */
+@keyframes matfFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.matf-fade-in {
+  animation: matfFadeIn 0.8s ease-out;
+}
+
+/* Academic link styling */
+a {
+  color: #8B0000;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-family: inherit !important;
+  text-rendering: optimizeLegibility;
+}
+
+a:hover {
+  color: #660000 !important;
+  text-decoration: underline;
+}
+
+/* University form improvements */
+.v-checkbox .v-selection-control__wrapper {
+  margin-right: 8px;
+}
+
+.v-divider {
+  border-color: rgba(139, 0, 0, 0.2) !important;
+}
+
+/* Academic footer styling */
+.text-caption {
+  font-size: 0.75rem !important;
+  font-weight: 400;
+  letter-spacing: 0.4px;
+  color: rgba(0, 0, 0, 0.6) !important;
+  font-family: 'Noto Sans', 'Inter', 'Open Sans', system-ui, sans-serif !important;
+  text-rendering: optimizeLegibility !important;
+}
+
+/* University gradient overlays */
+.matf-gradient-primary {
+  background: linear-gradient(135deg, #8B0000 0%, #660000 100%);
+}
+
+.matf-gradient-secondary {
+  background: linear-gradient(135deg, #660000 0%, #8B0000 100%);
+}
+
+/* CRITICAL: Fix for Serbian diacritics rendering */
+.v-application {
+  text-rendering: optimizeLegibility !important;
+  font-variant-ligatures: common-ligatures !important;
+  font-synthesis: none !important;
+  font-kerning: auto;
+  text-decoration-skip-ink: auto;
+}
+
+/* Specific fixes for input fields and forms */
+.v-text-field input,
+.v-textarea textarea,
+.v-select .v-field input {
+  font-family: 'Noto Sans', 'Inter', 'Open Sans', system-ui, sans-serif !important;
+  font-variant-ligatures: common-ligatures !important;
+  text-rendering: optimizeLegibility !important;
+}
+
+/* Force proper encoding for all text elements */
+* {
+  font-feature-settings: "liga", "kern", "clig", "calt";
+  text-decoration-skip-ink: auto;
+}
+
+/* Additional fallback for problematic browsers */
+@supports not (font-feature-settings: "liga") {
+  .serbian-text,
+  .v-application * {
+    font-family: 'DejaVu Sans', 'Liberation Sans', Arial, sans-serif !important;
+  }
+}
+
+/* Ensure proper character rendering in WebKit browsers */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  .serbian-text,
+  .v-application * {
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-stroke: 0.01em transparent;
+  }
+}

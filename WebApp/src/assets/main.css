@@ -1,10 +1,37 @@
 @import './base.css';
 
+/* Enhanced Serbian character support */
 #app {
-  max-width: 1280px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0;
   font-weight: normal;
+  font-family: 'Noto Sans', 'Inter', 'Open Sans', 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Arial Unicode MS', sans-serif;
+  text-rendering: optimizeLegibility;
+  font-variant-ligatures: common-ligatures;
+}
+
+/* Enhanced Serbian text rendering */
+.v-application,
+.v-application * {
+  font-family: 'Noto Sans', 'Inter', 'Open Sans', 'Roboto', system-ui, sans-serif !important;
+  text-rendering: optimizeLegibility !important;
+  font-variant-ligatures: common-ligatures !important;
+}
+
+/* Specific Serbian character support */
+.serbian-text,
+.v-btn,
+.v-text-field label,
+.v-label,
+.v-messages,
+.v-field-label,
+h1, h2, h3, h4, h5, h6,
+p, span, div {
+  font-family: 'Noto Sans', 'Inter', 'Open Sans', system-ui, sans-serif !important;
+  text-rendering: optimizeLegibility !important;
+  font-variant-ligatures: common-ligatures !important;
+  font-feature-settings: "liga", "kern";
 }
 
 a,
@@ -13,6 +40,7 @@ a,
   color: hsla(160, 100%, 37%, 1);
   transition: 0.4s;
   padding: 3px;
+  font-family: inherit !important;
 }
 
 @media (hover: hover) {
@@ -21,15 +49,26 @@ a,
   }
 }
 
+/* Remove the desktop grid layout for auth pages */
 @media (min-width: 1024px) {
   body {
-    display: flex;
-    place-items: center;
+    display: block;
   }
 
   #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
+    display: block;
+    padding: 0;
   }
+}
+
+/* Force Unicode rendering */
+html {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+/* Additional Serbian character fixes */
+input, textarea, select {
+  font-family: 'Noto Sans', 'Inter', system-ui, sans-serif !important;
+  text-rendering: optimizeLegibility !important;
 }
