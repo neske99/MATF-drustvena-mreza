@@ -45,14 +45,14 @@ export default defineComponent({
       });*/
       this.connection.on("ReceiveMessageReal", (userId: number, message: string,chatGroupId:number,messageId) => {
         if(chatStore().currentChatGroupId === chatGroupId) {
-          this.messages.push({ message:message, isSender: userId === authStore().userId,id:messageId });
+          this.messages.unshift({ message:message, isSender: userId === authStore().userId,id:messageId });
         }
         let chGroup = chatStore().currentChatGroups.find(x => x.chatId === chatGroupId)!;
         chGroup.hasNewMessages = userId !== authStore().userId;
         if(chGroup.hasNewMessages){
           let index=chatStore().currentChatGroups.indexOf(chGroup);
           chatStore().currentChatGroups.splice(index,1);
-          chatStore().currentChatGroups.push(chGroup);
+          chatStore().currentChatGroups.unshift(chGroup);
         }
 
 

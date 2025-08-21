@@ -44,7 +44,6 @@ namespace Chat.Repository.Repositories.Contracts
         .Where(cm => cm.ChatGroupId == chatGroupId)
         .OrderByDescending(cm => cm.CreatedDate)
         .Take(100)
-        .OrderBy(cm=> cm.CreatedDate)
         .Select(cm => new ChatMessageDTO
         {
           Id=cm.Id,
