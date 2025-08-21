@@ -12,6 +12,42 @@
         {{ text }}
       </v-card-text>
 
+      <!-- Likes Section -->
+      <v-card-actions>
+        <v-btn 
+          :color="userHasLiked ? 'red' : 'grey'" 
+          :icon="userHasLiked ? 'mdi-heart' : 'mdi-heart-outline'"
+          @click="toggleLike"
+          size="small"
+        >
+        </v-btn>
+        <span class="ml-1">{{ likes?.length || 0 }}</span>
+        
+        <v-spacer></v-spacer>
+        
+        <!-- Show who liked the post -->
+        <v-menu v-if="likes && likes.length > 0" offset-y>
+          <template v-slot:activator="{ props }">
+            <v-btn 
+              text 
+              size="small" 
+              v-bind="props"
+            >
+              {{ likes.length === 1 ? '1 like' : `${likes.length} likes` }}
+            </v-btn>
+          </template>
+          <v-list dense>
+            <v-list-item v-for="like in likes" :key="like.id">
+              <v-list-item-title v-if="like.user">
+                <router-link :to="'/userdetail/'+ like.user.username">
+                  {{ like.user.username }}
+                </router-link>
+              </v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </v-card-actions>
+
       <v-divider></v-divider>
 
     <v-card-subtitle class="mt-2 mb-1">Comments</v-card-subtitle>
@@ -43,22 +79,53 @@
 
 <script lang='ts'>
 import { postStore } from '@/stores/post';
+import { authStore } from '@/stores/auth';
 import { defineComponent } from 'vue'
-
+import type { likeDTO } from '@/dtos/post/likeDTO';
 
 export default defineComponent({
   name: 'PostComponent',
-  props: [/*'title',*/ 'text', 'username', 'comments','id'],
+  props: ['text', 'username', 'comments', 'likes', 'id'],
   data() {
     return {
-      newComment:''
+      newComment: ''
     }
   },
-  methods:{
-    addComment: async function(){
-      if(this.newComment!=='')
+  computed: {
+    userHasLiked(): boolean {
+      if (!this.likes || !Array.isArray(this.likes)) return false;
+      const currentUserId = authStore().userId;
+      return this.likes.some((like: likeDTO) => like.user?.id === currentUserId);
+    }
+  },
+  methods: {
+    addComment: async function() {
+      if (this.newComment !== '') {
         await postStore().AddComment(this.newComment, this.id);
+        this.newComment = '';
+        // Emit event to parent to refresh posts or handle optimistic update
+        this.$emit('comment-added');
+      }
+    },
+    toggleLike: async function() {
+      try {
+        if (this.userHasLiked) {
+          await postStore().RemoveLike(this.id);
+        } else {
+          await postStore().AddLike(this.id);
+        }
+        // Emit event to parent to refresh posts or handle optimistic update
+        this.$emit('like-toggled');
+      } catch (error) {
+        console.error('Error toggling like:', error);
+      }
     }
   }
 })
 </script>
+
+<style scoped>
+.v-btn {
+  text-transform: none;
+}
+</style>

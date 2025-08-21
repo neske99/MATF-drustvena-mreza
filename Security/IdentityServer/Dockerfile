@@ -13,7 +13,8 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Security/IdentityServer/IdentityService.csproj", "Security/IdentityServer/"]
-COPY ["Common/EventBusMessages.csproj", "Common/"]
+COPY ["Common/Common.EventBus/Common.EventBus.csproj", "Common/Common.EventBus/"]
+COPY ["Common/Common.Logger/Common.Logger.csproj", "Common/Common.Logger/"]
 RUN dotnet restore "./Security/IdentityServer/IdentityService.csproj"
 COPY . .
 WORKDIR "/src/Security/IdentityServer"

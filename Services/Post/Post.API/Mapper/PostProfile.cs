@@ -13,14 +13,19 @@ namespace Post.API.Mapper
 
             CreateMap<Comment, GetCommentDTO>().ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User)).ReverseMap();
 
+            CreateMap<Like, GetLikeDTO>().ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User)).ReverseMap();
+
             CreateMap<Post.Domain.Entities.Post, GetPostDTO>().
             ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User)).
-            ForMember(dest => dest.Comments, opt => opt.MapFrom(src => src.Comments)).ReverseMap();
+            ForMember(dest => dest.Comments, opt => opt.MapFrom(src => src.Comments)).
+            ForMember(dest => dest.Likes, opt => opt.MapFrom(src => src.Likes)).ReverseMap();
 
             //Set DTOs
             CreateMap<User, CreateUserDTO>().ReverseMap();
 
             CreateMap<Comment, CreateCommentDTO>().ReverseMap();
+
+            CreateMap<Like, CreateLikeDTO>().ReverseMap();
 
             CreateMap<Post.Domain.Entities.Post, CreatePostDTO>().
             ForMember(dest => dest.Comments, opt => opt.MapFrom(src => src.Comments)).ReverseMap();

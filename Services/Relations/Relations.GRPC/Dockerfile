@@ -7,6 +7,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Services/Relations/Relations.GRPC/Relations.GRPC.csproj", "Services/Relations/Relations.GRPC/"]
+COPY ["Services/Relations/Relations.Common/Relations.Common.csproj", "Services/Relations/Relations.Common/"]
 RUN dotnet restore "Services/Relations/Relations.GRPC/Relations.GRPC.csproj"
 COPY . .
 WORKDIR "/src/Services/Relations/Relations.GRPC"

@@ -1,8 +1,18 @@
 <template>
   <h2>{{username}}</h2>
 
-  <UploadPostComponent></UploadPostComponent>
-  <PostComponent v-for="post in posts" :id="post.id" :text="post.text" :username="post.user.username" :comments="post.comments" :key="post.id"></PostComponent>
+  <UploadPostComponent @post-uploaded="refreshPosts"></UploadPostComponent>
+  <PostComponent 
+    v-for="post in posts" 
+    :id="post.id" 
+    :text="post.text" 
+    :username="post.user.username" 
+    :comments="post.comments" 
+    :likes="post.likes"
+    :key="post.id"
+    @comment-added="refreshPosts"
+    @like-toggled="refreshPosts"
+  ></PostComponent>
 </template>
 
 <script lang="ts">
@@ -29,12 +39,18 @@ export default defineComponent({
     };
   },
   async created() {
-    let self = this;
-
-    self.username = authStore().username;
-    self.posts = await postStore().GetPosts();
-
-    console.log(self.posts);
+    await this.loadPosts();
+  },
+  methods: {
+    async loadPosts() {
+      this.username = authStore().username;
+      this.posts = await postStore().GetPosts();
+      console.log(this.posts);
+    },
+    async refreshPosts() {
+      // Refresh posts after comment/like/new post actions
+      await this.loadPosts();
+    }
   }
 });
 </script>

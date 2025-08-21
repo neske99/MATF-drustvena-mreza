@@ -16,6 +16,7 @@ namespace Post.Domain.Entities
         public string Text { get; set; } = string.Empty;
         public string Picture { get; set; } = string.Empty;
         public List<Comment> Comments { get; set; } = new List<Comment>() { };
+        public List<Like> Likes { get; set; } = new List<Like>() { };
 
 
     }

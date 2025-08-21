@@ -17,6 +17,7 @@ namespace Post.Infrastructure.Persistance
         }
         public DbSet<Post.Domain.Entities.Post> Posts { get; set; } = null!;
         public DbSet<Comment> Comments { get; set; } = null!;
+        public DbSet<Like> Likes { get; set; } = null!;
         public DbSet<User> Users { get; set; } = null!;
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -43,6 +44,7 @@ namespace Post.Infrastructure.Persistance
         {
             modelBuilder.ApplyConfiguration(new UserConfiguration());
             modelBuilder.ApplyConfiguration(new CommentConfiguration());
+            modelBuilder.ApplyConfiguration(new LikeConfiguration());
             modelBuilder.ApplyConfiguration(new PostConfiguration());
             base.OnModelCreating(modelBuilder);
         }
