@@ -1,7 +1,8 @@
+using Post.Infrastructure.Contracts;
 using Relations.GRPC;
-namespace Post.API.GrpcServices;
+namespace Post.Infrastructure.GrpcServices;
 
-public class RelationsService
+public class RelationsService:IRelationService
 {
     //privete readonly Greeter.GreeterClient _greeterService;
     private readonly RelationsProtoService.RelationsProtoServiceClient _grpcService;

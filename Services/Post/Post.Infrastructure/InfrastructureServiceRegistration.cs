@@ -9,6 +9,10 @@ using Microsoft.Extensions.Options;
 using Post.Application.Contracts;
 using Post.Infrastructure.Persistance;
 using Post.Infrastructure.Repositories;
+using Post.Application;
+using Post.Infrastructure.Contracts;
+using Post.Infrastructure.GrpcServices;
+using Relations.GRPC;
 
 namespace Post.Infrastructure
 {
@@ -16,7 +20,14 @@ namespace Post.Infrastructure
     {
         public static void RegisterInfrastructureService(this IServiceCollection services, IConfiguration configuration)
         {
+            services.RegisterApplicationService();
             services.AddScoped<IPostRepository, PostRepository>();
+            services.AddGrpcClient<RelationsProtoService.RelationsProtoServiceClient>(o =>
+            {
+                o.Address = new Uri(configuration.GetValue<string>("GrpcSettings:RelationsUrl"));
+            });
+
+            services.AddScoped<IRelationService, RelationsService>();
             services.AddDbContext<PostContext>(options =>
             {
                 options.UseSqlServer(configuration.GetConnectionString("mssql"));

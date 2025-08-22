@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Relations.GRPC;
-using Post.API.GrpcServices;
 using System.Reflection;
 using Common.Logger.Extensions;
 
@@ -16,13 +15,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.RegisterInfrastructureService(builder.Configuration);
 
-builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
-builder.Services.AddGrpcClient<RelationsProtoService.RelationsProtoServiceClient>(o =>
-{
-    o.Address = new Uri(builder.Configuration.GetValue<string>("GrpcSettings:RelationsUrl"));
-});
-builder.Services.AddScoped<RelationsService>();
+
 
 // Add logger with Action<LoggerOptions> configuration
 builder.Services.AddLogger(options =>

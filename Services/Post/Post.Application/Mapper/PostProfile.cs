@@ -2,7 +2,7 @@ using AutoMapper;
 using Post.Application.DTOs;
 using Post.Domain.Entities;
 
-namespace Post.API.Mapper
+namespace Post.Application.Mapper
 {
     public class PostProfile : Profile
     {
