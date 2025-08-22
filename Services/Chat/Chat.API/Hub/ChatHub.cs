@@ -71,9 +71,11 @@ namespace Chat.Chat.API
 
 
         //TODO: Add message to chat group in the database
-        await _chatService.CreateMessageForChatGroupAsync(userId, chatGroupId, message);
+        var res=await _chatService.CreateMessageForChatGroupAsync(userId, chatGroupId, message);
 
-        await Clients.Group(chatGroupId.ToString()).SendAsync("ReceiveMessageReal", userId,message,chatGroupId);
+        await Clients.Group(chatGroupId.ToString()).SendAsync("ReceiveMessageReal", userId,message,chatGroupId,res.Id);
+
+        //await Clients.Group(chatGroupId.ToString()).SendAsync("ReceiveMessageReal", userId,message,chatGroupId);
         //await Clients.Group(chatGroup).SendAsync("ReceiveMessageReal", userId,chatGroup,message);
       }
 

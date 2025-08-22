@@ -53,6 +53,10 @@ namespace Relations.GRPC {
     static readonly grpc::Marshaller<global::Relations.GRPC.GetRelationsWithRequest> __Marshaller_GetRelationsWithRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Relations.GRPC.GetRelationsWithRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::Relations.GRPC.GetRelationsWithResponse> __Marshaller_GetRelationsWithResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Relations.GRPC.GetRelationsWithResponse.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Relations.GRPC.GetFriendRequestsRequests> __Marshaller_GetFriendRequestsRequests = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Relations.GRPC.GetFriendRequestsRequests.Parser));
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Marshaller<global::Relations.GRPC.GetFriendRequestsResponse> __Marshaller_GetFriendRequestsResponse = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::Relations.GRPC.GetFriendRequestsResponse.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::Relations.GRPC.GetFriendsRequest, global::Relations.GRPC.GetFriendsResponse> __Method_GetFriends = new grpc::Method<global::Relations.GRPC.GetFriendsRequest, global::Relations.GRPC.GetFriendsResponse>(
@@ -69,6 +73,14 @@ namespace Relations.GRPC {
         "GetRelationsWith",
         __Marshaller_GetRelationsWithRequest,
         __Marshaller_GetRelationsWithResponse);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+    static readonly grpc::Method<global::Relations.GRPC.GetFriendRequestsRequests, global::Relations.GRPC.GetFriendRequestsResponse> __Method_GetFriendRequests = new grpc::Method<global::Relations.GRPC.GetFriendRequestsRequests, global::Relations.GRPC.GetFriendRequestsResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "GetFriendRequests",
+        __Marshaller_GetFriendRequestsRequests,
+        __Marshaller_GetFriendRequestsResponse);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -142,6 +154,26 @@ namespace Relations.GRPC {
       public virtual grpc::AsyncUnaryCall<global::Relations.GRPC.GetRelationsWithResponse> GetRelationsWithAsync(global::Relations.GRPC.GetRelationsWithRequest request, grpc::CallOptions options)
       {
         return CallInvoker.AsyncUnaryCall(__Method_GetRelationsWith, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Relations.GRPC.GetFriendRequestsResponse GetFriendRequests(global::Relations.GRPC.GetFriendRequestsRequests request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return GetFriendRequests(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual global::Relations.GRPC.GetFriendRequestsResponse GetFriendRequests(global::Relations.GRPC.GetFriendRequestsRequests request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_GetFriendRequests, null, options, request);
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Relations.GRPC.GetFriendRequestsResponse> GetFriendRequestsAsync(global::Relations.GRPC.GetFriendRequestsRequests request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return GetFriendRequestsAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
+      public virtual grpc::AsyncUnaryCall<global::Relations.GRPC.GetFriendRequestsResponse> GetFriendRequestsAsync(global::Relations.GRPC.GetFriendRequestsRequests request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_GetFriendRequests, null, options, request);
       }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]

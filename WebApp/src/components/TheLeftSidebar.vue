@@ -2,7 +2,7 @@
   <v-navigation-drawer app permanent class="d-flex flex-column">
 
     <template v-slot:append>
-      <v-list class="flex-grow-1">
+      <v-list class="flex-grow-1" style="overflow-y:auto;max-height: 90vh;flex-direction:column-reverse;display:flex;">
         <v-list-item v-for="friend in filteredFriends" :key="friend.chatId" v-on:click="openChatWithFriend(friend)" :style="friend.chatId === currentChatGroupId ? 'background-color: #aef2e0;' : ''">
           <v-list-item-title :style="{fontWeight: friend.hasNewMessages ? 'bold' : 'normal' }"> {{ friend.username }} </v-list-item-title>
         </v-list-item>
@@ -45,7 +45,7 @@ export default defineComponent({
     this.connection =  await getSignalRConnection();
     if(this.connection) {
       this.connection.on("ReceiveMessage", (chatGroupId: number, userId: number,username:string) => {
-        self.friends.push({username:username,chatId:chatGroupId,userId:userId, hasNewMessages:true});
+        self.friends.unshift({username:username,chatId:chatGroupId,userId:userId, hasNewMessages:true});
         self.connection?.invoke("RegisterToGroup",chatGroupId);
 
       });

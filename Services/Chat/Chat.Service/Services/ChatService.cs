@@ -35,7 +35,7 @@ namespace Chat.Service.Services
         return await _chatRepository.GetUsersForGroupAsync(userId, chatGroupId);
     }
 
-    public async Task<bool> CreateMessageForChatGroupAsync(int userId, int chatGroupId,string message)
+    public async Task<ChatMessage> CreateMessageForChatGroupAsync(int userId, int chatGroupId,string message)
     {
 
         var result=await _chatRepository.CreateMessageForChatGroupAsync(userId, chatGroupId,message);

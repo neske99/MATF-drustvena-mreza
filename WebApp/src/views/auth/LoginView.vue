@@ -151,7 +151,10 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { authStore } from '../../stores/auth.ts';
+import { authStore } from '../../stores/auth.ts'
+import { chatStore } from '@/stores/chat.ts';
+import { userStore } from '@/stores/user.ts';
+
 
 export default defineComponent({
   name: 'LoginView',

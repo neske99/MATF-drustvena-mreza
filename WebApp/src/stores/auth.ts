@@ -3,6 +3,8 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 import router from '@/router'
 import { startSignalRConnection, stopSignalRConnection } from '@/plugin/signalr';
+import { chatStore } from './chat';
+import { userStore } from './user';
 
 export const authStore = defineStore('auth', () => {
   // state
@@ -38,6 +40,7 @@ export const authStore = defineStore('auth', () => {
       userId.value= response.data.userId;
       isAuthenticated.value = true;
 
+       //await userStore().GetFriendRequests();
        await startSignalRConnection();
 
       console.log(isAuthenticated);

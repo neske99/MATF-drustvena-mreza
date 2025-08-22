@@ -172,6 +172,14 @@ namespace Relations.API.Controllers
         }
 
 
+        [HttpGet("Testiranje")]
+        //[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetRelation(int userId)
+        {
+            var result = await _repository.GetReceivedFriendRequests(userId);
+            return Ok(result);
+        }
+
     }
 
 }

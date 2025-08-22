@@ -16,6 +16,12 @@ export const postStore = defineStore('post', () => {
     return result;
   };
 
+  const GetPostsForUser = async function (userId:number) {
+    let result = (await axiosAuthenticated.get(`http://localhost:8080/Post/GetPostsCreatedByUser?userId=${userId}`)).data;
+
+    return result;
+  };
+
   const AddComment = async function (text: string, postId: number) {
     let result = await axiosAuthenticated.post(`http://localhost:8080/Post/AddCommentToPost?postId=${postId}`, {
       text:text,
@@ -47,5 +53,5 @@ export const postStore = defineStore('post', () => {
   }
 
 
-  return { getCurrentPosts,UploadPost,AddComment, AddLike, RemoveLike, GetPosts };
+  return { getCurrentPosts,UploadPost,AddComment, AddLike,RemoveLike,GetPosts,GetPostsForUser };
 })

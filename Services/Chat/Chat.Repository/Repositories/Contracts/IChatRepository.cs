@@ -14,7 +14,7 @@ namespace Chat.Repository.Repositories.Contracts
 
         Task<bool> ReplicateUser(User user);
 
-        Task<bool> CreateMessageForChatGroupAsync(int userId, int chatGroupId, string message);
+        Task<ChatMessage> CreateMessageForChatGroupAsync(int userId, int chatGroupId, string message);
 
         Task<ChatGroup> CreateChatGroupAsync(int userAId, int userBId);
 

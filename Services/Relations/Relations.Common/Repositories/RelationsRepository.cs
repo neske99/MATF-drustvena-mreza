@@ -177,11 +177,13 @@ namespace Relations.Common.Repositories
         public async Task<IEnumerable<User>> GetReceivedFriendRequests(int userId)
         {
             await _context.DatabaseClient.ConnectAsync();
-            return await _context.DatabaseClient.Cypher
+            var result = await _context.DatabaseClient.Cypher
                 .OptionalMatch("(user:User)-[:REQUESTED_FRIENDSHIP_WITH]->(potential_friend:User)")
                 .Where((User potential_friend) => potential_friend.Id == userId)
                 .Return(user => user.As<User>())
                 .ResultsAsync;
+
+            return result.Where(u => u != null).ToList();
         }
 
         public async Task<bool> AcceptFriendRequest(int sourceUserId, int targetUserId)

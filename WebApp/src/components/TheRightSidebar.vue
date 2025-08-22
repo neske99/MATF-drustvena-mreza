@@ -1,11 +1,12 @@
 <template>
 
   <v-navigation-drawer app permanent location="right">
-    <template v-slot:append>
-      <MessageComponent v-for="message in messages" :message="message.message" :key="message.message"
+    <template v-slot:append ">
+      <div style="overflow-y:auto;max-height: 90vh;display:flex;flex-direction:column-reverse;">
+      <MessageComponent v-for="message in messages" :message="message.message" :key="message.id"
         :isSender="message.isSender">
       </MessageComponent>
-
+      </div>
       <v-divider></v-divider>
       <v-card-actions>
         <v-text-field placeholder="Type Message" v-model="messageToSend">
@@ -42,16 +43,16 @@ export default defineComponent({
    /*   this.connection.on("ReceiveMessage", (username: string, message: string) => {
         //this.messages.push({ message:message, isSender: username === authStore().username });
       });*/
-      this.connection.on("ReceiveMessageReal", (userId: number, message: string,chatGroupId:number) => {
+      this.connection.on("ReceiveMessageReal", (userId: number, message: string,chatGroupId:number,messageId) => {
         if(chatStore().currentChatGroupId === chatGroupId) {
-          this.messages.push({ message:message, isSender: userId === authStore().userId });
+          this.messages.unshift({ message:message, isSender: userId === authStore().userId,id:messageId });
         }
         let chGroup = chatStore().currentChatGroups.find(x => x.chatId === chatGroupId)!;
         chGroup.hasNewMessages = userId !== authStore().userId;
         if(chGroup.hasNewMessages){
           let index=chatStore().currentChatGroups.indexOf(chGroup);
           chatStore().currentChatGroups.splice(index,1);
-          chatStore().currentChatGroups.push(chGroup);
+          chatStore().currentChatGroups.unshift(chGroup);
         }
 
 

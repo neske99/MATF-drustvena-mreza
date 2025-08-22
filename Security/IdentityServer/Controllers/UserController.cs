@@ -65,6 +65,22 @@ namespace IdentityService.Controllers
             return Ok(userRelations);
         }
 
+        [HttpGet("GetFriendRequests")]
+        public async Task<ActionResult> GetFriendRequests([FromQuery] int userId)
+        {
+            var friendRequestUserIdList = _relationsService.GetFriendRequestUserIdList(userId);
+            var users = await _userManager.Users.Where(u => friendRequestUserIdList.Contains(u.Id)).ToListAsync();
+
+            return Ok(
+                    users.Select(u => new UserRelationDTO
+                    {
+                        Id = u.Id,
+                        Username = u.UserName ?? string.Empty,
+                        Relation = "RECEIVED_FRIENDSHIP_REQUEST_FROM"
+                    }).ToList()
+
+            );
+        }
 
 
         [HttpGet("GetUser/{username}")]
