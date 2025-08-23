@@ -18,7 +18,7 @@ namespace Post.Infrastructure
 {
     public static class InfrastructureServiceRegistration
     {
-        public static void RegisterInfrastructureService(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection RegisterInfrastructureService(this IServiceCollection services, IConfiguration configuration)
         {
             services.RegisterApplicationService();
             services.AddScoped<IPostRepository, PostRepository>();
@@ -33,6 +33,7 @@ namespace Post.Infrastructure
                 options.UseSqlServer(configuration.GetConnectionString("mssql"));
                 //options.UseSqlServer("Server=localhost,8091;Database=PostDb;User Id=sa;Password=MATF12345678rs2;TrustServerCertificate=True;");
             });
+            return services;
         }
 
     }
