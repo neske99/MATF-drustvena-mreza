@@ -1,36 +1,50 @@
 import { authStore } from '@/stores/auth';
-import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
+import { HubConnection, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
 
 let connection: HubConnection | null = null;
 
-export async function startSignalRConnection(){
-  if(!connection) {
-    connection = new HubConnectionBuilder()
-      .withUrl('http://localhost:8095/chathub',{
-          accessTokenFactory: () => {
-              return authStore().accessToken;
-          }})
-      .withAutomaticReconnect()
-      .build();
-      await connection.start();
-      console.log("started connection");
-  }
+export async function startSignalRConnection(): Promise<HubConnection | null> {
+  try {
+    if (connection && connection.state === HubConnectionState.Connected) {
+      return connection;
+    }
 
+    if (connection && connection.state !== HubConnectionState.Disconnected) {
+      await connection.stop();
+    }
+
+    connection = new HubConnectionBuilder()
+      .withUrl('http://localhost:8095/chathub', {
+        accessTokenFactory: () => {
+          return authStore().accessToken;
+        }
+      })
+      .withAutomaticReconnect([0, 2000, 10000, 30000])
+      .build();
+
+    await connection.start();
+    return connection;
+  } catch (error) {
+    connection = null;
+    return null;
+  }
+}
+
+export async function getSignalRConnection(): Promise<HubConnection | null> {
+  if (!connection || connection.state !== HubConnectionState.Connected) {
+    return await startSignalRConnection();
+  }
   return connection;
 }
 
-
-export function getSignalRConnection(): HubConnection | null {
-    if (!connection) {
-      return null;
-   }
-    return connection;
-}
-
-export function stopSignalRConnection() {
-  if(connection) {
-    console.log("ended connection");
-    connection.stop();
-    connection = null;
+export async function stopSignalRConnection(): Promise<void> {
+  if (connection) {
+    try {
+      await connection.stop();
+    } catch (error) {
+      // Ignore errors when stopping
+    } finally {
+      connection = null;
+    }
   }
 }

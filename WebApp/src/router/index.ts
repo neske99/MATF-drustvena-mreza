@@ -7,6 +7,7 @@ import UserDetailView from '@/views/UserDetailView.vue'
 import UserSearchView from '@/views/UserSearchView.vue'
 import PostsView from '@/views/PostsView.vue'
 import FriendRequestsView from '@/views/FriendRequestsView.vue'
+import SettingsView from '@/views/SettingsView.vue'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -44,6 +45,11 @@ const routes: RouteRecordRaw[] = [
     path: '/friendRequests',
     name: 'friendRequests',
     component: FriendRequestsView
+  },
+  {
+    path: '/settings',
+    name: 'settings',
+    component: SettingsView
   },
   {
     path: '/auth/signup',

@@ -58,10 +58,39 @@
 
               <v-card flat class="auth-card pa-8" elevation="0">
                 <v-form @submit.prevent="onSignUpClick" ref="signupForm">
+                  <v-row>
+                    <v-col cols="12" sm="6">
+                      <v-text-field
+                        v-model="firstName"
+                        label="First Name"
+                        prepend-inner-icon="mdi-account"
+                        variant="outlined"
+                        color="matf-red"
+                        class="mb-4"
+                        :rules="[rules.required, rules.nameLength]"
+                        hide-details="auto"
+                        hint="Your first name"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="6">
+                      <v-text-field
+                        v-model="lastName"
+                        label="Last Name"
+                        prepend-inner-icon="mdi-account"
+                        variant="outlined"
+                        color="matf-red"
+                        class="mb-4"
+                        :rules="[rules.required, rules.nameLength]"
+                        hide-details="auto"
+                        hint="Your last name"
+                      />
+                    </v-col>
+                  </v-row>
+
                   <v-text-field
                     v-model="username"
                     label="Username"
-                    prepend-inner-icon="mdi-account"
+                    prepend-inner-icon="mdi-at"
                     variant="outlined"
                     color="matf-red"
                     class="mb-4"
@@ -80,7 +109,7 @@
                     class="mb-4"
                     :rules="[rules.required, rules.passwordLength]"
                     hide-details="auto"
-                    hint="Minimum 6 characters"
+                    hint="Minimum 8 characters"
                   />
 
                   <v-text-field
@@ -174,6 +203,8 @@ export default defineComponent({
   name: 'SignupView',
   data() {
     return {
+      firstName: '',
+      lastName: '',
       username: '',
       password: '',
       confirmPassword: '',
@@ -183,8 +214,9 @@ export default defineComponent({
       errorMessage: '',
       rules: {
         required: (v: string) => !!v || 'This field is required',
+        nameLength: (v: string) => (v && v.length >= 2) || 'Name must be at least 2 characters',
         minLength: (v: string) => (v && v.length >= 3) || 'Username must be at least 3 characters',
-        passwordLength: (v: string) => (v && v.length >= 6) || 'Password must be at least 6 characters',
+        passwordLength: (v: string) => (v && v.length >= 8) || 'Password must be at least 8 characters',
         passwordMatch: (v: string) => v === this.password || 'Passwords do not match'
       }
     };
@@ -200,10 +232,12 @@ export default defineComponent({
 
       try {
         const store = authStore();
-        await store.signup(this.username, this.password);
+        await store.signup(this.username, this.password, this.firstName, this.lastName);
         this.showSuccess = true;
         
         // Clear form
+        this.firstName = '';
+        this.lastName = '';
         this.username = '';
         this.password = '';
         this.confirmPassword = '';

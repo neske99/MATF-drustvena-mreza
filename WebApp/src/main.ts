@@ -1,13 +1,12 @@
 import './assets/main.css'
-import './assets/icons.css' // Add explicit icons CSS
+import './assets/icons.css' // Enable icons CSS for proper icon display
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
-
 import App from './App.vue'
 import router from './router'
-import vuetify from './plugin/vuetify.ts'
+import vuetify from './plugin/vuetify'
 import piniaPersist from 'pinia-plugin-persistedstate'
 
 const pinia = createPinia();

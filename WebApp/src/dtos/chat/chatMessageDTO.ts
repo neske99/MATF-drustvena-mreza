@@ -1,5 +1,6 @@
 export interface ChatMessageDTO {
-  id:number,
-  message: string,
-  isSender: boolean
+  id: number;
+  message: string;
+  isSender: boolean;
+  timestamp: Date;
 }

@@ -1,55 +1,43 @@
-/* Material Design Icons - Fallback styles */
-@import url('https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css');
+/* Material Design Icons - Simple and reliable approach */
 
-/* Ensure icons are properly rendered */
+/* Import Material Design Icons from CDN */
+@import url('https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css');
+
+/* Ensure proper font loading */
 .v-icon {
-  font-family: 'Material Design Icons', sans-serif !important;
-  font-weight: normal;
-  font-style: normal;
-  font-size: 24px;
-  line-height: 1;
-  letter-spacing: normal;
-  text-transform: none;
+  font-family: "Material Design Icons" !important;
+  font-weight: normal !important;
+  font-style: normal !important;
   display: inline-block;
-  white-space: nowrap;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
   word-wrap: normal;
+  white-space: nowrap;
   direction: ltr;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Specific MDI icon fixes */
-.mdi:before,
-.v-icon.mdi:before {
-  font-family: 'Material Design Icons', sans-serif !important;
-  font-weight: normal;
-  font-style: normal;
+/* Fix Vuetify icon display */
+.v-btn .v-icon,
+.v-list-item .v-icon,
+.v-text-field .v-icon {
+  vertical-align: middle;
 }
 
-/* Force icon display for common icons used in login/signup */
-.mdi-account:before { content: "\F0004"; }
-.mdi-lock:before { content: "\F033E"; }
-.mdi-lock-check:before { content: "\F139A"; }
-.mdi-account-plus:before { content: "\F0014"; }
-.mdi-login:before { content: "\F0342"; }
-.mdi-school:before { content: "\F0549"; }
-.mdi-heart:before { content: "\F02D1"; }
-.mdi-chat:before { content: "\F0B79"; }
-.mdi-book-open-variant:before { content: "\F0F7B"; }
-.mdi-account-group:before { content: "\F0849"; }
-.mdi-calculator:before { content: "\F00C5"; }
-.mdi-forum:before { content: "\F00F6"; }
-.mdi-calendar-account:before { content: "\F0ED7"; }
-.mdi-book-open-page-variant:before { content: "\F05DB"; }
-.mdi-handshake:before { content: "\F1218"; }
+/* Ensure icons are visible */
+.v-icon:before {
+  font-family: "Material Design Icons" !important;
+}
 
-/* Ensure proper icon sizing */
-.v-icon--size-default {
+/* Common icon sizes */
+.v-icon {
   font-size: 24px;
 }
 
 .v-icon--size-small {
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .v-icon--size-large {
@@ -57,5 +45,5 @@
 }
 
 .v-icon--size-x-large {
-  font-size: 40px;
+  font-size: 48px;
 }
