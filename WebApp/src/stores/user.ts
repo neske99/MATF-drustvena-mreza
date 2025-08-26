@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import axiosAuthenticated from '@/plugin/axios';
 import type { UserPreviewDTO } from '@/dtos/user/userPreviewDTO';
 import type { UserDetailDTO } from '@/dtos/user/userDetailDTO';
+import type { UpdateProfileDTO, ChangePasswordDTO } from '@/dtos/user/updateUserDTO';
 import { authStore } from './auth';
 
 export const userStore = defineStore('user', () => {
@@ -41,7 +42,21 @@ export const userStore = defineStore('user', () => {
   };
 
   const GetRelation = async function (userId: number, friendId: number) {
-    return (await axiosAuthenticated.get(`http://localhost:8000/api/v1/Relations/relations/${userId}/${friendId}`)).data;
+    try {
+      console.log(`=== Frontend GetRelation Call ===`);
+      console.log(`Calling: http://localhost:8000/api/v1/Relations/relations/${userId}/${friendId}`);
+      
+      const response = await axiosAuthenticated.get(`http://localhost:8000/api/v1/Relations/relations/${userId}/${friendId}`);
+      
+      console.log(`API Response Status: ${response.status}`);
+      console.log(`API Response Data:`, response.data);
+      
+      // Just return the raw response - no normalization needed
+      return response.data || "NONE";
+    } catch (error) {
+      console.error('Error in GetRelation:', error);
+      return "NONE"; // Fallback to prevent crashes
+    }
   }
 
   const SendFriendRequest = async function (userId: number, friendId: number) {
@@ -52,7 +67,28 @@ export const userStore = defineStore('user', () => {
     await axiosAuthenticated.put(`http://localhost:8000/api/v1/Relations/received/accept/${userId}/${friendId}`);
   }
 
+  const DeclineFriendRequest = async function (userId: number, friendId: number) {
+    await axiosAuthenticated.delete(`http://localhost:8000/api/v1/Relations/received/decline/${userId}/${friendId}`);
+  }
 
+  const RemoveFriend = async function (userId: number, friendId: number) {
+    await axiosAuthenticated.delete(`http://localhost:8000/api/v1/Relations/friends/${userId}/${friendId}`);
+  }
 
-  return { getSearchedUsers,numFriendRequests,GetFriendRequests, GetRelation,GetUsers, GetSearchedUsers, GetUser,SendFriendRequest,AcceptFriendRequest  };
+  const UpdateProfile = async function (updateData: UpdateProfileDTO) {
+    let result: UserDetailDTO;
+    result = (await axiosAuthenticated.put(`http://localhost:8094/api/v1/User/UpdateProfile`, updateData)).data;
+    return result;
+  }
+
+  const ChangePassword = async function (passwordData: ChangePasswordDTO) {
+    await axiosAuthenticated.put(`http://localhost:8094/api/v1/User/ChangePassword`, passwordData);
+  }
+
+  const GetUserFriends = async function (userId: number) {
+    const result = (await axiosAuthenticated.get(`http://localhost:8000/api/v1/Relations/friends/${userId}`)).data;
+    return result;
+  }
+
+  return { getSearchedUsers,numFriendRequests,GetFriendRequests, GetUserFriends, GetRelation,GetUsers, GetSearchedUsers, GetUser,SendFriendRequest,AcceptFriendRequest, DeclineFriendRequest, RemoveFriend, UpdateProfile, ChangePassword  };
 })

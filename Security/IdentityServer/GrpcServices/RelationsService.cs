@@ -26,15 +26,24 @@ public class RelationsService
 
     public List<string> GetRelationShips(int userId, List<int> userIdList)
     {
-        GetRelationsWithRequest request = new GetRelationsWithRequest();
-        var user = new User();
-        user.Id = userId;
-        request.User = user;
+        try
+        {
+            GetRelationsWithRequest request = new GetRelationsWithRequest();
+            var user = new User();
+            user.Id = userId;
+            request.User = user;
 
-        request.TargetUsers.AddRange(userIdList.Select(id => new User { Id = id }));
+            request.TargetUsers.AddRange(userIdList.Select(id => new User { Id = id }));
 
-        var response = _grpcService.GetRelationsWith(request);
-        return response.Relations.Select(r => r.ToString()).ToList();
+            var response = _grpcService.GetRelationsWith(request);
+            return response.Relations.Select(r => r.Relation_).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in GetRelationShips: {ex.Message}");
+            // Return default relationships for all users to prevent crashes
+            return userIdList.Select(_ => "NONE").ToList();
+        }
     }
 
     public List<int> GetFriendRequestUserIdList(int userId)

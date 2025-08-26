@@ -94,6 +94,97 @@ namespace IdentityService.Controllers
 
         }
 
+        [HttpPut("UpdateProfile")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ProducesResponseType(typeof(UserDetails), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> UpdateProfileAsync([FromBody] UpdateProfileDto updateProfile)
+        {
+            // Try multiple claim types to find the user ID
+            var userId = User.FindFirst("nameid")?.Value ?? 
+                         User.FindFirst("sub")?.Value ?? 
+                         User.FindFirst("id")?.Value ?? 
+                         User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+             
+            if (string.IsNullOrEmpty(userId))
+            {
+                // Debug: Log all available claims
+                var claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
+                return BadRequest($"User ID not found in token. Available claims: {string.Join(", ", claims.Select(c => $"{c.Type}={c.Value}"))}");
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            // Check if username is being changed and if it's already taken
+            if (!string.IsNullOrEmpty(updateProfile.Username) && updateProfile.Username != user.UserName)
+            {
+                var existingUser = await _userManager.FindByNameAsync(updateProfile.Username);
+                if (existingUser != null)
+                {
+                    return BadRequest("Username is already taken");
+                }
+                user.UserName = updateProfile.Username;
+                user.NormalizedUserName = updateProfile.Username.ToUpper();
+            }
+
+            // Update profile fields
+            if (!string.IsNullOrEmpty(updateProfile.FirstName))
+            {
+                user.FirstName = updateProfile.FirstName;
+            }
+
+            if (!string.IsNullOrEmpty(updateProfile.LastName))
+            {
+                user.LastName = updateProfile.LastName;
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return Ok(_mapper.Map<UserDetails>(user));
+            }
+
+            return BadRequest(result.Errors);
+        }
+
+        [HttpPut("ChangePassword")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> ChangePasswordAsync([FromBody] ChangePasswordDto changePassword)
+        {
+            // Try multiple claim types to find the user ID
+            var userId = User.FindFirst("nameid")?.Value ?? 
+                         User.FindFirst("sub")?.Value ?? 
+                         User.FindFirst("id")?.Value ?? 
+                         User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                         
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID not found in token");
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            var result = await _userManager.ChangePasswordAsync(user, changePassword.CurrentPassword, changePassword.NewPassword);
+            if (result.Succeeded)
+            {
+                return Ok("Password changed successfully");
+            }
+
+            return BadRequest(result.Errors);
+        }
+
 
     }
 }

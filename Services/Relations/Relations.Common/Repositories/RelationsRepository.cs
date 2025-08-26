@@ -17,7 +17,7 @@ namespace Relations.Common.Repositories
             await _context.DatabaseClient.ConnectAsync();
 
             var relation = await _context.DatabaseClient.Cypher
-                .Match("(a:User)-[r]-(b:User)")
+                .Match("(a:User)-[r]->(b:User)")
                 .Where((User a) => a.Id == sourceUserId)
                 .AndWhere((User b) => b.Id == targetUserId)
                 .Return(r => r.Type())

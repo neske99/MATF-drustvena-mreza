@@ -45,5 +45,17 @@ public class ChatController : ControllerBase
     return Ok(await _chatService.GetAllUsers());
   }
 
-
+  [HttpPost("CreateChatGroup")]
+  public async Task<ActionResult> CreateChatGroup([FromQuery] int userAId, [FromQuery] int userBId)
+  {
+    try
+    {
+      var chatGroup = await _chatService.CreateChatGroupAsync(userAId, userBId);
+      return Ok(chatGroup);
+    }
+    catch (Exception ex)
+    {
+      return BadRequest($"Error creating chat group: {ex.Message}");
+    }
+  }
 }

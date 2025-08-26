@@ -28,16 +28,12 @@ public class RelationsService : RelationsProtoService.RelationsProtoServiceBase
         var user = request.User;
         var targetUsers = request.TargetUsers;
 
-        var relations = new List<string>();
         var response = new GetRelationsWithResponse();
         foreach (var targetUser in targetUsers)
         {
-            relations.Add(await _relationsRepository.GetRelation(user.Id, targetUser.Id));
-            response.Relations.Add(new Relation { Relation_ = relations.Last() });
+            var relation = await _relationsRepository.GetRelation(user.Id, targetUser.Id);
+            response.Relations.Add(new Relation { Relation_ = relation });
         }
-        response.Relations.Add(new Relation { Relation_ = "FRIENDS_WITH" });
-
-        //response.Relations.AddRange((IEnumerable<Relation>)relations);
 
         return response;
     }

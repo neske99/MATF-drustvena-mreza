@@ -19,15 +19,21 @@ export const authStore = defineStore('auth', () => {
   //getters
   const isUserAuthenticated = computed(() => isAuthenticated);
   //actions
-  const signup = async function (username: string, password: string) {
+  const signup = async function (username: string, password: string, firstName: string, lastName: string) {
     //Todo
     try {
-      let response = await axios.post(baseUrl + "RegisterBuyer", { Username: username, Password: password, FirstName: "Una", LastName: "Na", email: Math.random().toString(36).substring(2, 10) + "@gmail.com" });
+      let response = await axios.post(baseUrl + "RegisterBuyer", { 
+        Username: username, 
+        Password: password, 
+        FirstName: firstName, 
+        LastName: lastName, 
+        email: Math.random().toString(36).substring(2, 10) + "@gmail.com" 
+      });
 
       console.log(response);
       router.push("/auth/login")
     } catch (err) {
-      alert(err);
+      throw err; // Let the component handle the error
     }
   };
   const login = async function (usrname: string, password: string) {
@@ -40,10 +46,7 @@ export const authStore = defineStore('auth', () => {
       userId.value= response.data.userId;
       isAuthenticated.value = true;
 
-       //await userStore().GetFriendRequests();
-       await startSignalRConnection();
-
-      console.log(isAuthenticated);
+      await startSignalRConnection();
       router.push('/home')
     } catch (err) {
       if (axios.isAxiosError(err)
@@ -58,9 +61,6 @@ export const authStore = defineStore('auth', () => {
     //console.log(response);
   };
   const logout = async function () {
-    //Todo
-    console.log(username.value);
-    console.log(refreshToken.value);
     try {
       let response = await axios.post(baseUrl + "Logout", { username: username.value, refreshToken: refreshToken.value },
         {
@@ -68,15 +68,11 @@ export const authStore = defineStore('auth', () => {
             Authorization: "Bearer " + accessToken.value
           }
         });
-      isAuthenticated.value = false;
-      router.push('/auth/login')
-
       await stopSignalRConnection();
+      router.push('/auth/login')
     } catch (err) {
-      //error 401
       if (axios.isAxiosError(err))
         alert(err.message);
-
     }
 
     username.value = "";

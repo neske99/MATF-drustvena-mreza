@@ -42,13 +42,14 @@ namespace Chat.Repository.Repositories.Contracts
       return await _chatContext.ChatMessages
         //.Include(cm => cm.UserId)
         .Where(cm => cm.ChatGroupId == chatGroupId)
-        .OrderByDescending(cm => cm.CreatedDate)
+        .OrderBy(cm => cm.CreatedDate)
         .Take(100)
         .Select(cm => new ChatMessageDTO
         {
           Id=cm.Id,
           IsSender = cm.UserId == userId,
-          Message = cm.Text
+          Message = cm.Text,
+          Timestamp = cm.CreatedDate 
         })
         .ToListAsync();
     }
