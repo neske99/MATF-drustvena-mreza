@@ -301,9 +301,6 @@ export default defineComponent({
   background: rgba(255, 255, 255, 0.5);
 }
 
-.username-link:hover .matf-red--text {
-  color: #660000 !important;
-}
 
 .post-text {
   line-height: 1.6;
@@ -401,5 +398,19 @@ export default defineComponent({
   .likes-chip {
     margin-top: 8px;
   }
+}
+
+.username-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.username-link .matf-red--text {
+    color: #000000 !important;
+    transition: color 0.2s;
+}
+
+.username-link:hover .matf-red--text {
+    color: #660000 !important;
 }
 </style>

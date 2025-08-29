@@ -185,6 +185,46 @@ namespace IdentityService.Controllers
             return BadRequest(result.Errors);
         }
 
+        [HttpPost("UploadProfilePicture")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> UploadProfilePicture([FromForm] IFormFile file)
+        {
+            // Get user ID from token
+            var userId = User.FindFirst("nameid")?.Value ?? 
+                         User.FindFirst("sub")?.Value ?? 
+                         User.FindFirst("id")?.Value ?? 
+                         User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest("User ID not found in token");
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return NotFound("User not found");
+
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded");
+
+            // Save file to disk (e.g., wwwroot/uploads/profile-pictures/)
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "profile-pictures");
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            var fileName = $"user_{user.Id}_{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+            var filePath = Path.Combine(uploadsFolder, fileName);
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            // Set the public URL
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+            var fileUrl = $"{baseUrl}/uploads/profile-pictures/{fileName}";
+            user.ProfilePictureUrl = fileUrl;
+            await _userManager.UpdateAsync(user);
+
+            return Ok(new { url = fileUrl });
+        }
+
 
     }
 }

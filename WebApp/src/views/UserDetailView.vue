@@ -1,26 +1,31 @@
 <template>
-  <div class="user-detail-page">
+  <div class="profile-detail-page">
     <!-- User Profile Header -->
-    <v-card 
-      class="profile-header-card mb-6" 
-      elevation="2"
-      rounded="lg"
-    >
+    <v-card class="profile-header-card mb-6" elevation="2" rounded="lg">
       <!-- Cover Photo Area -->
       <div class="cover-photo">
         <div class="cover-overlay"></div>
       </div>
-      
       <!-- Profile Content -->
       <v-card-text class="profile-content pa-6">
         <div class="d-flex align-start">
           <!-- Profile Avatar -->
-          <div class="profile-avatar-container mr-6">
-            <v-avatar size="120" color="matf-red" class="profile-avatar">
-              <v-icon size="60" color="white">mdi-account</v-icon>
+          <div class="profile-avatar-container mr-6 avatar-hover-group" style="position:relative;">
+            <v-avatar size="120" color="matf-red" class="profile-avatar mb-2">
+              <img v-if="userDetail.profilePictureUrl" :src="userDetail.profilePictureUrl" alt="Profile Picture" />
+              <v-icon v-else size="60" color="white">mdi-account</v-icon>
             </v-avatar>
+            <v-btn
+              v-if="isOwnProfile"
+              icon
+              class="avatar-edit-btn"
+              color="white"
+              style="position:absolute;top:8px;left:8px;z-index:2;background:white;width:32px;height:32px;min-width:32px;min-height:32px;"
+              @click="showProfilePictureModal = true"
+            >
+              <v-icon color="matf-red" size="16">mdi-pencil</v-icon>
+            </v-btn>
           </div>
-          
           <!-- Profile Info -->
           <div class="flex-grow-1">
             <div class="d-flex justify-space-between align-start mb-4">
@@ -37,15 +42,6 @@
               <div class="profile-actions">
                 <!-- Own Profile Actions -->
                 <div v-if="isOwnProfile">
-                  <v-btn
-                    color="matf-red"
-                    size="large"
-                    class="text-none mr-2"
-                    prepend-icon="mdi-pencil"
-                    @click="editProfile = true"
-                  >
-                    Edit Profile
-                  </v-btn>
                   
                   <v-btn
                     color="matf-red"
@@ -370,45 +366,20 @@
       </v-window-item>
     </v-window>
 
-    <!-- Edit Profile Dialog -->
-    <v-dialog v-model="editProfile" max-width="500px">
-      <v-card>
-        <v-card-title class="text-h5 matf-red--text">Edit Profile</v-card-title>
-        <v-card-text>
-          <v-form ref="editForm">
-            <v-text-field
-              v-model="editedFirstName"
-              label="First Name"
-              variant="outlined"
-              color="matf-red"
-              class="mb-4"
-              :rules="[rules.required]"
-            />
-            <v-text-field
-              v-model="editedLastName"
-              label="Last Name"
-              variant="outlined"
-              color="matf-red"
-              :rules="[rules.required]"
-            />
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn color="grey" variant="text" @click="editProfile = false">
-            Cancel
-          </v-btn>
-          <v-btn color="matf-red" @click="saveProfile">
-            Save Changes
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+
+
+    <!-- Profile picture upload modal -->
+    <ProfilePictureUpload
+      :show="showProfilePictureModal"
+      @close="showProfilePictureModal = false"
+      @profile-picture-updated="onProfilePictureUpdated"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import PostComponent from '@/components/Post/PostComponent.vue';
+import ProfilePictureUpload from '@/components/Profile/ProfilePictureUpload.vue';
 import { defineComponent } from 'vue';
 import { authStore } from '../stores/auth.ts'
 import { userStore } from '../stores/user.ts'
@@ -423,7 +394,8 @@ export default defineComponent({
   name: 'UserDetailView',
   props: ['username'],
   components: {
-    PostComponent
+    PostComponent,
+    ProfilePictureUpload
   },
   data() {
     return {
@@ -436,12 +408,7 @@ export default defineComponent({
       friendsList: [] as UserDetailDTO[],
       loadingFriends: false,
       loading: true,
-      editProfile: false,
-      editedFirstName: '',
-      editedLastName: '',
-      rules: {
-        required: (v: string) => !!v || 'This field is required'
-      }
+      showProfilePictureModal: false,
     };
   },
   async created() {
@@ -598,6 +565,13 @@ export default defineComponent({
     viewFriendProfile(username: string) {
       this.$router.push({ name: 'UserDetail', params: { username } });
     },
+    async onProfilePictureUpdated(newUrl: string) {
+      this.userDetail.profilePictureUrl = newUrl;
+      this.loadUserData(); // Refresh user data after upload
+    },
+    async refreshUserPosts() {
+      this.userPosts = await postStore().GetPostsForUser(this.userDetail.id);
+    }
   },
   watch: {
     username: {
@@ -822,5 +796,25 @@ export default defineComponent({
   .profile-stats {
     margin-top: 1rem;
   }
+}
+.avatar-edit-btn {
+  box-shadow: 0 2px 8px rgba(139, 0, 0, 0.15);
+  border-radius: 50%;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.avatar-hover-group:hover .avatar-edit-btn {
+  opacity: 1;
+}
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+    display: block;
 }
 </style>
