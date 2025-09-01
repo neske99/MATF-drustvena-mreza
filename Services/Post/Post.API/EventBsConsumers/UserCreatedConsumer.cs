@@ -24,8 +24,7 @@ namespace Post.API.EventBsConsumers
                 {
                     Username = userCreated.UserName,
                     CreatedDate = userCreated.CreationDate,
-                    Id = userCreated.UserId,
-                    ProfilePictureUrl = userCreated.ProfilePictureUrl
+                    Id = userCreated.UserId
                 };
 
                 await _postRepository.ReplicateUser(newUser);

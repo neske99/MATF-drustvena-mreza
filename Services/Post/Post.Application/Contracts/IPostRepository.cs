@@ -18,6 +18,5 @@ namespace Post.Application.Contracts
         Task<IEnumerable<Post.Domain.Entities.Post>> GetAllPostsAsync();
         Task<List<User>> GetUsers();
         Task<IEnumerable<Post.Domain.Entities.Post>> GetPostsCreatedByUser(int userId);
-        Task<bool> UpdateUserProfilePicture(int userId, string? profilePictureUrl);
     }
 }

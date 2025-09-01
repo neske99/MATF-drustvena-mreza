@@ -74,26 +74,12 @@ export const authStore = defineStore('auth', () => {
     //console.log(response);
   };
   const logout = async function () {
-    try {
-      let response = await axios.post(baseUrl + "Logout", { username: username.value, refreshToken: refreshToken.value },
-        {
-          headers: {
-            Authorization: "Bearer " + accessToken.value
-          }
-        });
-      await stopSignalRConnection();
-      router.push('/auth/login')
-    } catch (err) {
-      if (axios.isAxiosError(err))
-        alert(err.message);
-    }
-
-    username.value = "";
-    accessToken.value = "";
-    refreshToken.value = "";
-    userId.value= 0;
-    profilePictureUrl.value = "";
-    isAuthenticated.value = false;
+    // Clear persisted state first
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Then force page refresh to login
+    window.location.href = '/auth/login';
   };
   const refresh = async function () {
     try {

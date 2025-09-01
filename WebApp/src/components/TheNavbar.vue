@@ -96,7 +96,14 @@
                 v-bind="props"
               >
                 <v-avatar size="32" class="mr-2">
-                  <v-icon>mdi-account</v-icon>
+                  <img 
+                    v-if="getCurrentUserProfilePicture()" 
+                    :src="getCurrentUserProfilePicture()" 
+                    alt="Your Profile Picture"
+                    @error="() => {}"
+                    class="navbar-avatar-image"
+                  />
+                  <v-icon v-else>mdi-account</v-icon>
                 </v-avatar>
                 <span class="d-none d-md-inline">{{ currentUsername }}</span>
                 <v-icon class="ml-1">mdi-chevron-down</v-icon>
@@ -162,13 +169,7 @@ export default defineComponent({
   },
   methods: {
     async onSignoutClick() {
-      const auth = authStore();
-      try {
-        await auth.logout();
-        this.$router.push('/auth/login');
-      } catch (err) {
-        console.error('Logout error:', err);
-      }
+      authStore().logout();
     },
     
     search() {
@@ -176,6 +177,21 @@ export default defineComponent({
         this.$router.push(`/usersearch/${this.searchText.trim()}`);
         this.searchText = "";
       }
+    },
+
+    getCurrentUserProfilePicture() {
+      const profilePictureUrl = authStore().profilePictureUrl;
+      if (!profilePictureUrl) return null;
+      
+      if (profilePictureUrl.startsWith('/uploads/profile-pictures/')) {
+        return import.meta.env.DEV ? `http://localhost:8094${profilePictureUrl}` : profilePictureUrl;
+      }
+      
+      if (profilePictureUrl.startsWith('/uploads/')) {
+        return import.meta.env.DEV ? `http://localhost:8094${profilePictureUrl}` : profilePictureUrl;
+      }
+      
+      return profilePictureUrl;
     }
   }
 })
@@ -290,6 +306,21 @@ export default defineComponent({
   .nav-btn .v-btn__prepend {
     margin-inline-end: 4px !important;
   }
+}
+
+/* Profile Picture Styles - Fix image fitting */
+.navbar-avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.v-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 /* Animations */

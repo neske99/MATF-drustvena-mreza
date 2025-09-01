@@ -108,5 +108,28 @@ export const userStore = defineStore('user', () => {
     return response.data.url;
   }
 
-  return { getSearchedUsers,numFriendRequests,GetFriendRequests, GetUserFriends, GetRelation,GetUsers, GetSearchedUsers, GetUser,SendFriendRequest,AcceptFriendRequest, DeclineFriendRequest, RemoveFriend, UpdateProfile, ChangePassword, UploadProfilePicture  };
+  const clearState = function () {
+    // Reset user store state on logout
+    numFriendRequests.value = 0;
+    // Clear any other reactive state if needed
+  };
+
+  return { 
+    getSearchedUsers, 
+    numFriendRequests, 
+    GetFriendRequests, 
+    GetUserFriends, 
+    GetRelation, 
+    GetUsers, 
+    GetSearchedUsers, 
+    GetUser, 
+    SendFriendRequest, 
+    AcceptFriendRequest, 
+    DeclineFriendRequest, 
+    RemoveFriend, 
+    UpdateProfile, 
+    ChangePassword, 
+    UploadProfilePicture,
+    clearState
+  };
 })

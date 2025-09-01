@@ -105,12 +105,9 @@ namespace Post.Infrastructure.Repositories
         public async Task<bool> ReplicateUser(User userToReplicate)
         {
             string toExecute = "SET IDENTITY_INSERT [dbo].[Users] ON " +
-                $"INSERT INTO [dbo].[Users] (Id,Username,CreatedDate,ProfilePictureUrl) VALUES ({userToReplicate.Id},'{userToReplicate.Username}','{userToReplicate.CreatedDate}','{userToReplicate.ProfilePictureUrl}')" +
+                $"INSERT INTO [dbo].[Users] (Id,Username,CreatedDate) VALUES ({userToReplicate.Id},'{userToReplicate.Username}','{userToReplicate.CreatedDate}')" +
                 " SET IDENTITY_INSERT [dbo].[Users] OFF";
             var result = await postContext.Database.ExecuteSqlRawAsync(toExecute);
-
-            //postContext.Users.Add(userToReplicate);
-            //var result = await postContext.SaveChangesAsync()>0;
 
             return result > 0;
         }
@@ -143,17 +140,6 @@ namespace Post.Infrastructure.Repositories
                 return false; // Post doesn't exist or user doesn't own it
 
             postContext.Posts.Remove(post);
-            var result = await postContext.SaveChangesAsync();
-            return result > 0;
-        }
-
-        public async Task<bool> UpdateUserProfilePicture(int userId, string? profilePictureUrl)
-        {
-            var user = await postContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            if (user == null)
-                return false;
-
-            user.ProfilePictureUrl = profilePictureUrl;
             var result = await postContext.SaveChangesAsync();
             return result > 0;
         }

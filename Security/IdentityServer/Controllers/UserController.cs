@@ -8,8 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MassTransit;
-using EventBusMessages.Events;
 
 namespace IdentityService.Controllers
 {
@@ -21,15 +19,13 @@ namespace IdentityService.Controllers
         private readonly RoleManager<IntRole> _roleManager;
         private readonly IMapper _mapper;
         private readonly RelationsService _relationsService;
-        private readonly IPublishEndpoint _publishEndpoint;
 
-    public UserController(UserManager<User> userManager, RoleManager<IntRole> roleManager, IMapper mapper, RelationsService relationsService, IPublishEndpoint publishEndpoint)
+    public UserController(UserManager<User> userManager, RoleManager<IntRole> roleManager, IMapper mapper, RelationsService relationsService)
     {
       _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
       _roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
       _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
       _relationsService = relationsService ?? throw new ArgumentNullException(nameof(relationsService));
-      _publishEndpoint = publishEndpoint ?? throw new ArgumentNullException(nameof(publishEndpoint));
     }
 
     [HttpGet("GetAllUsers")]
@@ -243,14 +239,6 @@ namespace IdentityService.Controllers
                 var relativePath = $"/uploads/profile-pictures/{fileName}";
                 user.ProfilePictureUrl = relativePath;
                 await _userManager.UpdateAsync(user);
-
-                // Publish profile picture update event
-                var profileUpdateEvent = new UserProfilePictureUpdatedEvent
-                {
-                    UserId = user.Id,
-                    ProfilePictureUrl = relativePath
-                };
-                await _publishEndpoint.Publish(profileUpdateEvent);
 
                 return Ok(new { url = relativePath });
             }

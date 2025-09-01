@@ -93,8 +93,11 @@
               :lastName="user.lastName" 
               :userId="user.id"
               :relation="user.relation"
+              :profilePictureUrl="user.profilePictureUrl"
               @request-sent="onRequestSent"
               @request-accepted="onRequestAccepted"
+              @request-declined="onRequestDeclined"
+              @friendship-removed="onFriendshipRemoved"
             />
           </v-col>
         </v-row>
@@ -106,9 +109,10 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { userStore } from '../stores/user.ts'
-import { authStore } from '../stores/auth.ts'
-import UserCardComponent from '@/components/UserSearch/UserCard.vue'
+import { userStore } from '../stores/user.ts';
+import { authStore } from '../stores/auth.ts';
+import { userCacheService } from '@/services/userCacheService';
+import UserCardComponent from '@/components/UserSearch/UserCard.vue';
 import type { UserPreviewDTO } from '@/dtos/user/userPreviewDTO.ts';
 
 export default defineComponent({
@@ -161,12 +165,33 @@ export default defineComponent({
         
         const results = await userstore.GetSearchedUsers(searchTerm.trim());
         
-        // Filter out current user from results
-        this.currentSearchedUsers = results.filter(user => 
+        // Filter out current user from results and enhance with profile pictures
+        const filteredResults = results.filter(user => 
           user.username !== authStore().username
         );
         
-        console.log('Search results:', this.currentSearchedUsers);
+        // Enhance each result with profile picture data
+        const enhancedResults = await Promise.all(
+          filteredResults.map(async (user) => {
+            try {
+              const userDetails = await userCacheService.getUserByUsername(user.username);
+              return {
+                ...user,
+                profilePictureUrl: userDetails?.profilePictureUrl || null
+              };
+            } catch (error) {
+              console.error(`Error fetching details for ${user.username}:`, error);
+              return {
+                ...user,
+                profilePictureUrl: null
+              };
+            }
+          })
+        );
+        
+        this.currentSearchedUsers = enhancedResults;
+        
+        console.log('Search results with relations and profile pictures:', this.currentSearchedUsers);
       } catch (error) {
         console.error('Error searching users:', error);
         this.currentSearchedUsers = [];
@@ -183,13 +208,41 @@ export default defineComponent({
         const userstore = userStore();
         const allUsers = await userstore.GetUsers();
         
-        // Filter out current user
-        this.currentSearchedUsers = allUsers.filter(user => 
+        // Filter out current user and get relationship status for each user
+        const filteredUsers = allUsers.filter(user => 
           user.username !== authStore().username
         );
+        
+        // Fetch relationship status and profile pictures for each user
+        const enhancedUsers = await Promise.all(
+          filteredUsers.map(async (user) => {
+            try {
+              // Get relationship status
+              const relation = await userstore.GetRelation(authStore().userId, user.id);
+              
+              // Get profile picture
+              const userDetails = await userCacheService.getUserByUsername(user.username);
+              
+              return {
+                ...user,
+                relation: relation,
+                profilePictureUrl: userDetails?.profilePictureUrl || null
+              };
+            } catch (error) {
+              console.error(`Error getting data for user ${user.id}:`, error);
+              return {
+                ...user,
+                relation: 'NONE', // Default relation if error
+                profilePictureUrl: null
+              };
+            }
+          })
+        );
+        
+        this.currentSearchedUsers = enhancedUsers;
         this.searchPerformed = true;
-       
-
+        
+        console.log('All users with relations and profile pictures:', this.currentSearchedUsers);
       } catch (error) {
         console.error('Error loading all users:', error);
       } finally {
@@ -201,7 +254,8 @@ export default defineComponent({
       // Update the user's status in the list
       const user = this.currentSearchedUsers.find(u => u.id === userId);
       if (user) {
-        user.relation = 'SENT_FRIENDSHIP_REQUEST_TO';
+        user.relation = 'REQUESTED_FRIENDSHIP_WITH';
+        console.log(`Updated relation for user ${userId} to: REQUESTED_FRIENDSHIP_WITH`);
       }
     },
     
@@ -209,7 +263,26 @@ export default defineComponent({
       // Update the user's status in the list
       const user = this.currentSearchedUsers.find(u => u.id === userId);
       if (user) {
-        user.relation = 'FRIENDS';
+        user.relation = 'FRIEND_WITH';
+        console.log(`Updated relation for user ${userId} to: FRIEND_WITH`);
+      }
+    },
+
+    onRequestDeclined(userId: number) {
+      // Update the user's status in the list
+      const user = this.currentSearchedUsers.find(u => u.id === userId);
+      if (user) {
+        user.relation = 'NONE';
+        console.log(`Updated relation for user ${userId} to: NONE`);
+      }
+    },
+
+    onFriendshipRemoved(userId: number) {
+      // Update the user's status in the list
+      const user = this.currentSearchedUsers.find(u => u.id === userId);
+      if (user) {
+        user.relation = 'NONE';
+        console.log(`Updated relation for user ${userId} to: NONE`);
       }
     }
   },

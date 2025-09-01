@@ -9,7 +9,5 @@ namespace Post.Domain.Entities
     public class User : Aggregate
     {
         public string Username { get; set; } = string.Empty;
-        public string? ProfilePictureUrl { get; set; }
-
     }
 }

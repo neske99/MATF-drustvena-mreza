@@ -43,7 +43,14 @@ export default defineComponent({
   computed: {
     isAuthenticated() {
       const auth = authStore();
-      return auth.isAuthenticated;
+      const authenticated = auth.isAuthenticated;
+      console.log('App.vue isAuthenticated computed - value:', authenticated);
+      console.log('App.vue auth store state:', {
+        username: auth.username,
+        userId: auth.userId,
+        hasAccessToken: !!auth.accessToken
+      });
+      return authenticated;
     }
   }
 })
@@ -80,9 +87,9 @@ export default defineComponent({
 }
 
 .content-wrapper {
-  max-width: 800px;
+  max-width: 1200px; /* Increased from 800px to 1200px */
   margin: 0 auto;
-  padding: 24px;
+  padding: 24px 32px; /* Increased horizontal padding */
 }
 
 .right-sidebar {
@@ -111,6 +118,11 @@ export default defineComponent({
   .main-content {
     margin-right: 0;
   }
+  
+  .content-wrapper {
+    max-width: 900px; /* Adjust for medium screens */
+    padding: 24px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -124,6 +136,7 @@ export default defineComponent({
   }
   
   .content-wrapper {
+    max-width: none; /* Full width on mobile */
     padding: 16px;
   }
 }

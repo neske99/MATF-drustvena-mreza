@@ -16,9 +16,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.RegisterInfrastructureService(builder.Configuration);
 
-builder.Services.AddHttpClient();
-
-// Add logger with Action<LoggerOptions> configuration
 builder.Services.AddLogger(options =>
 {
     options.LogDirectory = "logs/post-api";
@@ -31,17 +28,12 @@ builder.Services.AddLogger(options =>
 builder.Services.AddMassTransit(config =>
 {
     config.AddConsumer<UserCreatedConsumer>();
-    config.AddConsumer<UserProfilePictureUpdatedConsumer>();
     config.UsingRabbitMq((ctx, cfg) =>
     {
         cfg.Host(builder.Configuration.GetValue<string>("EventBusSettings:HostAddress"));
         cfg.ReceiveEndpoint(EventBusConstants.UserCreatedQueue, c =>
         {
             c.ConfigureConsumer<UserCreatedConsumer>(ctx);
-        });
-        cfg.ReceiveEndpoint("user-profile-picture-updated-queue", c =>
-        {
-            c.ConfigureConsumer<UserProfilePictureUpdatedConsumer>(ctx);
         });
     });
 });

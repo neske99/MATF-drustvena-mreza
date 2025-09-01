@@ -51,6 +51,9 @@
             <v-icon class="mr-1" size="16">mdi-account-plus</v-icon>
             Find People
           </v-btn>
+          <div class="mt-2" v-if="debugInfo">
+            <p class="text-caption text--secondary">Debug: {{ debugInfo }}</p>
+          </div>
         </div>
 
         <!-- Friends List -->
@@ -67,7 +70,14 @@
               <!-- Friend Avatar -->
               <template v-slot:prepend>
                 <v-avatar size="40" color="matf-red">
-                  <v-icon color="white">mdi-account</v-icon>
+                  <img 
+                    v-if="getUserProfilePicture(friend)" 
+                    :src="getUserProfilePicture(friend)" 
+                    alt="Profile Picture"
+                    @error="() => {}"
+                    class="avatar-image"
+                  />
+                  <v-icon v-else color="white">mdi-account</v-icon>
                 </v-avatar>
               </template>
 
@@ -83,7 +93,7 @@
               </v-list-item-title>
               
               <v-list-item-subtitle class="text--secondary">
-                MATF Student
+                {{ getFriendDisplayName(friend) }}
               </v-list-item-subtitle>
 
               <!-- New Message Indicator -->
@@ -135,7 +145,14 @@
               >
                 <template v-slot:prepend>
                   <v-avatar size="40" color="matf-red">
-                    <v-icon color="white">mdi-account</v-icon>
+                    <img 
+                      v-if="getUserProfilePicture(user)" 
+                      :src="getUserProfilePicture(user)" 
+                      alt="Profile Picture"
+                      @error="() => {}"
+                      class="avatar-image"
+                    />
+                    <v-icon v-else color="white">mdi-account</v-icon>
                   </v-avatar>
                 </template>
                 
@@ -195,6 +212,7 @@ import { defineComponent } from 'vue'
 import { chatStore } from '../stores/chat.ts'
 import { userStore } from '../stores/user.ts'
 import { authStore } from '../stores/auth.ts'
+import { userCacheService } from '@/services/userCacheService'
 import type { HubConnection } from '@microsoft/signalr';
 import type { ChatGroupDTO } from '@/dtos/chat/chatGroupDTO.ts';
 import type { UserPreviewDTO } from '@/dtos/user/userPreviewDTO.ts';
@@ -212,17 +230,34 @@ export default defineComponent({
       addFriendSearchText: "",
       allUsersResults: [] as UserPreviewDTO[],
       searchingAllUsers: false,
-      addFriendTimeout: null as NodeJS.Timeout | null
+      addFriendTimeout: null as NodeJS.Timeout | null,
+
+      // User profile picture cache
+      userProfilePictures: new Map<string, string>(),
+      friendsUserInfo: new Map<string, any>(),
+
+      // Debug info
+      debugInfo: null as string | null
     }
   },
   async created() {
     try {
-      await chatStore().getChatGroupsForUser();
+      const store = chatStore();
+      console.log('Loading chat groups for user:', authStore().userId);
+      
+      await store.getChatGroupsForUser();
+      console.log('Chat groups loaded:', store.currentChatGroups);
+      
+      this.debugInfo = `Loaded ${store.currentChatGroups.length} chat groups`;
+      
+      await this.loadUserProfilePictures();
 
       this.connection = await getSignalRConnection();
       if (this.connection) {
+        console.log('SignalR connection established');
         this.connection.on("ReceiveMessage", (chatGroupId: number, userId: number, username: string) => {
-          this.friends.unshift({
+          const store = chatStore();
+          store.currentChatGroups.unshift({
             username: username,
             chatId: chatGroupId,
             userId: userId, 
@@ -230,9 +265,28 @@ export default defineComponent({
           });
           this.connection?.invoke("RegisterToGroup", chatGroupId);
         });
+      } else {
+        console.log('SignalR connection failed');
+        this.debugInfo = 'SignalR connection failed';
       }
     } catch (error) {
-      // Ignore connection errors
+      console.error('Error in LeftSidebar created:', error);
+      this.debugInfo = `Error: ${error}`;
+    }
+  },
+  async mounted() {
+    // Listen for friendship changes from other components
+    this.$root.$on('friendship-changed', this.refreshChatGroups);
+  },
+
+  beforeUnmount() {
+    // Clean up event listener
+    this.$root.$off('friendship-changed', this.refreshChatGroups);
+    
+    // Clean up SignalR connection
+    if (this.connection) {
+      this.connection.stop();
+      this.connection = null;
     }
   },
   computed: {
@@ -252,8 +306,11 @@ export default defineComponent({
   },
   methods: {
     openChatWithFriend(friend: ChatGroupDTO) {
-      chatStore().switchUserChat(friend);
+      console.log('Opening chat with friend:', friend);
+      const store = chatStore();
+      store.switchUserChat(friend);
       friend.hasNewMessages = false;
+      console.log('Friend new messages set to false');
     },
     
     // Open Add Friend Dialog - same functionality as before
@@ -306,6 +363,67 @@ export default defineComponent({
       if (this.addFriendTimeout) {
         clearTimeout(this.addFriendTimeout);
         this.addFriendTimeout = null;
+      }
+    },
+
+    // Load profile pictures for chat friends
+    async loadUserProfilePictures() {
+      const friends = chatStore().currentChatGroups;
+      for (const friend of friends) {
+        if (friend.username && !this.userProfilePictures.has(friend.username)) {
+          try {
+            const userInfo = await userCacheService.getUserByUsername(friend.username);
+            if (userInfo) {
+              this.friendsUserInfo.set(friend.username, userInfo);
+              if (userInfo.profilePictureUrl) {
+                this.userProfilePictures.set(friend.username, userInfo.profilePictureUrl);
+              }
+            }
+          } catch (error) {
+            console.log(`Could not fetch profile picture for ${friend.username}:`, error);
+          }
+        }
+      }
+    },
+
+    // Get friend display name
+    getFriendDisplayName(friend: any) {
+      const userInfo = this.friendsUserInfo.get(friend.username);
+      if (userInfo && userInfo.firstName && userInfo.lastName) {
+        return `${userInfo.firstName} ${userInfo.lastName}`;
+      }
+      return 'MATF Student';
+    },
+
+    // Get profile picture URL for a user
+    getUserProfilePicture(user: any) {
+      const profilePictureUrl = user.profilePictureUrl || this.userProfilePictures.get(user.username);
+      if (!profilePictureUrl) return null;
+      
+      if (profilePictureUrl.startsWith('/uploads/profile-pictures/')) {
+        return import.meta.env.DEV
+          ? `http://localhost:8094${profilePictureUrl}`
+          : profilePictureUrl;
+      }
+      
+      if (profilePictureUrl.startsWith('/uploads/')) {
+        return import.meta.env.DEV
+          ? `http://localhost:8094${profilePictureUrl}`
+          : profilePictureUrl;
+      }
+      
+      return profilePictureUrl;
+    },
+
+    // Refresh chat groups when friendship changes
+    async refreshChatGroups() {
+      try {
+        console.log('Refreshing chat groups due to friendship change');
+        const store = chatStore();
+        await store.getChatGroupsForUser();
+        await this.loadUserProfilePictures();
+      } catch (error) {
+        console.error('Error refreshing chat groups:', error);
       }
     }
   }
@@ -411,48 +529,25 @@ export default defineComponent({
   transform: translateY(-1px);
 }
 
-/* Custom scrollbar */
-.friends-list::-webkit-scrollbar,
-.search-results-list::-webkit-scrollbar {
-  width: 4px;
-}
-
-.friends-list::-webkit-scrollbar-track,
-.search-results-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.friends-list::-webkit-scrollbar-thumb,
-.search-results-list::-webkit-scrollbar-thumb {
-  background: rgba(139, 0, 0, 0.3);
-  border-radius: 2px;
-}
-
-.friends-list::-webkit-scrollbar-thumb:hover,
-.search_RESULTS_list::-webkit-scrollbar-thumb:hover {
-  background: rgba(139, 0, 0, 0.5);
-}
-
-/* Animations */
-.friend-item {
-  animation: slideInLeft 0.3s ease-out;
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .left-sidebar {
     display: none !important;
   }
+}
+
+/* Profile Picture Styles - Fix image fitting */
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.v-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 </style>

@@ -19,14 +19,21 @@
         <div v-else class="active-chat-header">
           <div class="d-flex align-center">
             <v-avatar size="40" color="matf-red" class="mr-3">
-              <v-icon color="white">mdi-account</v-icon>
+              <img 
+                v-if="getCurrentChatUserProfilePicture()" 
+                :src="getCurrentChatUserProfilePicture()" 
+                alt="Profile Picture"
+                @error="() => {}"
+                class="chat-avatar-image"
+              />
+              <v-icon v-else color="white">mdi-account</v-icon>
             </v-avatar>
             <div class="flex-grow-1">
               <h3 class="text-h6 font-weight-bold text--primary mb-0">
                 {{ currentChatUser }}
               </h3>
               <p class="text-caption text--secondary mb-0">
-                MATF Student
+                {{ getCurrentChatUserDisplayName }}
               </p>
             </div>
             <v-btn 
@@ -152,6 +159,7 @@
 import { defineComponent } from 'vue'
 import MessageComponent from './Chat/MessageComponent.vue';
 import { chatStore } from '../stores/chat.ts'
+import { userCacheService } from '@/services/userCacheService'
 import { startSignalRConnection, getSignalRConnection, stopSignalRConnection } from '../plugin/signalr.ts'
 import type { HubConnection } from '@microsoft/signalr';
 import { authStore } from '@/stores/auth.ts';
@@ -163,56 +171,104 @@ export default defineComponent({
   },
   data() {
     return {
-      messages: chatStore().getCurrentMessages,
       messageToSend: "",
       connection: null as HubConnection | null,
       loading: false,
-      sendingMessage: false
+      sendingMessage: false,
+      currentChatUserInfo: null as any
+    }
+  },
+  computed: {
+    messages() {
+      const messages = chatStore().getCurrentMessages;
+      console.log('RIGHT SIDEBAR: messages computed property called, returning:', messages);
+      return messages;
+    },
+    
+    isSendMessageDisabled() {
+      return chatStore().currentChatGroupId === 0;
+    },
+    
+    currentChatGroupId() {
+      const chatId = chatStore().currentChatGroupId;
+      console.log('RIGHT SIDEBAR: currentChatGroupId computed property called, returning:', chatId);
+      return chatId;
+    },
+    
+    currentChatUser() {
+      const store = chatStore();
+      const currentGroup = store.currentChatGroups.find(
+        group => group.chatId === store.currentChatGroupId
+      );
+      const username = currentGroup?.username || 'Unknown User';
+      console.log('RIGHT SIDEBAR: currentChatUser computed property called, returning:', username);
+      return username;
+    },
+
+    getCurrentChatUserDisplayName() {
+      if (this.currentChatUserInfo) {
+        return `${this.currentChatUserInfo.firstName} ${this.currentChatUserInfo.lastName}`;
+      }
+      return 'MATF Student';
     }
   },
   async created() {
     this.connection = await getSignalRConnection();
     if (this.connection) {
       this.connection.on("ReceiveMessageReal", (userId: number, message: string, chatGroupId: number, messageId: number, timestamp?: string) => {
-        if (chatStore().currentChatGroupId === chatGroupId) {
-          this.messages.push({ 
+        console.log('Received message via SignalR:', { userId, message, chatGroupId, messageId });
+        
+        const store = chatStore();
+        if (store.currentChatGroupId === chatGroupId) {
+          const newMessage = { 
             message: message, 
             isSender: userId === authStore().userId, 
             id: messageId,
             timestamp: timestamp ? new Date(timestamp) : new Date()
-          });
+          };
+          
+          // Add message to the store's message array
+          store.currentChatMessages.push(newMessage);
+          
+          console.log('Added message to current chat, total messages:', store.currentChatMessages.length);
+          
           this.scrollToBottom();
         }
         
-        const chGroup = chatStore().currentChatGroups.find(x => x.chatId === chatGroupId);
+        const chGroup = store.currentChatGroups.find(x => x.chatId === chatGroupId);
         if (chGroup) {
           chGroup.hasNewMessages = userId !== authStore().userId;
           if (chGroup.hasNewMessages) {
-            const index = chatStore().currentChatGroups.indexOf(chGroup);
-            chatStore().currentChatGroups.splice(index, 1);
-            chatStore().currentChatGroups.unshift(chGroup);
+            const index = store.currentChatGroups.indexOf(chGroup);
+            store.currentChatGroups.splice(index, 1);
+            store.currentChatGroups.unshift(chGroup);
           }
         }
       });
     }
   },
-  computed: {
-    isSendMessageDisabled() {
-      return chatStore().currentChatGroupId === 0;
-    },
-    
-    currentChatGroupId() {
-      return chatStore().currentChatGroupId;
-    },
-    
-    currentChatUser() {
-      const currentGroup = chatStore().currentChatGroups.find(
-        group => group.chatId === chatStore().currentChatGroupId
-      );
-      return currentGroup?.username || 'Unknown User';
+  beforeUnmount() {
+    // Clean up SignalR connection
+    if (this.connection) {
+      this.connection.stop();
+      this.connection = null;
     }
   },
   methods: {
+    getCurrentChatUserProfilePicture() {
+      if (!this.currentChatUserInfo?.profilePictureUrl) return null;
+      
+      const url = this.currentChatUserInfo.profilePictureUrl;
+      if (url.startsWith('/uploads/profile-pictures/')) {
+        return import.meta.env.DEV ? `http://localhost:8094${url}` : url;
+      }
+      
+      if (url.startsWith('/uploads/')) {
+        return import.meta.env.DEV ? `http://localhost:8094${url}` : url;
+      }
+      
+      return url;
+    },
     async onSend() {
       if (!this.messageToSend.trim() || this.sendingMessage) return;
       
@@ -226,12 +282,14 @@ export default defineComponent({
         }
         
         if (this.connection) {
-          await this.connection.invoke("SendMessageToGroup", chatStore().currentChatGroupId, messageText);
+          const store = chatStore();
+          await this.connection.invoke("SendMessageToGroup", store.currentChatGroupId, messageText);
         }
         
         // Clear message regardless of success/failure
         this.messageToSend = "";
       } catch (error) {
+        console.error('Error sending message:', error);
         // Still clear the message even if sending failed
         this.messageToSend = "";
       } finally {
@@ -265,15 +323,51 @@ export default defineComponent({
     currentChatGroupId: {
       immediate: true,
       async handler(newChatId, oldChatId) {
+        console.log('=== RIGHT SIDEBAR: CurrentChatGroupId watcher ===');
+        console.log('CurrentChatGroupId changed:', newChatId, 'from:', oldChatId);
+        console.log('Messages length after chat switch:', this.messages.length);
+        console.log('Current messages:', this.messages);
+        
         if (newChatId !== oldChatId) {
-          this.messages = chatStore().getCurrentMessages;
+          console.log('Chat ID actually changed, processing...');
+          
           if (newChatId !== 0) {
+            console.log('New chat ID is not 0, loading user info...');
+            
+            // Load user info for current chat user
+            const store = chatStore();
+            const currentGroup = store.currentChatGroups.find(
+              group => group.chatId === newChatId
+            );
+            
+            console.log('Current group from store:', currentGroup);
+            console.log('All groups in store:', store.currentChatGroups);
+            
+            if (currentGroup?.username) {
+              try {
+                console.log('Fetching user info for username:', currentGroup.username);
+                this.currentChatUserInfo = await userCacheService.getUserByUsername(currentGroup.username);
+                console.log('Loaded user info:', this.currentChatUserInfo);
+              } catch (error) {
+                console.error(`Could not fetch user info for ${currentGroup.username}:`, error);
+              }
+            } else {
+              console.log('No current group found or no username');
+            }
+            
             await this.loadMessages();
             this.$nextTick(() => {
               this.scrollToBottom();
             });
+          } else {
+            console.log('New chat ID is 0, clearing user info');
+            this.currentChatUserInfo = null;
           }
+        } else {
+          console.log('Chat ID did not change, skipping...');
         }
+        
+        console.log('=== RIGHT SIDEBAR: CurrentChatGroupId watcher completed ===');
       }
     }
   }
@@ -424,5 +518,20 @@ export default defineComponent({
   .right-sidebar {
     display: none !important;
   }
+}
+
+/* Profile Picture Styles - Fix image fitting */
+.chat-avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.v-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 </style>

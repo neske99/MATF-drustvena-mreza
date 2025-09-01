@@ -97,11 +97,11 @@
                         <v-spacer></v-spacer>
 
                         <!-- Action buttons -->
-                        <div class="d-flex gap-3">
+                        <div class="action-buttons d-flex">
                             <v-btn variant="outlined"
                                    color="grey"
                                    size="large"
-                                   class="text-none px-4"
+                                   class="text-none px-4 mr-4"
                                    @click="clearPost"
                                    :disabled="(!newPost && !attachedFile) || loading">
                                 <v-icon class="mr-2">mdi-close</v-icon>
