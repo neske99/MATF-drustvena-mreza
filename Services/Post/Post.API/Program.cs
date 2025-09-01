@@ -8,6 +8,7 @@ using System.Text;
 using Relations.GRPC;
 using System.Reflection;
 using Common.Logger.Extensions;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,8 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.RegisterInfrastructureService(builder.Configuration);
 
-
-
+builder.Services.AddHttpClient();
 
 // Add logger with Action<LoggerOptions> configuration
 builder.Services.AddLogger(options =>
@@ -26,15 +26,22 @@ builder.Services.AddLogger(options =>
     options.ExcludedPaths.Add("/api/posts/upload");
 });
 
+
+
 builder.Services.AddMassTransit(config =>
 {
     config.AddConsumer<UserCreatedConsumer>();
+    config.AddConsumer<UserProfilePictureUpdatedConsumer>();
     config.UsingRabbitMq((ctx, cfg) =>
     {
         cfg.Host(builder.Configuration.GetValue<string>("EventBusSettings:HostAddress"));
         cfg.ReceiveEndpoint(EventBusConstants.UserCreatedQueue, c =>
         {
             c.ConfigureConsumer<UserCreatedConsumer>(ctx);
+        });
+        cfg.ReceiveEndpoint("user-profile-picture-updated-queue", c =>
+        {
+            c.ConfigureConsumer<UserProfilePictureUpdatedConsumer>(ctx);
         });
     });
 });
@@ -74,6 +81,20 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+
+var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+if (!Directory.Exists(uploadsPath))
+{
+    Directory.CreateDirectory(uploadsPath);
+}
+
+app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(uploadsPath),
+    RequestPath = "/uploads"
+});
 
 // Add logger middleware early in the pipeline
 app.UseLogger();

@@ -12,7 +12,7 @@
           <!-- Profile Avatar -->
           <div class="profile-avatar-container mr-6 avatar-hover-group" style="position:relative;">
             <v-avatar size="120" color="matf-red" class="profile-avatar mb-2">
-              <img v-if="userDetail.profilePictureUrl" :src="userDetail.profilePictureUrl" alt="Profile Picture" />
+              <img v-if="formattedProfilePictureUrl" :src="formattedProfilePictureUrl" alt="Profile Picture" @error="handleImageError" />
               <v-icon v-else size="60" color="white">mdi-account</v-icon>
             </v-avatar>
             <v-btn
@@ -228,11 +228,18 @@
                 :id="post.id" 
                 :text="post.text" 
                 :username="post.user.username" 
+                :userId="post.user.id"
+                :createdDate="post.createdDate"
+                :userProfilePictureUrl="post.user.profilePictureUrl"
                 :comments="post.comments" 
                 :likes="post.likes"
+                :fileUrl="post.fileUrl"
+                :fileName="post.fileName"
+                :fileType="post.fileType"
                 :key="post.id"
                 @comment-added="refreshUserPosts"
                 @like-toggled="refreshUserPosts"
+                @post-deleted="refreshUserPosts"
                 class="mb-4"
               />
             </TransitionGroup>
@@ -342,7 +349,13 @@
                     <v-card-text class="pa-4">
                       <div class="d-flex align-center">
                         <v-avatar size="48" color="matf-red" class="mr-3">
-                          <v-icon color="white">mdi-account</v-icon>
+                          <img 
+                              v-if="getUserProfilePictureUrl(friend.profilePictureUrl)" 
+                              :src="getUserProfilePictureUrl(friend.profilePictureUrl)" 
+                              alt="Profile Picture"
+                              @error="() => {}"
+                          />
+                          <v-icon v-else color="white">mdi-account</v-icon>
                         </v-avatar>
                         
                         <div class="flex-grow-1">
@@ -365,7 +378,6 @@
         </v-card>
       </v-window-item>
     </v-window>
-
 
 
     <!-- Profile picture upload modal -->
@@ -409,6 +421,7 @@ export default defineComponent({
       loadingFriends: false,
       loading: true,
       showProfilePictureModal: false,
+      imageError: false,
     };
   },
   async created() {
@@ -421,6 +434,10 @@ export default defineComponent({
     
     isOwnProfile() {
       return this.username === authStore().username;
+    },
+
+    formattedProfilePictureUrl() {
+      return this.getUserProfilePictureUrl(this.userDetail.profilePictureUrl);
     }
   },
   methods: {
@@ -562,16 +579,50 @@ export default defineComponent({
       }
     },
     
-    viewFriendProfile(username: string) {
+    viewFriendProfile(username: boolean) {
       this.$router.push({ name: 'UserDetail', params: { username } });
     },
     async onProfilePictureUpdated(newUrl: string) {
       this.userDetail.profilePictureUrl = newUrl;
+      
+      // If this is the current user's profile, update auth store too
+      if (this.isOwnProfile) {
+        authStore().updateProfilePicture(newUrl);
+      }
+      
       this.loadUserData(); // Refresh user data after upload
     },
     async refreshUserPosts() {
       this.userPosts = await postStore().GetPostsForUser(this.userDetail.id);
-    }
+    },
+
+    getUserProfilePictureUrl(url: string) {
+      // Handle profile pictures which should be served from identity service
+      if (!url) return null;
+      
+      // Check if this is a profile picture path (correct path)
+      if (url.startsWith('/uploads/profile-pictures/')) {
+        return import.meta.env.DEV
+          ? `http://localhost:8094${url}`
+          : url;
+      }
+      
+      // Handle any other uploads path - default to identity service for profile pics
+      if (url.startsWith('/uploads/')) {
+        return import.meta.env.DEV
+          ? `http://localhost:8094${url}`
+          : url;
+      }
+      
+      // If it's already a full URL, return as is
+      return url;
+    },
+
+    handleImageError() {
+      console.error('Profile image failed to load:', this.formattedProfilePictureUrl);
+      console.error('Original profile picture URL:', this.userDetail.profilePictureUrl);
+      this.imageError = true;
+    },
   },
   watch: {
     username: {

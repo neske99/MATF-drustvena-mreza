@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MassTransit;
+using EventBusMessages.Events;
 
 namespace IdentityService.Controllers
 {
@@ -19,12 +21,15 @@ namespace IdentityService.Controllers
         private readonly RoleManager<IntRole> _roleManager;
         private readonly IMapper _mapper;
         private readonly RelationsService _relationsService;
-    public UserController(UserManager<User> userManager, RoleManager<IntRole> roleManager, IMapper mapper, RelationsService relationsService)
+        private readonly IPublishEndpoint _publishEndpoint;
+
+    public UserController(UserManager<User> userManager, RoleManager<IntRole> roleManager, IMapper mapper, RelationsService relationsService, IPublishEndpoint publishEndpoint)
     {
       _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
       _roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
       _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
       _relationsService = relationsService ?? throw new ArgumentNullException(nameof(relationsService));
+      _publishEndpoint = publishEndpoint ?? throw new ArgumentNullException(nameof(publishEndpoint));
     }
 
     [HttpGet("GetAllUsers")]
@@ -204,25 +209,55 @@ namespace IdentityService.Controllers
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded");
 
-            // Save file to disk (e.g., wwwroot/uploads/profile-pictures/)
-            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "profile-pictures");
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
-
-            var fileName = $"user_{user.Id}_{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-            var filePath = Path.Combine(uploadsFolder, fileName);
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            try
             {
-                await file.CopyToAsync(stream);
+                // Save file to disk (e.g., wwwroot/uploads/profile-pictures/)
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "profile-pictures");
+                
+                // Create directory with more robust error handling
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    try
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+                    catch (UnauthorizedAccessException ex)
+                    {
+                        return StatusCode(500, $"Permission denied creating upload directory: {ex.Message}");
+                    }
+                    catch (Exception ex)
+                    {
+                        return StatusCode(500, $"Error creating upload directory: {ex.Message}");
+                    }
+                }
+
+                var fileName = $"user_{user.Id}_{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+                var filePath = Path.Combine(uploadsFolder, fileName);
+                
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                // Save relative path instead of full URL for better portability
+                var relativePath = $"/uploads/profile-pictures/{fileName}";
+                user.ProfilePictureUrl = relativePath;
+                await _userManager.UpdateAsync(user);
+
+                // Publish profile picture update event
+                var profileUpdateEvent = new UserProfilePictureUpdatedEvent
+                {
+                    UserId = user.Id,
+                    ProfilePictureUrl = relativePath
+                };
+                await _publishEndpoint.Publish(profileUpdateEvent);
+
+                return Ok(new { url = relativePath });
             }
-
-            // Set the public URL
-            var baseUrl = $"{Request.Scheme}://{Request.Host}";
-            var fileUrl = $"{baseUrl}/uploads/profile-pictures/{fileName}";
-            user.ProfilePictureUrl = fileUrl;
-            await _userManager.UpdateAsync(user);
-
-            return Ok(new { url = fileUrl });
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error uploading file: {ex.Message}");
+            }
         }
 
 

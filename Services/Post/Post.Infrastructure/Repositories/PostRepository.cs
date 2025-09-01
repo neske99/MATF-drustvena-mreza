@@ -86,13 +86,17 @@ namespace Post.Infrastructure.Repositories
 
         public async Task<IEnumerable<Domain.Entities.Post>> GetPostsForUser(int userId, List<int> friendIdList)
         {
+           
+            var usersToInclude = new List<int>(friendIdList) { userId };
+            
             var result = await postContext.Posts.
                 Include(p => p.User).
                 Include(p => p.Comments).
                 ThenInclude(c => c.User).
                 Include(p => p.Likes).
                 ThenInclude(l => l.User).
-                Where(p => p.CreatedDate.AddMonths(3) > DateTime.Now && friendIdList.Contains(p.UserId)).
+                Where(p => p.CreatedDate.AddMonths(3) > DateTime.Now && usersToInclude.Contains(p.UserId)).
+                OrderByDescending(p => p.CreatedDate).
                 ToListAsync();
 
             return result;
@@ -101,7 +105,7 @@ namespace Post.Infrastructure.Repositories
         public async Task<bool> ReplicateUser(User userToReplicate)
         {
             string toExecute = "SET IDENTITY_INSERT [dbo].[Users] ON " +
-                $"INSERT INTO [dbo].[Users] (Id,Username,CreatedDate) VALUES ({userToReplicate.Id},'{userToReplicate.Username}','{userToReplicate.CreatedDate}')" +
+                $"INSERT INTO [dbo].[Users] (Id,Username,CreatedDate,ProfilePictureUrl) VALUES ({userToReplicate.Id},'{userToReplicate.Username}','{userToReplicate.CreatedDate}','{userToReplicate.ProfilePictureUrl}')" +
                 " SET IDENTITY_INSERT [dbo].[Users] OFF";
             var result = await postContext.Database.ExecuteSqlRawAsync(toExecute);
 
@@ -125,7 +129,33 @@ namespace Post.Infrastructure.Repositories
                 Include(p => p.Likes).
                 ThenInclude(l => l.User).
                 Where(p => p.CreatedDate.AddMonths(3) > DateTime.Now && p.UserId==userId).
+                OrderByDescending(p => p.CreatedDate).
                 ToListAsync();
+        }
+
+        public async Task<bool> DeletePost(int postId, int userId)
+        {
+            var post = await postContext.Posts
+                .Where(p => p.Id == postId && p.UserId == userId)
+                .FirstOrDefaultAsync();
+
+            if (post == null)
+                return false; // Post doesn't exist or user doesn't own it
+
+            postContext.Posts.Remove(post);
+            var result = await postContext.SaveChangesAsync();
+            return result > 0;
+        }
+
+        public async Task<bool> UpdateUserProfilePicture(int userId, string? profilePictureUrl)
+        {
+            var user = await postContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+                return false;
+
+            user.ProfilePictureUrl = profilePictureUrl;
+            var result = await postContext.SaveChangesAsync();
+            return result > 0;
         }
     }
 }

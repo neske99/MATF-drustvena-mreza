@@ -41,13 +41,23 @@ export default defineComponent({
       required: true
     },
     timestamp: {
-      type: Date,
+      type: [Date, String],
       default: () => new Date()
     }
   },
   methods: {
-    formatTime(date: Date) {
-      return date.toLocaleTimeString([], { 
+    formatTime(date: Date | string) {
+
+      let dateObj: Date;
+      
+      if (typeof date === 'string') {
+        // Parse UTC date string and ensure it's treated as UTC
+        dateObj = new Date(date + (date.includes('Z') ? '' : 'Z'));
+      } else {
+        dateObj = date;
+      }
+      
+      return dateObj.toLocaleTimeString([], { 
         hour: '2-digit', 
         minute: '2-digit',
         hour12: false 

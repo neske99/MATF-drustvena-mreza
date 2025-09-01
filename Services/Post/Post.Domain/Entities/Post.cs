@@ -14,7 +14,11 @@ namespace Post.Domain.Entities
         [ForeignKey("UserId")]
         public User? User { get; set; }
         public string Text { get; set; } = string.Empty;
-        public string Picture { get; set; } = string.Empty;
+
+        public string? FileUrl { get; set; }
+        public string? FileName { get; set; }
+        public string? FileType { get; set; }
+
         public List<Comment> Comments { get; set; } = new List<Comment>() { };
         public List<Like> Likes { get; set; } = new List<Like>() { };
 

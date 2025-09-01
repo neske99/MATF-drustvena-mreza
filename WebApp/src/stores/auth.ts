@@ -12,6 +12,7 @@ export const authStore = defineStore('auth', () => {
   const baseUrl = "http://localhost:8094/api/v1/Authentication/";
   let username = ref("");
   let userId=ref(0);
+  let profilePictureUrl = ref("");
 
   let accessToken = ref("");
   let refreshToken = ref("");
@@ -46,6 +47,18 @@ export const authStore = defineStore('auth', () => {
       userId.value= response.data.userId;
       isAuthenticated.value = true;
 
+      // Load user profile data to get profile picture
+      try {
+        const userResponse = await axios.get(`http://localhost:8094/api/v1/User/GetUser/${usrname}`, {
+          headers: {
+            Authorization: "Bearer " + response.data.accessToken
+          }
+        });
+        profilePictureUrl.value = userResponse.data.profilePictureUrl || "";
+      } catch (error) {
+        console.log('Could not load user profile data:', error);
+      }
+
       await startSignalRConnection();
       router.push('/home')
     } catch (err) {
@@ -79,6 +92,7 @@ export const authStore = defineStore('auth', () => {
     accessToken.value = "";
     refreshToken.value = "";
     userId.value= 0;
+    profilePictureUrl.value = "";
     isAuthenticated.value = false;
   };
   const refresh = async function () {
@@ -94,12 +108,17 @@ export const authStore = defineStore('auth', () => {
         accessToken.value = "";
         refreshToken.value = "";
         userId.value= 0;
+        profilePictureUrl.value = "";
         isAuthenticated.value = false;
       }
     }
   }
 
-  return { username, isAuthenticated, accessToken, refreshToken,userId, refresh, signup, login, logout };
+  const updateProfilePicture = function (newUrl: string) {
+    profilePictureUrl.value = newUrl;
+  }
+
+  return { username, isAuthenticated, accessToken, refreshToken,userId, profilePictureUrl, refresh, signup, login, logout, updateProfilePicture };
 },
   {
     persist: true

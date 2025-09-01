@@ -94,7 +94,7 @@ export const userStore = defineStore('user', () => {
     const formData = new FormData();
     formData.append('file', file);
 
-    // Use the correct backend port (8090 or 8094, as needed)
+    // Use the correct backend port (8094) for Identity Service
     const response = await axiosAuthenticated.post(
       "http://localhost:8094/api/v1/User/UploadProfilePicture",
       formData,

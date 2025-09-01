@@ -20,7 +20,6 @@ public class PostController : ControllerBase
 {
     private readonly IPostRepository _postRepository;
     private readonly IMapper _mapper;
-
     private readonly IMediator _mediator;
 
   public PostController(IPostRepository repository, IMapper mapper, IMediator mediator)
@@ -33,83 +32,45 @@ public class PostController : ControllerBase
     [HttpGet("[action]")]
     public async Task<ActionResult> GetPostsForUser([FromQuery] int userId)
     {
-        /*var userFriends= _relationsService.GetFriends(userId);
-
-        Dictionary<int, string> userIdToRelationsDict=new Dictionary<int, string>();
-
-
-       var result= _mapper.Map<IEnumerable<GetPostDTO>>(await _postRepository.GetPostsForUser(userId, userFriends ));
-
-       foreach (var post in result)
-        {
-            if (post.User != null)
-            {
-                if(!userIdToRelationsDict.ContainsKey(post.User.Id))
-                    userIdToRelationsDict.Add(post.User.Id,"Nesto   je");
-
-                foreach (var comment in post.Comments)
-                {
-                    if (comment.User != null )
-                    {
-                        if(!userIdToRelationsDict.ContainsKey(comment.User.Id))
-                            userIdToRelationsDict.Add(comment.User.Id, "Nesto    je ");
-                    }
-                }
-
-                // Add like users to the relations dictionary
-                foreach (var like in post.Likes)
-                {
-                    if (like.User != null)
-                    {
-                        if (!userIdToRelationsDict.ContainsKey(like.User.Id))
-                            userIdToRelationsDict.Add(like.User.Id, "Nesto je");
-                    }
-                }
-            }
-
-        }
-
-        var userIdList = userIdToRelationsDict.Keys.ToList();
-        var userRelations = _relationsService.GetRelationShips(userId, userIdList);
-        for(int i=0;i<userIdList.Count;i++)
-        {
-            userIdToRelationsDict[userIdList[i]] = userRelations[i];
-        }
-
-       foreach (var post in result)
-            {
-                if (post.User != null)
-                {
-                    post.User.Relation = userIdToRelationsDict[post.User.Id];
-
-                    foreach (var comment in post.Comments)
-                    {
-                        if (comment.User != null)
-                        {
-                            comment.User.Relation = userIdToRelationsDict[comment.User.Id];
-                        }
-                    }
-
-                    // Set relations for like users
-                    foreach (var like in post.Likes)
-                    {
-                        if (like.User != null)
-                        {
-                            like.User.Relation = userIdToRelationsDict[like.User.Id];
-                        }
-                    }
-                }
-
-            }
-
-        return Ok(_mapper.Map<IEnumerable<GetPostDTO>>(result));*/
         return Ok(await _mediator.Send(new GetPostForUserQuery(){UserId=userId}));
     }
 
     [HttpPost("[action]")]
-    public async Task<ActionResult> CreatePostForUser([FromQuery] int userId, [FromBody] CreatePostDTO post)
+    public async Task<ActionResult> CreatePostForUser(
+    [FromForm] int userId,
+    [FromForm] string text,
+    [FromForm] IFormFile? file
+)
     {
-        CreatePostForUserCommand createCommand = new CreatePostForUserCommand()
+        string? fileUrl = null;
+        string? fileName = null;
+        string? fileType = null;
+
+        if (file != null && file.Length > 0)
+        {
+            // Fixed: Add wwwroot to the path so static file middleware can serve the files
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "post-files");
+            Directory.CreateDirectory(uploadsFolder);
+            fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+            var filePath = Path.Combine(uploadsFolder, fileName);
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+            fileUrl = $"/uploads/post-files/{fileName}";
+            fileType = file.ContentType;
+        }
+
+        var post = new CreatePostDTO
+        {
+            UserId = userId,
+            Text = text,
+            FileUrl = fileUrl,
+            FileName = fileName,
+            FileType = fileType,
+        };
+
+        var createCommand = new CreatePostForUserCommand
         {
             UserId = userId,
             Post = post
@@ -159,4 +120,14 @@ public class PostController : ControllerBase
         }));
     }
 
+    [HttpDelete("[action]")]
+    public async Task<ActionResult> DeletePost([FromQuery] int postId, [FromQuery] int userId)
+    {
+        var result = await _postRepository.DeletePost(postId, userId);
+        if (result)
+        {
+            return Ok(new { message = "Post deleted successfully" });
+        }
+        return NotFound(new { message = "Post not found or you don't have permission to delete it" });
+    }
 }

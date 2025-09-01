@@ -9,7 +9,13 @@
       <v-card-text class="pa-6">
         <div class="d-flex align-center">
           <v-avatar size="60" color="matf-red" class="mr-4">
-            <v-icon size="32" color="white">mdi-account</v-icon>
+            <img 
+                v-if="currentUserProfilePicture" 
+                :src="currentUserProfilePicture" 
+                alt="Your Profile Picture"
+                @error="() => {}"
+            />
+            <v-icon v-else size="32" color="white">mdi-account</v-icon>
           </v-avatar>
           <div class="flex-grow-1">
             <h2 class="text-h5 font-weight-bold matf-red--text mb-1">
@@ -95,11 +101,18 @@
             :id="post.id" 
             :text="post.text" 
             :username="post.user.username" 
+            :userId="post.user.id"
+            :createdDate="post.createdDate"
+            :userProfilePictureUrl="post.user.profilePictureUrl"
             :comments="post.comments" 
             :likes="post.likes"
+            :fileUrl="post.fileUrl"
+            :fileName="post.fileName"
+            :fileType="post.fileType"
             :key="post.id"
             @comment-added="refreshPosts"
             @like-toggled="refreshPosts"
+            @post-deleted="refreshPosts"
             class="mb-4"
           />
         </TransitionGroup>
@@ -154,6 +167,10 @@ export default defineComponent({
   computed: {
     totalLikes() {
       return this.posts.reduce((sum, post) => sum + (post.likes?.length || 0), 0);
+    },
+
+    currentUserProfilePicture() {
+      return this.getUserProfilePictureUrl(authStore().profilePictureUrl);
     }
   },
   methods: {
@@ -211,6 +228,28 @@ export default defineComponent({
     
     scrollToTop() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+
+    getUserProfilePictureUrl(url: string) {
+      // Handle profile pictures which should be served from identity service
+      if (!url) return null;
+      
+      // Check if this is a profile picture path (correct path)
+      if (url.startsWith('/uploads/profile-pictures/')) {
+        return import.meta.env.DEV
+          ? `http://localhost:8094${url}`
+          : url;
+      }
+      
+      // Handle any other uploads path - default to identity service for profile pics
+      if (url.startsWith('/uploads/')) {
+        return import.meta.env.DEV
+          ? `http://localhost:8094${url}`
+          : url;
+      }
+      
+      // If it's already a full URL, return as is
+      return url;
     }
   }
 });
@@ -295,6 +334,14 @@ export default defineComponent({
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
+}
+
+/* Profile Picture Styles */
+.v-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 /* Mobile Responsiveness */

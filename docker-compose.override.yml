@@ -8,9 +8,11 @@ services:
       - "GrpcSettings:RelationsUrl=http://relations.grpc:8080"
     ports:
       - "8094:8080"
+    volumes:
+      - identity_uploads:/app/wwwroot/uploads
     depends_on:
-    - identitydb
-    - rabbitmq
+      - identitydb
+      - rabbitmq
 
   identitydb:
     container_name: identitydb
@@ -30,6 +32,8 @@ services:
       - "GrpcSettings:RelationsUrl=http://relations.grpc:8080"
     ports:
       - "8080:8080"
+    volumes:
+      - post_uploads:/app/wwwroot/uploads
     depends_on:
       - mssql
       - rabbitmq
@@ -61,7 +65,7 @@ services:
     environment:
       - NEO4J_AUTH=neo4j/12345678
     volumes:
-      - neo4j_data:\data
+      - neo4j_data:/data
 
   relations.api:
     environment:
@@ -111,3 +115,10 @@ services:
     environment:
       - SA_PASSWORD=MATF12345678rs2
       - ACCEPT_EULA=Y
+
+volumes:
+  neo4j_data:
+  identity_uploads:
+    driver: local
+  post_uploads:
+    driver: local

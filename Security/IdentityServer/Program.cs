@@ -56,9 +56,23 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-if (!Directory.Exists(uploadsPath))
+var profilePicturesPath = Path.Combine(uploadsPath, "profile-pictures");
+
+try
 {
-    Directory.CreateDirectory(uploadsPath);
+    if (!Directory.Exists(uploadsPath))
+    {
+        Directory.CreateDirectory(uploadsPath);
+    }
+    
+    if (!Directory.Exists(profilePicturesPath))
+    {
+        Directory.CreateDirectory(profilePicturesPath);
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Warning: Could not create upload directories: {ex.Message}");
 }
 
 app.UseStaticFiles();
