@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
+using Common.Logger.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,15 @@ builder.Services.ConfigureJWT(builder.Configuration);
 builder.Services.ConfigurePersistence(builder.Configuration);
 builder.Services.ConfigureIdentity();
 builder.Services.ConfigureExtraStuff(builder.Configuration);
+
+// Add logger service
+builder.Services.AddLogger(options =>
+{
+    options.LogDirectory = "/app/logs/identity-server";
+    options.EnableFileLogging = true;
+    options.ExcludedPaths.Add("/api/user/uploadprofilepicture");
+});
+
 builder.Services.AddMassTransit(config =>
 {
     //TODO
@@ -81,6 +91,8 @@ app.UseStaticFiles(new StaticFileOptions
     FileProvider = new PhysicalFileProvider(uploadsPath),
     RequestPath = "/uploads"
 });
+
+app.UseLogger();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -29,6 +29,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Chat.Service\Chat.Service.csproj" />
     <ProjectReference Include="..\..\..\Common\Common.EventBus\Common.EventBus.csproj" />
+    <ProjectReference Include="..\..\..\Common\Common.Logger\Common.Logger.csproj" />
   </ItemGroup>
 
 </Project>

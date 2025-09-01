@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Relations.Common\Relations.Common.csproj" />
+    <ProjectReference Include="..\..\..\Common\Common.Logger\Common.Logger.csproj" />
   </ItemGroup>
 
 </Project>

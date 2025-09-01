@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: Security/IdentityServer/Dockerfile
+    volumes:
+      - app_logs:/app/logs
 
   identitydb:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -17,6 +19,8 @@ services:
     build:
       context: .
       dockerfile: Services/Post/Post.API/Dockerfile
+    volumes:
+      - app_logs:/app/logs
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -28,6 +32,8 @@ services:
     build:
       context: .
       dockerfile: Services/Relations/Relations.API/Dockerfile
+    volumes:
+      - app_logs:/app/logs
 
   relations.grpc:
     image: relations.grpc
@@ -41,6 +47,8 @@ services:
     build:
       context: .
       dockerfile: Services/Chat/Chat.API/Dockerfile
+    volumes:
+      - app_logs:/app/logs
 
   chatdb:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -51,6 +59,7 @@ volumes:
     neo4j_data:
     post_uploads:
     identity_uploads:
+    app_logs:
 
 
 

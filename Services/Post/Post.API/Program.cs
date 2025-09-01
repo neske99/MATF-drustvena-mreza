@@ -18,7 +18,7 @@ builder.Services.RegisterInfrastructureService(builder.Configuration);
 
 builder.Services.AddLogger(options =>
 {
-    options.LogDirectory = "logs/post-api";
+    options.LogDirectory = "/app/logs/post-api";
     options.EnableFileLogging = true;
     options.ExcludedPaths.Add("/api/posts/upload");
 });
