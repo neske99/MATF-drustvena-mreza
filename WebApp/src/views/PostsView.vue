@@ -9,7 +9,13 @@
       <v-card-text class="pa-6">
         <div class="d-flex align-center">
           <v-avatar size="60" color="matf-red" class="mr-4">
-            <v-icon size="32" color="white">mdi-account</v-icon>
+            <img 
+                v-if="currentUserProfilePicture" 
+                :src="currentUserProfilePicture" 
+                alt="Your Profile Picture"
+                @error="() => {}"
+            />
+            <v-icon v-else size="32" color="white">mdi-account</v-icon>
           </v-avatar>
           <div class="flex-grow-1">
             <h2 class="text-h5 font-weight-bold matf-red--text mb-1">
@@ -95,11 +101,20 @@
             :id="post.id" 
             :text="post.text" 
             :username="post.user.username" 
+            :firstName="post.user.firstName"
+            :lastName="post.user.lastName"
+            :userId="post.user.id"
+            :createdDate="post.createdDate"
+            :userProfilePictureUrl="post.user.profilePictureUrl"
             :comments="post.comments" 
             :likes="post.likes"
+            :fileUrl="post.fileUrl"
+            :fileName="post.fileName"
+            :fileType="post.fileType"
             :key="post.id"
             @comment-added="refreshPosts"
             @like-toggled="refreshPosts"
+            @post-deleted="refreshPosts"
             class="mb-4"
           />
         </TransitionGroup>
@@ -127,13 +142,14 @@
 </template>
 
 <script lang="ts">
+import { authStore } from '@/stores/auth';
+import { postStore } from '@/stores/post';
+import { userStore } from '@/stores/user';
+import { userCacheService } from '@/services/userCacheService';
 import PostComponent from '@/components/Post/PostComponent.vue';
 import UploadPostComponent from '@/components/Post/UploadPostComponent.vue';
 import { defineComponent } from 'vue';
-import { postStore } from '../stores/post.ts'
-import { userStore } from '../stores/user.ts'
-import  type { postDTO }  from '../dtos/post/postDTO.ts';
-import { authStore } from '@/stores/auth.ts';
+import type { postDTO } from '../dtos/post/postDTO.ts';
 
 export default defineComponent({
   name: 'PostsView',
@@ -151,9 +167,26 @@ export default defineComponent({
   async created() {
     await this.loadInitialData();
   },
+  mounted() {
+    this.isLoading = true;
+    try {
+      postStore().GetPosts().then((posts) => {
+        this.posts = posts;
+        this.fetchUserDataForPosts();
+      });
+    } catch (error) {
+      console.error('Error loading posts:', error);
+    } finally {
+      this.isLoading = false;
+    }
+  },
   computed: {
     totalLikes() {
       return this.posts.reduce((sum, post) => sum + (post.likes?.length || 0), 0);
+    },
+
+    currentUserProfilePicture() {
+      return this.getUserProfilePictureUrl(authStore().profilePictureUrl);
     }
   },
   methods: {
@@ -199,7 +232,105 @@ export default defineComponent({
     },
     
     async refreshPosts() {
-      await this.loadPosts();
+      try {
+        this.posts = await postStore().GetPosts();
+        await this.fetchUserDataForPosts();
+      } catch (error) {
+        console.error('Error refreshing posts:', error);
+      }
+    },
+
+    async fetchUserDataForPosts() {
+      // Get unique user IDs from posts, comments, and likes
+      const userIds = new Set<number>();
+      const userIdToUsernameMap = new Map<number, string>();
+      
+      this.posts.forEach(post => {
+        userIds.add(post.user.id);
+        userIdToUsernameMap.set(post.user.id, post.user.username);
+        
+        if (post.comments) {
+          post.comments.forEach(comment => {
+            if (comment.user?.id && comment.user?.username) {
+              userIds.add(comment.user.id);
+              userIdToUsernameMap.set(comment.user.id, comment.user.username);
+            }
+          });
+        }
+        
+        if (post.likes) {
+          post.likes.forEach(like => {
+            if (like.user?.id && like.user?.username) {
+              userIds.add(like.user.id);
+              userIdToUsernameMap.set(like.user.id, like.user.username);
+            }
+          });
+        }
+      });
+
+      // Fetch user data for all unique user IDs
+      const usersMap = new Map();
+      
+      for (const userId of userIds) {
+        try {
+          const username = userIdToUsernameMap.get(userId);
+          if (username) {
+            const userData = await userCacheService.getUserByUsername(username);
+            if (userData) {
+              usersMap.set(userId, userData);
+            }
+          }
+        } catch (error) {
+          console.log(`Could not fetch user data for ID ${userId}:`, error);
+        }
+      }
+
+      // Update posts with complete user data
+      this.posts.forEach(post => {
+        const userData = usersMap.get(post.user.id);
+        if (userData) {
+          post.user = {
+            ...post.user,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            profilePictureUrl: userData.profilePictureUrl
+          };
+        }
+
+        // Update comment users
+        if (post.comments) {
+          post.comments.forEach(comment => {
+            if (comment.user?.id) {
+              const userData = usersMap.get(comment.user.id);
+              if (userData) {
+                comment.user = {
+                  ...comment.user,
+                  firstName: userData.firstName,
+                  lastName: userData.lastName,
+                  profilePictureUrl: userData.profilePictureUrl
+                };
+              }
+            }
+          });
+        }
+
+        // Update like users
+        if (post.likes) {
+          post.likes.forEach(like => {
+            if (like.user?.id) {
+              const userData = usersMap.get(like.user.id);
+              if (userData) {
+                like.user = {
+                  ...like.user,
+                  firstName: userData.firstName,
+                  lastName: userData.lastName,
+                  profilePictureUrl: userData.profilePictureUrl
+                };
+              }
+            }
+          });
+        }
+      });
     },
     
     scrollToCreatePost() {
@@ -211,6 +342,28 @@ export default defineComponent({
     
     scrollToTop() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+
+    getUserProfilePictureUrl(url: string) {
+      // Handle profile pictures which should be served from identity service
+      if (!url) return null;
+      
+      // Check if this is a profile picture path (correct path)
+      if (url.startsWith('/uploads/profile-pictures/')) {
+        return import.meta.env.DEV
+          ? `http://localhost:8094${url}`
+          : url;
+      }
+      
+      // Handle any other uploads path - default to identity service for profile pics
+      if (url.startsWith('/uploads/')) {
+        return import.meta.env.DEV
+          ? `http://localhost:8094${url}`
+          : url;
+      }
+      
+      // If it's already a full URL, return as is
+      return url;
     }
   }
 });
@@ -295,6 +448,14 @@ export default defineComponent({
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
+}
+
+/* Profile Picture Styles */
+.v-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 /* Mobile Responsiveness */

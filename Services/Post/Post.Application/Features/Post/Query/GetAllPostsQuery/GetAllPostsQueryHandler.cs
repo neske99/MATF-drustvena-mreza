@@ -1,4 +1,3 @@
-
 using AutoMapper;
 using MediatR;
 using Post.Application.Contracts;

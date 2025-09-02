@@ -49,6 +49,8 @@ services:
 
 volumes:
     neo4j_data:
+    post_uploads:
+    identity_uploads:
 
 
 

@@ -8,6 +8,7 @@ using System.Text;
 using Relations.GRPC;
 using System.Reflection;
 using Common.Logger.Extensions;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,16 +16,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.RegisterInfrastructureService(builder.Configuration);
 
-
-
-
-// Add logger with Action<LoggerOptions> configuration
 builder.Services.AddLogger(options =>
 {
     options.LogDirectory = "logs/post-api";
     options.EnableFileLogging = true;
     options.ExcludedPaths.Add("/api/posts/upload");
 });
+
+
 
 builder.Services.AddMassTransit(config =>
 {
@@ -74,6 +73,20 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+
+var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+if (!Directory.Exists(uploadsPath))
+{
+    Directory.CreateDirectory(uploadsPath);
+}
+
+app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(uploadsPath),
+    RequestPath = "/uploads"
+});
 
 // Add logger middleware early in the pipeline
 app.UseLogger();

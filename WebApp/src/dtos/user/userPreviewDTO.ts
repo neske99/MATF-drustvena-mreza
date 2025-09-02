@@ -3,5 +3,6 @@ export interface UserPreviewDTO {
   username: string,
   firstName: string,
   lastName: string,
-  relation:string
+  relation: string,
+  profilePictureUrl?: string
 }

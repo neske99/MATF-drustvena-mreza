@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Chat.Repository.Migrations
 {
     [DbContext(typeof(ChatContext))]
-    [Migration("20250817181915_AddChatUserHasNewMessages")]
-    partial class AddChatUserHasNewMessages
+    [Migration("20250828134412_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -19,6 +19,7 @@ namespace IdentityService.Controllers
         private readonly RoleManager<IntRole> _roleManager;
         private readonly IMapper _mapper;
         private readonly RelationsService _relationsService;
+
     public UserController(UserManager<User> userManager, RoleManager<IntRole> roleManager, IMapper mapper, RelationsService relationsService)
     {
       _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
@@ -183,6 +184,68 @@ namespace IdentityService.Controllers
             }
 
             return BadRequest(result.Errors);
+        }
+
+        [HttpPost("UploadProfilePicture")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> UploadProfilePicture([FromForm] IFormFile file)
+        {
+            // Get user ID from token
+            var userId = User.FindFirst("nameid")?.Value ?? 
+                         User.FindFirst("sub")?.Value ?? 
+                         User.FindFirst("id")?.Value ?? 
+                         User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest("User ID not found in token");
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return NotFound("User not found");
+
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded");
+
+            try
+            {
+                // Save file to disk (e.g., wwwroot/uploads/profile-pictures/)
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "profile-pictures");
+                
+                // Create directory with more robust error handling
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    try
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+                    catch (UnauthorizedAccessException ex)
+                    {
+                        return StatusCode(500, $"Permission denied creating upload directory: {ex.Message}");
+                    }
+                    catch (Exception ex)
+                    {
+                        return StatusCode(500, $"Error creating upload directory: {ex.Message}");
+                    }
+                }
+
+                var fileName = $"user_{user.Id}_{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+                var filePath = Path.Combine(uploadsFolder, fileName);
+                
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                // Save relative path instead of full URL for better portability
+                var relativePath = $"/uploads/profile-pictures/{fileName}";
+                user.ProfilePictureUrl = relativePath;
+                await _userManager.UpdateAsync(user);
+
+                return Ok(new { url = relativePath });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error uploading file: {ex.Message}");
+            }
         }
 
 

@@ -42,16 +42,22 @@ export const postStore = defineStore('post', () => {
     return result;
   }
 
-  const UploadPost = async function (newPost: string, userId: number) {
-    let result = await axiosAuthenticated.post(`http://localhost:8080/Post/CreatePostForUser?userId=${userId}`, {
-      text:newPost,
-      userId: authStore().userId,
-      picture:'picture',
-      comments:[]
-    });
+    const UploadPost = async function (formData: FormData) {
+      let result = await axiosAuthenticated.post(
+          'http://localhost:8080/Post/CreatePostForUser',
+          formData,
+          {
+              headers: { 'Content-Type': 'multipart/form-data' }
+          }
+      );
+      return result;
+  }
+
+  const DeletePost = async function (postId: number) {
+    let result = await axiosAuthenticated.delete(`http://localhost:8080/Post/DeletePost?postId=${postId}&userId=${authStore().userId}`);
     return result;
   }
 
 
-  return { getCurrentPosts,UploadPost,AddComment, AddLike,RemoveLike,GetPosts,GetPostsForUser };
+  return { getCurrentPosts,UploadPost,AddComment, AddLike,RemoveLike,GetPosts,GetPostsForUser, DeletePost };
 })

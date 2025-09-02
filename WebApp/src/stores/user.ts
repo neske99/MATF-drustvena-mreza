@@ -90,5 +90,46 @@ export const userStore = defineStore('user', () => {
     return result;
   }
 
-  return { getSearchedUsers,numFriendRequests,GetFriendRequests, GetUserFriends, GetRelation,GetUsers, GetSearchedUsers, GetUser,SendFriendRequest,AcceptFriendRequest, DeclineFriendRequest, RemoveFriend, UpdateProfile, ChangePassword  };
+  const UploadProfilePicture = async function (file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    // Use the correct backend port (8094) for Identity Service
+    const response = await axiosAuthenticated.post(
+      "http://localhost:8094/api/v1/User/UploadProfilePicture",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      }
+    );
+    // Return the URL from the backend response
+    return response.data.url;
+  }
+
+  const clearState = function () {
+    // Reset user store state on logout
+    numFriendRequests.value = 0;
+    // Clear any other reactive state if needed
+  };
+
+  return { 
+    getSearchedUsers, 
+    numFriendRequests, 
+    GetFriendRequests, 
+    GetUserFriends, 
+    GetRelation, 
+    GetUsers, 
+    GetSearchedUsers, 
+    GetUser, 
+    SendFriendRequest, 
+    AcceptFriendRequest, 
+    DeclineFriendRequest, 
+    RemoveFriend, 
+    UpdateProfile, 
+    ChangePassword, 
+    UploadProfilePicture,
+    clearState
+  };
 })

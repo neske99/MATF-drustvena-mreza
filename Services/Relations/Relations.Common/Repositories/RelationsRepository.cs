@@ -63,11 +63,13 @@ namespace Relations.Common.Repositories
         public async Task<IEnumerable<User>> GetUserFriends(int userId)
         {
             await _context.DatabaseClient.ConnectAsync();
-            return await _context.DatabaseClient.Cypher
+            var friends = await _context.DatabaseClient.Cypher
                 .OptionalMatch("(user:User)-[:FRIEND_WITH]->(friend:User)")
                 .Where((User user) => user.Id == userId)
                 .Return(friend => friend.As<User>())
                 .ResultsAsync;
+
+            return friends.Where(f => f != null).ToList();
         }
 
         public async Task<IEnumerable<User>> GetBlockedUsers(int userId)

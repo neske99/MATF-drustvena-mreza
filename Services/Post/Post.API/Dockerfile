@@ -2,7 +2,6 @@
 
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER app
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
@@ -31,5 +30,8 @@ RUN dotnet publish "./Post.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
+# Create uploads directory and set proper permissions - run as root
+RUN mkdir -p /app/wwwroot/uploads/post-files && \
+    chmod -R 777 /app/wwwroot
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Post.API.dll"]

@@ -13,10 +13,10 @@ namespace Post.Application.Contracts
         Task<bool> AddCommentToPost(int postId, Comment comment);
         Task<bool> AddLikeToPost(int postId, Like like);
         Task<bool> RemoveLikeFromPost(int postId, int userId);
-        public Task<bool> ReplicateUser(User userToReplicate);
-        public Task<IEnumerable<Post.Domain.Entities.Post>> GetAllPostsAsync();
-        public Task<List<User>> GetUsers();
+        Task<bool> DeletePost(int postId, int userId);
+        Task<bool> ReplicateUser(User userToReplicate);
+        Task<IEnumerable<Post.Domain.Entities.Post>> GetAllPostsAsync();
+        Task<List<User>> GetUsers();
         Task<IEnumerable<Post.Domain.Entities.Post>> GetPostsCreatedByUser(int userId);
-
     }
 }

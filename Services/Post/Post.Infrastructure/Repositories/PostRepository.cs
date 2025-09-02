@@ -86,13 +86,17 @@ namespace Post.Infrastructure.Repositories
 
         public async Task<IEnumerable<Domain.Entities.Post>> GetPostsForUser(int userId, List<int> friendIdList)
         {
+           
+            var usersToInclude = new List<int>(friendIdList) { userId };
+            
             var result = await postContext.Posts.
                 Include(p => p.User).
                 Include(p => p.Comments).
                 ThenInclude(c => c.User).
                 Include(p => p.Likes).
                 ThenInclude(l => l.User).
-                Where(p => p.CreatedDate.AddMonths(3) > DateTime.Now && friendIdList.Contains(p.UserId)).
+                Where(p => p.CreatedDate.AddMonths(3) > DateTime.Now && usersToInclude.Contains(p.UserId)).
+                OrderByDescending(p => p.CreatedDate).
                 ToListAsync();
 
             return result;
@@ -104,9 +108,6 @@ namespace Post.Infrastructure.Repositories
                 $"INSERT INTO [dbo].[Users] (Id,Username,CreatedDate) VALUES ({userToReplicate.Id},'{userToReplicate.Username}','{userToReplicate.CreatedDate}')" +
                 " SET IDENTITY_INSERT [dbo].[Users] OFF";
             var result = await postContext.Database.ExecuteSqlRawAsync(toExecute);
-
-            //postContext.Users.Add(userToReplicate);
-            //var result = await postContext.SaveChangesAsync()>0;
 
             return result > 0;
         }
@@ -125,7 +126,22 @@ namespace Post.Infrastructure.Repositories
                 Include(p => p.Likes).
                 ThenInclude(l => l.User).
                 Where(p => p.CreatedDate.AddMonths(3) > DateTime.Now && p.UserId==userId).
+                OrderByDescending(p => p.CreatedDate).
                 ToListAsync();
+        }
+
+        public async Task<bool> DeletePost(int postId, int userId)
+        {
+            var post = await postContext.Posts
+                .Where(p => p.Id == postId && p.UserId == userId)
+                .FirstOrDefaultAsync();
+
+            if (post == null)
+                return false; // Post doesn't exist or user doesn't own it
+
+            postContext.Posts.Remove(post);
+            var result = await postContext.SaveChangesAsync();
+            return result > 0;
         }
     }
 }

@@ -10,7 +10,14 @@
     <v-card-text class="pa-4">
       <div class="d-flex align-center mb-3">
         <v-avatar size="56" color="matf-red" class="mr-3">
-          <v-icon size="28" color="white">mdi-account</v-icon>
+          <img 
+            v-if="profilePictureUrl" 
+            :src="getUserProfilePictureUrl(profilePictureUrl)" 
+            alt="Profile Picture"
+            @error="() => {}"
+            class="user-card-avatar-image"
+          />
+          <v-icon v-else size="28" color="white">mdi-account</v-icon>
         </v-avatar>
         
         <div class="flex-grow-1">
@@ -145,7 +152,7 @@
           
           <!-- Only show Message button when users are friends -->
           <v-btn
-            v-if="localRelation === 'FRIENDS'"
+            v-if="canMessage"
             color="matf-red"
             class="text-none flex-grow-1"
             @click.stop="startMessage"
@@ -162,6 +169,8 @@
 <script lang='ts'>
 import { authStore } from '@/stores/auth';
 import { userStore } from '@/stores/user';
+import { chatStore } from '@/stores/chat';
+import axiosAuthenticated from '@/plugin/axios';
 import { defineComponent } from 'vue'
 
 export default defineComponent({
@@ -186,6 +195,10 @@ export default defineComponent({
     relation: {
       type: String,
       required: true
+    },
+    profilePictureUrl: {
+      type: String,
+      required: false
     }
   },
   emits: ['request-sent', 'request-accepted', 'request-declined', 'friendship-removed'],
@@ -203,7 +216,8 @@ export default defineComponent({
   },
   computed: {
     showFriendRequestButton() {
-      return this.localRelation === 'NONE' || this.localRelation === '' || !this.localRelation;
+      const allowedStatuses = ['NONE', '', null, undefined, 'NO_RELATION'];
+      return allowedStatuses.includes(this.localRelation);
     },
     
     showAcceptButton() {
@@ -211,21 +225,22 @@ export default defineComponent({
     },
     
     showFriendsStatus() {
-      return this.localRelation === 'FRIEND_WITH';
+      return this.localRelation === 'FRIEND_WITH' || this.localRelation === 'FRIENDS';
     },
     
     showRequestSentStatus() {
-      return this.localRelation === 'REQUESTED_FRIENDSHIP_WITH';
+      return this.localRelation === 'REQUESTED_FRIENDSHIP_WITH' || this.localRelation === 'SENT_FRIENDSHIP_REQUEST_TO';
     },
     
     canMessage() {
-      return this.localRelation === 'FRIEND_WITH';
+      return this.localRelation === 'FRIEND_WITH' || this.localRelation === 'FRIENDS';
     }
   },
   watch: {
     relation: {
       immediate: true,
       handler(newVal) {
+        console.log(`UserCard: Relation changed for ${this.firstName} ${this.lastName} (${this.text}):`, newVal);
         this.localRelation = newVal;
       }
     }
@@ -249,7 +264,11 @@ export default defineComponent({
       try {
         this.acceptingRequest = true;
         await userStore().AcceptFriendRequest(authStore().userId, this.userId);
-        this.localRelation = 'FRIENDS';
+        this.localRelation = 'FRIEND_WITH';
+        
+        // Emit event to refresh chat groups
+        this.$root.$emit('friendship-changed');
+        
         this.$emit('request-accepted', this.userId);
         console.log('Friend request accepted from:', this.text);
       } catch (error) {
@@ -280,6 +299,28 @@ export default defineComponent({
         this.removingFriend = true;
         await userStore().RemoveFriend(authStore().userId, this.userId);
         this.localRelation = 'NONE';
+        
+        // Clear the user from chat groups when unfriending
+        const chatGroupsStore = chatStore();
+        const existingGroupIndex = chatGroupsStore.currentChatGroups.findIndex(
+          group => group.username === this.text
+        );
+        
+        if (existingGroupIndex !== -1) {
+          const removedGroup = chatGroupsStore.currentChatGroups[existingGroupIndex];
+          chatGroupsStore.currentChatGroups.splice(existingGroupIndex, 1);
+          console.log('Removed unfriended user from chat groups');
+          
+          // If this was the active chat, reset it
+          if (chatGroupsStore.currentChatGroupId === removedGroup.chatId) {
+            chatGroupsStore.currentChatGroupId = 0;
+            chatGroupsStore.currentChatMessages = [];
+          }
+        }
+        
+        // Emit event to refresh chat groups
+        this.$root.$emit('friendship-changed');
+        
         this.$emit('friendship-removed', this.userId);
         console.log('Friendship removed with:', this.text);
       } catch (error) {
@@ -294,20 +335,89 @@ export default defineComponent({
       this.$router.push(`/userdetail/${this.text}`);
     },
     
-    startMessage() {
+    async startMessage() {
       if (this.canMessage) {
+        console.log('=== STARTING STARTMESSAGE ===');
         console.log('Starting message with', this.text);
-        // TODO: Implement messaging functionality
-        // For now, just navigate to home and focus on chat
-        this.$router.push('/home');
+        console.log('User ID:', this.userId);
+        console.log('Current user ID:', authStore().userId);
+        
+        try {
+          const chatGroupsStore = chatStore();
+          console.log('Getting chat groups for user...');
+          await chatGroupsStore.getChatGroupsForUser();
+          console.log('Current chat groups:', chatGroupsStore.currentChatGroups);
+          
+          let existingChatGroup = chatGroupsStore.currentChatGroups.find(
+            group => group.username === this.text
+          );
+          console.log('Existing chat group found:', existingChatGroup);
+          
+          if (!existingChatGroup) {
+            console.log('Creating new chat group...');
+            try {
+              const response = await axiosAuthenticated.post(
+                `http://localhost:8095/api/v1/Chat/CreateChatGroup?userAId=${authStore().userId}&userBId=${this.userId}`
+              );
+              console.log('Create chat group response:', response.data);
+              
+              const newChatGroup = response.data;
+              
+              existingChatGroup = {
+                chatId: newChatGroup.id,
+                username: this.text,
+                userId: this.userId,
+                hasNewMessages: false
+              };
+              
+              chatGroupsStore.currentChatGroups.unshift(existingChatGroup);
+              console.log('New chat group created:', existingChatGroup);
+            } catch (error) {
+              console.error('Error creating chat group - API response:', error.response);
+              console.error('Error creating chat group - full error:', error);
+              
+              // Create a fallback chat group to allow UI to work
+              existingChatGroup = {
+                chatId: Date.now(), // temporary ID
+                username: this.text,
+                userId: this.userId,
+                hasNewMessages: false
+              };
+              
+              chatGroupsStore.currentChatGroups.unshift(existingChatGroup);
+              console.log('Fallback chat group created:', existingChatGroup);
+            }
+          }
+          
+          console.log('Switching to chat group:', existingChatGroup);
+          await chatGroupsStore.switchUserChat(existingChatGroup);
+          console.log('Chat switched successfully');
+          
+          // Navigate to home to show the chat
+          console.log('Navigating to home...');
+          this.$router.push('/home');
+          console.log('=== STARTMESSAGE COMPLETED ===');
+        } catch (error) {
+          console.error('=== STARTMESSAGE ERROR ===');
+          console.error('Error starting message:', error);
+          console.error('Error details:', error.response || error.message);
+          // Still navigate to home in case of error
+          this.$router.push('/home');
+        }
+      } else {
+        console.log('Cannot message - not friends or messaging not allowed');
+        console.log('canMessage:', this.canMessage);
+        console.log('localRelation:', this.localRelation);
       }
     },
     
     getStatusColor() {
       switch (this.localRelation) {
         case 'FRIEND_WITH':
+        case 'FRIENDS':
           return 'success';
         case 'REQUESTED_FRIENDSHIP_WITH':
+        case 'SENT_FRIENDSHIP_REQUEST_TO':
           return 'warning';
         case 'RECEIVED_FRIENDSHIP_REQUEST_FROM':
           return 'info';
@@ -319,15 +429,31 @@ export default defineComponent({
     getStatusText() {
       switch (this.localRelation) {
         case 'FRIEND_WITH':
+        case 'FRIENDS':
           return 'Friend';
         case 'REQUESTED_FRIENDSHIP_WITH':
+        case 'SENT_FRIENDSHIP_REQUEST_TO':
           return 'Pending';
         case 'RECEIVED_FRIENDSHIP_REQUEST_FROM':
           return 'Requests';
         default:
           return 'MATF';
       }
-    }
+    },
+
+    getUserProfilePictureUrl(url: string) {
+      if (!url) return null;
+      
+      if (url.startsWith('/uploads/profile-pictures/')) {
+        return import.meta.env.DEV ? `http://localhost:8094${url}` : url;
+      }
+      
+      if (url.startsWith('/uploads/')) {
+        return import.meta.env.DEV ? `http://localhost:8094${url}` : url;
+      }
+      
+      return url;
+    },
   }
 })
 </script>
@@ -422,5 +548,20 @@ export default defineComponent({
 /* Prevent text selection on hover */
 .user-card {
   user-select: none;
+}
+
+/* Profile Picture Styles - Fix image fitting */
+.user-card-avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.v-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 </style>

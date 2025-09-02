@@ -17,5 +17,7 @@
     </None>
     <None Include="docker-compose.yml" />
     <None Include=".dockerignore" />
+    <None Include="vue WebApp\src\components\Post\PostComponent.vue" />
+    <None Include="vue WebApp\src\components\Post\UploadPostComponent.vue" />
   </ItemGroup>
 </Project>

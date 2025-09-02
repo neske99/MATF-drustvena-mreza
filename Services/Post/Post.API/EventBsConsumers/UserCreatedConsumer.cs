@@ -34,9 +34,6 @@ namespace Post.API.EventBsConsumers
             {
                 throw;
             }
-
-
-
         }
     }
 }

@@ -1,26 +1,31 @@
 <template>
-  <div class="user-detail-page">
+  <div class="profile-detail-page">
     <!-- User Profile Header -->
-    <v-card 
-      class="profile-header-card mb-6" 
-      elevation="2"
-      rounded="lg"
-    >
+    <v-card class="profile-header-card mb-6" elevation="2" rounded="lg">
       <!-- Cover Photo Area -->
       <div class="cover-photo">
         <div class="cover-overlay"></div>
       </div>
-      
       <!-- Profile Content -->
       <v-card-text class="profile-content pa-6">
         <div class="d-flex align-start">
           <!-- Profile Avatar -->
-          <div class="profile-avatar-container mr-6">
-            <v-avatar size="120" color="matf-red" class="profile-avatar">
-              <v-icon size="60" color="white">mdi-account</v-icon>
+          <div class="profile-avatar-container mr-6 avatar-hover-group" style="position:relative;">
+            <v-avatar size="120" color="matf-red" class="profile-avatar mb-2">
+              <img v-if="formattedProfilePictureUrl" :src="formattedProfilePictureUrl" alt="Profile Picture" @error="handleImageError" />
+              <v-icon v-else size="60" color="white">mdi-account</v-icon>
             </v-avatar>
+            <v-btn
+              v-if="isOwnProfile"
+              icon
+              class="avatar-edit-btn"
+              color="white"
+              style="position:absolute;top:8px;left:8px;z-index:2;background:white;width:32px;height:32px;min-width:32px;min-height:32px;"
+              @click="showProfilePictureModal = true"
+            >
+              <v-icon color="matf-red" size="16">mdi-pencil</v-icon>
+            </v-btn>
           </div>
-          
           <!-- Profile Info -->
           <div class="flex-grow-1">
             <div class="d-flex justify-space-between align-start mb-4">
@@ -40,16 +45,6 @@
                   <v-btn
                     color="matf-red"
                     size="large"
-                    class="text-none mr-2"
-                    prepend-icon="mdi-pencil"
-                    @click="editProfile = true"
-                  >
-                    Edit Profile
-                  </v-btn>
-                  
-                  <v-btn
-                    color="matf-red"
-                    size="large"
                     class="text-none"
                     prepend-icon="mdi-cog"
                     to="/settings"
@@ -59,7 +54,7 @@
                 </div>
 
                 <!-- Other Profile Actions -->
-                <div v-else>
+                <div v-else class="d-flex align-center">
                   <!-- Send Friend Request - only when no relationship exists -->
                   <v-btn
                     v-if="relation === 'NONE' || relation === '' || !relation"
@@ -102,22 +97,36 @@
                       color="matf-red"
                       size="large"
                       class="text-none mr-2"
-                      prepend-icon="mdi-account-minus"
-                      @click="removeFriend"
-                    >
-                      Remove Friend
-                    </v-btn>
-                    
-                    <v-btn
-                      color="matf-red"
-                      size="large"
-                      class="text-none"
                       prepend-icon="mdi-message"
                       @click="openChat"
                     >
                       Message
                     </v-btn>
                   </template>
+
+                  <!-- More Options Menu - only show when there are menu options available -->
+                  <v-menu v-if="relation === 'FRIEND_WITH'" offset-y>
+                    <template v-slot:activator="{ props }">
+                      <v-btn 
+                        icon 
+                        variant="text" 
+                        size="large" 
+                        v-bind="props"
+                        class="ml-2"
+                      >
+                        <v-icon>mdi-dots-vertical</v-icon>
+                      </v-btn>
+                    </template>
+                    <v-list>
+                      <!-- Remove Friend option - only when you are friends -->
+                      <v-list-item @click="confirmRemoveFriend">
+                        <template v-slot:prepend>
+                          <v-icon color="red-darken-1">mdi-account-minus</v-icon>
+                        </template>
+                        <v-list-item-title>Remove Friend</v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
                 </div>
               </div>
             </div>
@@ -231,12 +240,21 @@
                 v-for="post in userPosts" 
                 :id="post.id" 
                 :text="post.text" 
-                :username="post.user.username" 
+                :username="post.user.username"
+                :firstName="post.user.firstName"
+                :lastName="post.user.lastName"
+                :userId="post.user.id"
+                :createdDate="post.createdDate"
+                :userProfilePictureUrl="post.user.profilePictureUrl"
                 :comments="post.comments" 
                 :likes="post.likes"
+                :fileUrl="post.fileUrl"
+                :fileName="post.fileName"
+                :fileType="post.fileType"
                 :key="post.id"
                 @comment-added="refreshUserPosts"
                 @like-toggled="refreshUserPosts"
+                @post-deleted="refreshUserPosts"
                 class="mb-4"
               />
             </TransitionGroup>
@@ -346,7 +364,13 @@
                     <v-card-text class="pa-4">
                       <div class="d-flex align-center">
                         <v-avatar size="48" color="matf-red" class="mr-3">
-                          <v-icon color="white">mdi-account</v-icon>
+                          <img 
+                              v-if="getUserProfilePictureUrl(friend.profilePictureUrl)" 
+                              :src="getUserProfilePictureUrl(friend.profilePictureUrl)" 
+                              alt="Profile Picture"
+                              @error="() => {}"
+                          />
+                          <v-icon v-else color="white">mdi-account</v-icon>
                         </v-avatar>
                         
                         <div class="flex-grow-1">
@@ -370,60 +394,35 @@
       </v-window-item>
     </v-window>
 
-    <!-- Edit Profile Dialog -->
-    <v-dialog v-model="editProfile" max-width="500px">
-      <v-card>
-        <v-card-title class="text-h5 matf-red--text">Edit Profile</v-card-title>
-        <v-card-text>
-          <v-form ref="editForm">
-            <v-text-field
-              v-model="editedFirstName"
-              label="First Name"
-              variant="outlined"
-              color="matf-red"
-              class="mb-4"
-              :rules="[rules.required]"
-            />
-            <v-text-field
-              v-model="editedLastName"
-              label="Last Name"
-              variant="outlined"
-              color="matf-red"
-              :rules="[rules.required]"
-            />
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn color="grey" variant="text" @click="editProfile = false">
-            Cancel
-          </v-btn>
-          <v-btn color="matf-red" @click="saveProfile">
-            Save Changes
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+
+    <!-- Profile picture upload modal -->
+    <ProfilePictureUpload
+      :show="showProfilePictureModal"
+      @close="showProfilePictureModal = false"
+      @profile-picture-updated="onProfilePictureUpdated"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import PostComponent from '@/components/Post/PostComponent.vue';
-import { defineComponent } from 'vue';
-import { authStore } from '../stores/auth.ts'
-import { userStore } from '../stores/user.ts'
-import { chatStore } from '@/stores/chat.ts';
-import { postStore } from '@/stores/post.ts';
+import { authStore } from '@/stores/auth';
+import { postStore } from '@/stores/post';
+import { userStore } from '@/stores/user';
+import { chatStore } from '@/stores/chat';
 import axiosAuthenticated from '@/plugin/axios';
-import { getSignalRConnection } from '@/plugin/signalr.ts';
-import type { UserDetailDTO } from '@/dtos/user/userDetailDTO.ts';
-import type { postDTO } from '@/dtos/post/postDTO.ts';
+import { userCacheService } from '@/services/userCacheService';
+import PostComponent from '@/components/Post/PostComponent.vue';
+import ProfilePictureUpload from '@/components/Profile/ProfilePictureUpload.vue';
+import { defineComponent } from 'vue';
+import type { UserDetailDTO } from '@/dtos/user/userDetailDTO';
+import type { postDTO } from '@/dtos/post/postDTO';
 
 export default defineComponent({
   name: 'UserDetailView',
   props: ['username'],
   components: {
-    PostComponent
+    PostComponent,
+    ProfilePictureUpload
   },
   data() {
     return {
@@ -436,12 +435,8 @@ export default defineComponent({
       friendsList: [] as UserDetailDTO[],
       loadingFriends: false,
       loading: true,
-      editProfile: false,
-      editedFirstName: '',
-      editedLastName: '',
-      rules: {
-        required: (v: string) => !!v || 'This field is required'
-      }
+      showProfilePictureModal: false,
+      imageError: false,
     };
   },
   async created() {
@@ -454,6 +449,10 @@ export default defineComponent({
     
     isOwnProfile() {
       return this.username === authStore().username;
+    },
+
+    formattedProfilePictureUrl() {
+      return this.getUserProfilePictureUrl(this.userDetail.profilePictureUrl);
     }
   },
   methods: {
@@ -469,6 +468,7 @@ export default defineComponent({
         }
         
         this.userPosts = await postStore().GetPostsForUser(this.userDetail.id);
+        await this.fetchUserDataForPosts();
         await this.loadFriendsList();
         
         this.editedFirstName = this.userDetail.firstName;
@@ -537,6 +537,10 @@ export default defineComponent({
       try {
         await userStore().AcceptFriendRequest(authStore().userId, this.userDetail.id);
         this.relation = 'FRIEND_WITH';
+        
+        // Emit event to refresh chat groups when accepting friend request
+        this.$root.$emit('friendship-changed');
+        
         await this.loadFriendsList();
       } catch (error) {
         // Handle errors silently
@@ -547,25 +551,72 @@ export default defineComponent({
       try {
         await userStore().RemoveFriend(authStore().userId, this.userDetail.id);
         this.relation = 'NONE';
+        
+        // Clear the user from chat groups when unfriending
+        const chatGroupsStore = chatStore();
+        const existingGroupIndex = chatGroupsStore.currentChatGroups.findIndex(
+          group => group.username === this.userDetail.username
+        );
+        
+        if (existingGroupIndex !== -1) {
+          chatGroupsStore.currentChatGroups.splice(existingGroupIndex, 1);
+          console.log('Removed unfriended user from chat groups');
+          
+          // If this was the active chat, reset it
+          if (chatGroupsStore.currentChatGroupId === chatGroupsStore.currentChatGroups[existingGroupIndex]?.chatId) {
+            chatGroupsStore.currentChatGroupId = 0;
+            chatGroupsStore.currentChatMessages = [];
+          }
+        }
+        
+        // Emit event to refresh chat groups in left sidebar
+        this.$root.$emit('friendship-changed');
+        
         await this.loadFriendsList();
       } catch (error) {
         // Handle errors silently
       }
     },
+
+    async confirmRemoveFriend() {
+      if (confirm(`Are you sure you want to remove ${this.userDetail.firstName} ${this.userDetail.lastName} from your friends? This action cannot be undone.`)) {
+        await this.removeFriend();
+      }
+    },
+
     async openChat() {
+      console.log('=== STARTING OPENCHAT ===');
+      console.log('Current user ID:', authStore().userId);
+      console.log('Target user:', this.userDetail);
+      
+      // First test if Chat API is reachable
+      try {
+        console.log('Testing Chat API connectivity...');
+        const testResponse = await axiosAuthenticated.get('http://localhost:8095/api/v1/Chat');
+        console.log('Chat API test response:', testResponse.data);
+      } catch (error) {
+        console.error('Chat API test failed:', error);
+        console.error('Chat service might be down or unreachable');
+      }
+      
       try {
         const chatGroupsStore = chatStore();
+        console.log('Getting chat groups for user...');
         await chatGroupsStore.getChatGroupsForUser();
+        console.log('Current chat groups:', chatGroupsStore.currentChatGroups);
         
         let existingChatGroup = chatGroupsStore.currentChatGroups.find(
           group => group.username === this.userDetail.username
         );
+        console.log('Existing chat group found:', existingChatGroup);
         
         if (!existingChatGroup) {
+          console.log('Creating new chat group...');
           try {
             const response = await axiosAuthenticated.post(
               `http://localhost:8095/api/v1/Chat/CreateChatGroup?userAId=${authStore().userId}&userBId=${this.userDetail.id}`
             );
+            console.log('Create chat group response:', response.data);
             
             const newChatGroup = response.data;
             
@@ -577,7 +628,12 @@ export default defineComponent({
             };
             
             chatGroupsStore.currentChatGroups.unshift(existingChatGroup);
+            console.log('New chat group created:', existingChatGroup);
           } catch (error) {
+            console.error('Error creating chat group - API response:', error.response);
+            console.error('Error creating chat group - full error:', error);
+            
+            // Create a fallback chat group to allow UI to work
             existingChatGroup = {
               chatId: Date.now(),
               username: this.userDetail.username,
@@ -586,17 +642,162 @@ export default defineComponent({
             };
             
             chatGroupsStore.currentChatGroups.unshift(existingChatGroup);
+            console.log('Fallback chat group created:', existingChatGroup);
           }
         }
         
+        console.log('Switching to chat group:', existingChatGroup);
         await chatGroupsStore.switchUserChat(existingChatGroup);
+        console.log('Chat switched successfully');
+        console.log('=== OPENCHAT COMPLETED ===');
       } catch (error) {
-        // Handle errors silently
+        console.error('=== OPENCHAT ERROR ===');
+        console.error('Error in openChat:', error);
+        console.error('Error details:', error.response || error.message);
       }
     },
     
     viewFriendProfile(username: string) {
-      this.$router.push({ name: 'UserDetail', params: { username } });
+      this.$router.push({ name: 'userDetail', params: { username } });
+    },
+    async onProfilePictureUpdated(newUrl: string) {
+      this.userDetail.profilePictureUrl = newUrl;
+      
+      // If this is the current user's profile, update auth store too
+      if (this.isOwnProfile) {
+        authStore().updateProfilePicture(newUrl);
+      }
+      
+      this.loadUserData(); // Refresh user data after upload
+    },
+    async refreshUserPosts() {
+      try {
+        this.userPosts = await postStore().GetPostsForUser(this.userDetail.id);
+        await this.fetchUserDataForPosts();
+      } catch (error) {
+        console.error('Error refreshing user posts:', error);
+      }
+    },
+
+    async fetchUserDataForPosts() {
+      // Get unique user IDs from posts, comments, and likes
+      const userIds = new Set<number>();
+      const userIdToUsernameMap = new Map<number, string>();
+      
+      this.userPosts.forEach(post => {
+        userIds.add(post.user.id);
+        userIdToUsernameMap.set(post.user.id, post.user.username);
+        
+        if (post.comments) {
+          post.comments.forEach(comment => {
+            if (comment.user?.id && comment.user?.username) {
+              userIds.add(comment.user.id);
+              userIdToUsernameMap.set(comment.user.id, comment.user.username);
+            }
+          });
+        }
+        
+        if (post.likes) {
+          post.likes.forEach(like => {
+            if (like.user?.id && like.user?.username) {
+              userIds.add(like.user.id);
+              userIdToUsernameMap.set(like.user.id, like.user.username);
+            }
+          });
+        }
+      });
+
+      // Fetch user data for all unique user IDs
+      const usersMap = new Map();
+      
+      for (const userId of userIds) {
+        try {
+          const username = userIdToUsernameMap.get(userId);
+          if (username) {
+            const userData = await userCacheService.getUserByUsername(username);
+            if (userData) {
+              usersMap.set(userId, userData);
+            }
+          }
+        } catch (error) {
+          console.log(`Could not fetch user data for ID ${userId}:`, error);
+        }
+      }
+
+      // Update posts with complete user data
+      this.userPosts.forEach(post => {
+        const userData = usersMap.get(post.user.id);
+        if (userData) {
+          post.user = {
+            ...post.user,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            profilePictureUrl: userData.profilePictureUrl
+          };
+        }
+
+        // Update comment users
+        if (post.comments) {
+          post.comments.forEach(comment => {
+            if (comment.user?.id) {
+              const userData = usersMap.get(comment.user.id);
+              if (userData) {
+                comment.user = {
+                  ...comment.user,
+                  firstName: userData.firstName,
+                  lastName: userData.lastName,
+                  profilePictureUrl: userData.profilePictureUrl
+                };
+              }
+            }
+          });
+        }
+
+        // Update like users
+        if (post.likes) {
+          post.likes.forEach(like => {
+            if (like.user?.id) {
+              const userData = usersMap.get(like.user.id);
+              if (userData) {
+                like.user = {
+                  ...like.user,
+                  firstName: userData.firstName,
+                  lastName: userData.lastName,
+                  profilePictureUrl: userData.profilePictureUrl
+                };
+              }
+            }
+          });
+        }
+      });
+    },
+
+    getUserProfilePictureUrl(url: string) {
+      // Handle profile pictures which should be served from identity service
+      if (!url) return null;
+      
+      // Check if this is a profile picture path (correct path)
+      if (url.startsWith('/uploads/profile-pictures/')) {
+        return import.meta.env.DEV
+          ? `http://localhost:8094${url}`
+          : url;
+      }
+      
+      // Handle any other uploads path - default to identity service for profile pics
+      if (url.startsWith('/uploads/')) {
+        return import.meta.env.DEV
+          ? `http://localhost:8094${url}`
+          : url;
+      }
+      
+      // If it's already a full URL, return as is
+      return url;
+    },
+
+    handleImageError() {
+      console.error('Profile image failed to load:', this.formattedProfilePictureUrl);
+      console.error('Original profile picture URL:', this.userDetail.profilePictureUrl);
+      this.imageError = true;
     },
   },
   watch: {
@@ -759,6 +960,14 @@ export default defineComponent({
   color: #8B0000 !important;
 }
 
+/* Fix friend avatar images */
+.friend-card .v-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
 /* Loading states */
 .loading-friends {
   min-height: 200px;
@@ -794,6 +1003,12 @@ export default defineComponent({
     margin-right: 0 !important;
   }
   
+  .profile-actions .d-flex {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+  
   .profile-stats .v-row {
     justify-content: center;
   }
@@ -807,20 +1022,36 @@ export default defineComponent({
   }
 }
 
-@media (max-width: 600px) {
-  .d-flex.align-start {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-  
-  .profile-avatar-container {
-    margin-right: 0 !important;
-    margin-bottom: 1rem;
-  }
-  
-  .profile-stats {
-    margin-top: 1rem;
-  }
+/* Menu styling */
+.v-list-item {
+  transition: background-color 0.2s ease;
+}
+
+.v-list-item:hover {
+  background-color: rgba(139, 0, 0, 0.05);
+}
+
+.v-list-item[role="menuitem"]:hover .v-icon {
+  color: #d32f2f !important; /* Bright red on hover */
+}
+.avatar-edit-btn {
+  box-shadow: 0 2px 8px rgba(139, 0, 0, 0.15);
+  border-radius: 50%;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.avatar-hover-group:hover .avatar-edit-btn {
+  opacity: 1;
+}
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+    display: block;
 }
 </style>
