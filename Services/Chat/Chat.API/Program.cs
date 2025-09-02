@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Common.Logger.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,14 +15,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSignalR();
 builder.Services.RegisterChatServices(builder.Configuration);
-
-// Add logger service
-builder.Services.AddLogger(options =>
-{
-    options.LogDirectory = "/app/logs/chat-api";
-    options.EnableFileLogging = true;
-    options.ExcludedPaths.Add("/chathub");
-});
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings.GetValue<string>("secretKey");
@@ -100,8 +91,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
-app.UseLogger();
 
 app.UseCors("CorsPolicy");
 // Configure the HTTP request pipeline.

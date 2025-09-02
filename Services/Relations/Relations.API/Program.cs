@@ -19,10 +19,10 @@ builder.Services.AddMassTransit(config =>
     });
 });
 
-
+// Add logger with Action<LoggerOptions> configuration
 builder.Services.AddLogger(options =>
 {
-    options.LogDirectory = "/app/logs/relations-api";
+    options.LogDirectory = "logs/relations-api";
     options.EnableFileLogging = true;
 });
 
