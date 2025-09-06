@@ -1,4 +1,4 @@
-{
+/*{
   "files": [],
   "references": [
     {
@@ -8,5 +8,16 @@
       "path": "./tsconfig.app.json"
     }
   ],
-  "include": ["**/*.js"]
+}*/
+{
+  "files": [],
+  "references": [
+    {
+       "path": "./tsconfig.node.json"
+  },
+    {
+      "path": "./tsconfig.app.json"
+    }
+  ],
+  "include": ["env.d.ts", "src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
 }
