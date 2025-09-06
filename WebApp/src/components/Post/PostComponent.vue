@@ -4,9 +4,9 @@
         <v-card-title class="post-header pa-4">
             <div class="d-flex align-center w-100">
                 <v-avatar size="48" color="matf-red" class="mr-3">
-                    <img 
-                        v-if="formattedProfilePictureUrl && !imageError" 
-                        :src="formattedProfilePictureUrl" 
+                    <img
+                        v-if="formattedProfilePictureUrl && !imageError"
+                        :src="formattedProfilePictureUrl"
                         alt="Profile Picture"
                         @error="handleImageError"
                     />
@@ -43,7 +43,7 @@
         <!-- Post Content -->
         <v-card-text class="post-content px-4 pb-2">
             <p class="text-body-1 post-text">{{ text }}</p>
-            
+
             <!-- File attachment display -->
             <div v-if="fileUrl" class="post-file-attachment mt-3">
                 <!-- Image files -->
@@ -162,7 +162,7 @@
                     </v-avatar>
 
                     <div class="flex-grow-1">
-                        <v-text-field 
+                        <v-text-field
                             v-model.trim="newComment"
                             placeholder="Write a comment..."
                             variant="outlined"
@@ -190,9 +190,9 @@
                 <div v-for="comment in comments" :key="comment.id" class="comment-item mb-3">
                     <div class="d-flex align-start">
                         <v-avatar size="32" color="matf-red" class="mr-3 flex-shrink-0">
-                            <img v-if="comment.user && getUserProfilePictureUrl(comment.user.profilePictureUrl)" 
-                                 :src="getUserProfilePictureUrl(comment.user.profilePictureUrl)" 
-                                 alt="Profile Picture" 
+                            <img v-if="comment.user && getUserProfilePictureUrl(comment.user.profilePictureUrl)"
+                                 :src="getUserProfilePictureUrl(comment.user.profilePictureUrl)"
+                                 alt="Profile Picture"
                                  @error="() => {}" />
                             <v-icon v-else color="white" size="18">mdi-account</v-icon>
                         </v-avatar>
@@ -224,10 +224,10 @@
 </template>
 
 <script lang='ts'>
-import { postStore } from '@/stores/post';
-import { authStore } from '@/stores/auth';
+import { postStore } from '../../stores/post';
+import { authStore } from '../../stores/auth';
 import { defineComponent } from 'vue'
-import type { likeDTO } from '@/dtos/post/likeDTO';
+import type { likeDTO } from '../../dtos/post/likeDTO';
 
 export default defineComponent({
     name: 'PostComponent',
@@ -316,15 +316,15 @@ export default defineComponent({
 
         getUserProfilePictureUrl(url: string) {
             if (!url) return null;
-            
+
             if (url.startsWith('/uploads/profile-pictures/')) {
                 return import.meta.env.DEV ? `http://localhost:8094${url}` : url;
             }
-            
+
             if (url.startsWith('/uploads/')) {
                 return import.meta.env.DEV ? `http://localhost:8094${url}` : url;
             }
-            
+
             return url;
         },
 
@@ -383,7 +383,7 @@ export default defineComponent({
 
         getTimeAgo(dateString: string): string {
             if (!dateString) return 'Unknown time';
-            
+
             const now = new Date();
             const postDate = new Date(dateString + (dateString.includes('Z') ? '' : 'Z'));
             const diffMs = now.getTime() - postDate.getTime();
@@ -395,7 +395,7 @@ export default defineComponent({
             if (diffMins < 60) return `${diffMins}m ago`;
             if (diffHours < 24) return `${diffHours}h ago`;
             if (diffDays < 7) return `${diffDays}d ago`;
-            
+
             return postDate.toLocaleDateString();
         },
 
@@ -426,8 +426,8 @@ export default defineComponent({
 
         getDisplayName() {
             // This will be populated by PostsView with data from Identity Service
-            return (this.firstName && this.lastName) 
-                ? `${this.firstName} ${this.lastName}` 
+            return (this.firstName && this.lastName)
+                ? `${this.firstName} ${this.lastName}`
                 : 'MATF Student';
         },
     }
@@ -576,7 +576,7 @@ export default defineComponent({
     padding-left: 12px;
     padding-right: 12px;
   }
-  
+
   .attachment-actions {
     flex-direction: column;
     gap: 4px;

@@ -37,7 +37,7 @@
                   @{{ userDetail.username }}
                 </h2>
               </div>
-              
+
               <!-- Action Buttons -->
               <div class="profile-actions">
                 <!-- Own Profile Actions -->
@@ -66,7 +66,7 @@
                   >
                     Send Friend Request
                   </v-btn>
-                  
+
                   <!-- Accept Request - when you received a request -->
                   <v-btn
                     v-if="relation === 'RECEIVED_FRIENDSHIP_REQUEST_FROM'"
@@ -78,7 +78,7 @@
                   >
                     Accept Request
                   </v-btn>
-                  
+
                   <!-- Request Sent - when you sent a request -->
                   <v-btn
                     v-if="relation === 'REQUESTED_FRIENDSHIP_WITH'"
@@ -90,7 +90,7 @@
                     <v-icon class="mr-2">mdi-clock</v-icon>
                     Request Sent
                   </v-btn>
-                  
+
                   <!-- Friends Actions - when you are friends -->
                   <template v-if="relation === 'FRIEND_WITH'">
                     <v-btn
@@ -107,10 +107,10 @@
                   <!-- More Options Menu - only show when there are menu options available -->
                   <v-menu v-if="relation === 'FRIEND_WITH'" offset-y>
                     <template v-slot:activator="{ props }">
-                      <v-btn 
-                        icon 
-                        variant="text" 
-                        size="large" 
+                      <v-btn
+                        icon
+                        variant="text"
+                        size="large"
                         v-bind="props"
                         class="ml-2"
                       >
@@ -130,7 +130,7 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Profile Stats -->
             <div class="profile-stats">
               <v-row>
@@ -166,14 +166,14 @@
     </v-card>
 
     <!-- Profile Navigation -->
-    <v-card 
-      class="profile-nav-card mb-6" 
+    <v-card
+      class="profile-nav-card mb-6"
       elevation="1"
       rounded="lg"
     >
       <v-card-text class="pa-4">
-        <v-tabs 
-          v-model="activeTab" 
+        <v-tabs
+          v-model="activeTab"
           color="matf-red"
           align-tabs="start"
           class="profile-tabs"
@@ -209,13 +209,13 @@
               {{ userPosts.length }} posts shared
             </p>
           </div>
-          
+
           <!-- Posts List -->
           <div v-if="loading" class="loading-posts">
             <v-card class="pa-8 text-center" elevation="1" rounded="lg">
-              <v-progress-circular 
-                indeterminate 
-                color="matf-red" 
+              <v-progress-circular
+                indeterminate
+                color="matf-red"
                 size="48"
                 class="mb-4"
               />
@@ -223,7 +223,7 @@
               <p class="text-body-2 text--secondary">Getting latest posts</p>
             </v-card>
           </div>
-          
+
           <div v-else-if="userPosts.length === 0" class="empty-posts">
             <v-card class="pa-8 text-center" elevation="1" rounded="lg">
               <v-icon size="64" color="grey-lighten-2" class="mb-4">mdi-post-outline</v-icon>
@@ -233,20 +233,20 @@
               </p>
             </v-card>
           </div>
-          
+
           <div v-else class="posts-list">
             <TransitionGroup name="post" tag="div">
-              <PostComponent 
-                v-for="post in userPosts" 
-                :id="post.id" 
-                :text="post.text" 
+              <PostComponent
+                v-for="post in userPosts"
+                :id="post.id"
+                :text="post.text"
                 :username="post.user.username"
                 :firstName="post.user.firstName"
                 :lastName="post.user.lastName"
                 :userId="post.user.id"
                 :createdDate="post.createdDate"
                 :userProfilePictureUrl="post.user.profilePictureUrl"
-                :comments="post.comments" 
+                :comments="post.comments"
                 :likes="post.likes"
                 :fileUrl="post.fileUrl"
                 :fileName="post.fileName"
@@ -270,7 +270,7 @@
               <v-icon class="mr-2" color="matf-red">mdi-information</v-icon>
               About {{ isOwnProfile ? 'You' : userDetail.firstName }}
             </h3>
-            
+
             <div class="about-info">
               <div class="info-item mb-3">
                 <v-icon color="matf-red" class="mr-3">mdi-account</v-icon>
@@ -279,7 +279,7 @@
                   <p class="text-body-2 text--secondary">{{ userDetail.firstName }} {{ userDetail.lastName }}</p>
                 </div>
               </div>
-              
+
               <div class="info-item mb-3">
                 <v-icon color="matf-red" class="mr-3">mdi-at</v-icon>
                 <div>
@@ -287,7 +287,7 @@
                   <p class="text-body-2 text--secondary">@{{ userDetail.username }}</p>
                 </div>
               </div>
-              
+
               <div class="info-item mb-3">
                 <v-icon color="matf-red" class="mr-3">mdi-school</v-icon>
                 <div>
@@ -295,7 +295,7 @@
                   <p class="text-body-2 text--secondary">Faculty of Mathematics, University of Belgrade</p>
                 </div>
               </div>
-              
+
               <div class="info-item mb-3">
                 <v-icon color="matf-red" class="mr-3">mdi-account-group</v-icon>
                 <div>
@@ -303,7 +303,7 @@
                   <p class="text-body-2 text--secondary">{{ friendsCount }} {{ friendsCount === 1 ? 'friend' : 'friends' }}</p>
                 </div>
               </div>
-              
+
               <div class="info-item mb-3">
                 <v-icon color="matf-red" class="mr-3">mdi-calendar</v-icon>
                 <div>
@@ -324,18 +324,18 @@
               <v-icon class="mr-2" color="matf-red">mdi-account-group</v-icon>
               {{ isOwnProfile ? 'Your Friends' : `${userDetail.firstName}'s Friends` }}
             </h3>
-            
+
             <!-- Friends List -->
             <div v-if="loadingFriends" class="loading-friends text-center py-6">
-              <v-progress-circular 
-                indeterminate 
-                color="matf-red" 
+              <v-progress-circular
+                indeterminate
+                color="matf-red"
                 size="48"
                 class="mb-4"
               />
               <p class="text-body-2 text--secondary">Loading friends...</p>
             </div>
-            
+
             <div v-else-if="friendsList.length === 0" class="text-center py-6">
               <v-icon size="64" color="grey-lighten-2" class="mb-4">mdi-account-group-outline</v-icon>
               <h4 class="text-subtitle-1 font-weight-medium text--secondary mb-2">
@@ -345,16 +345,16 @@
                 {{ isOwnProfile ? 'Start connecting with people to build your network!' : 'This user hasn\'t connected with anyone yet.' }}
               </p>
             </div>
-            
+
             <div v-else class="friends-grid">
               <v-row>
-                <v-col 
-                  v-for="friend in friendsList" 
+                <v-col
+                  v-for="friend in friendsList"
                   :key="friend.id"
                   cols="12" sm="12" md="6"
                   class="mb-4"
                 >
-                  <v-card 
+                  <v-card
                     class="friend-card"
                     elevation="1"
                     rounded="lg"
@@ -364,15 +364,15 @@
                     <v-card-text class="pa-4">
                       <div class="d-flex align-center">
                         <v-avatar size="48" color="matf-red" class="mr-3">
-                          <img 
-                              v-if="getUserProfilePictureUrl(friend.profilePictureUrl)" 
-                              :src="getUserProfilePictureUrl(friend.profilePictureUrl)" 
+                          <img
+                              v-if="getUserProfilePictureUrl(friend.profilePictureUrl)"
+                              :src="getUserProfilePictureUrl(friend.profilePictureUrl)"
                               alt="Profile Picture"
                               @error="() => {}"
                           />
                           <v-icon v-else color="white">mdi-account</v-icon>
                         </v-avatar>
-                        
+
                         <div class="flex-grow-1">
                           <h4 class="text-subtitle-1 font-weight-bold text--primary mb-1">
                             {{ friend.firstName }} {{ friend.lastName }}
@@ -381,7 +381,7 @@
                             @{{ friend.username }}
                           </p>
                         </div>
-                        
+
                         <v-icon color="matf-red">mdi-chevron-right</v-icon>
                       </div>
                     </v-card-text>
@@ -405,17 +405,17 @@
 </template>
 
 <script lang="ts">
-import { authStore } from '@/stores/auth';
-import { postStore } from '@/stores/post';
-import { userStore } from '@/stores/user';
-import { chatStore } from '@/stores/chat';
-import axiosAuthenticated from '@/plugin/axios';
-import { userCacheService } from '@/services/userCacheService';
-import PostComponent from '@/components/Post/PostComponent.vue';
-import ProfilePictureUpload from '@/components/Profile/ProfilePictureUpload.vue';
+import { authStore } from '../stores/auth';
+import { postStore } from '../stores/post';
+import { userStore } from '../stores/user';
+import { chatStore } from '../stores/chat';
+import axiosAuthenticated from '../plugin/axios';
+import { userCacheService } from '../services/userCacheService';
+import PostComponent from '../components/Post/PostComponent.vue';
+import ProfilePictureUpload from '../components/Profile/ProfilePictureUpload.vue';
 import { defineComponent } from 'vue';
-import type { UserDetailDTO } from '@/dtos/user/userDetailDTO';
-import type { postDTO } from '@/dtos/post/postDTO';
+import type { UserDetailDTO } from '../dtos/user/userDetailDTO';
+import type { postDTO } from '../dtos/post/postDTO';
 
 export default defineComponent({
   name: 'UserDetailView',
@@ -446,7 +446,7 @@ export default defineComponent({
     totalLikes() {
       return this.userPosts.reduce((sum, post) => sum + (post.likes?.length || 0), 0);
     },
-    
+
     isOwnProfile() {
       return this.username === authStore().username;
     },
@@ -460,17 +460,17 @@ export default defineComponent({
       try {
         this.loading = true;
         const userstore = userStore();
-        
+
         this.userDetail = await userstore.GetUser(this.username);
-        
+
         if (!this.isOwnProfile) {
           this.relation = await userstore.GetRelation(authStore().userId, this.userDetail.id);
         }
-        
+
         this.userPosts = await postStore().GetPostsForUser(this.userDetail.id);
         await this.fetchUserDataForPosts();
         await this.loadFriendsList();
-        
+
         this.editedFirstName = this.userDetail.firstName;
         this.editedLastName = this.userDetail.lastName;
       } catch (error) {
@@ -484,17 +484,17 @@ export default defineComponent({
       try {
         this.loadingFriends = true;
         const userstore = userStore();
-        
+
         const friends = await userstore.GetUserFriends(this.userDetail.id);
         this.friendsCount = friends.length;
-        
+
         if (friends.length === 0) {
           this.friendsList = [];
           return;
         }
-        
+
         const allUsers = await userstore.GetUsers();
-        
+
         const friendDetailsPromises = friends
           .filter(friend => friend && friend.id)
           .map(async (friend) => {
@@ -508,12 +508,12 @@ export default defineComponent({
             }
             return null;
           });
-        
+
         const friendDetails = await Promise.all(friendDetailsPromises);
-        
+
         this.friendsList = friendDetails
           .filter((friend): friend is UserDetailDTO => friend !== null)
-          .filter((friend, index, self) => 
+          .filter((friend, index, self) =>
             self.findIndex(f => f.id === friend.id) === index
           );
       } catch (error) {
@@ -532,15 +532,15 @@ export default defineComponent({
         // Handle errors silently
       }
     },
-    
+
     async acceptRequest() {
       try {
         await userStore().AcceptFriendRequest(authStore().userId, this.userDetail.id);
         this.relation = 'FRIEND_WITH';
-        
+
         // Emit event to refresh chat groups when accepting friend request
         this.$root.$emit('friendship-changed');
-        
+
         await this.loadFriendsList();
       } catch (error) {
         // Handle errors silently
@@ -551,27 +551,27 @@ export default defineComponent({
       try {
         await userStore().RemoveFriend(authStore().userId, this.userDetail.id);
         this.relation = 'NONE';
-        
+
         // Clear the user from chat groups when unfriending
         const chatGroupsStore = chatStore();
         const existingGroupIndex = chatGroupsStore.currentChatGroups.findIndex(
           group => group.username === this.userDetail.username
         );
-        
+
         if (existingGroupIndex !== -1) {
           chatGroupsStore.currentChatGroups.splice(existingGroupIndex, 1);
           console.log('Removed unfriended user from chat groups');
-          
+
           // If this was the active chat, reset it
           if (chatGroupsStore.currentChatGroupId === chatGroupsStore.currentChatGroups[existingGroupIndex]?.chatId) {
             chatGroupsStore.currentChatGroupId = 0;
             chatGroupsStore.currentChatMessages = [];
           }
         }
-        
+
         // Emit event to refresh chat groups in left sidebar
         this.$root.$emit('friendship-changed');
-        
+
         await this.loadFriendsList();
       } catch (error) {
         // Handle errors silently
@@ -588,7 +588,7 @@ export default defineComponent({
       console.log('=== STARTING OPENCHAT ===');
       console.log('Current user ID:', authStore().userId);
       console.log('Target user:', this.userDetail);
-      
+
       // First test if Chat API is reachable
       try {
         console.log('Testing Chat API connectivity...');
@@ -598,18 +598,18 @@ export default defineComponent({
         console.error('Chat API test failed:', error);
         console.error('Chat service might be down or unreachable');
       }
-      
+
       try {
         const chatGroupsStore = chatStore();
         console.log('Getting chat groups for user...');
         await chatGroupsStore.getChatGroupsForUser();
         console.log('Current chat groups:', chatGroupsStore.currentChatGroups);
-        
+
         let existingChatGroup = chatGroupsStore.currentChatGroups.find(
           group => group.username === this.userDetail.username
         );
         console.log('Existing chat group found:', existingChatGroup);
-        
+
         if (!existingChatGroup) {
           console.log('Creating new chat group...');
           try {
@@ -617,22 +617,22 @@ export default defineComponent({
               `http://localhost:8095/api/v1/Chat/CreateChatGroup?userAId=${authStore().userId}&userBId=${this.userDetail.id}`
             );
             console.log('Create chat group response:', response.data);
-            
+
             const newChatGroup = response.data;
-            
+
             existingChatGroup = {
               chatId: newChatGroup.id,
               username: this.userDetail.username,
               userId: this.userDetail.id,
               hasNewMessages: false
             };
-            
+
             chatGroupsStore.currentChatGroups.unshift(existingChatGroup);
             console.log('New chat group created:', existingChatGroup);
           } catch (error) {
             console.error('Error creating chat group - API response:', error.response);
             console.error('Error creating chat group - full error:', error);
-            
+
             // Create a fallback chat group to allow UI to work
             existingChatGroup = {
               chatId: Date.now(),
@@ -640,12 +640,12 @@ export default defineComponent({
               userId: this.userDetail.id,
               hasNewMessages: false
             };
-            
+
             chatGroupsStore.currentChatGroups.unshift(existingChatGroup);
             console.log('Fallback chat group created:', existingChatGroup);
           }
         }
-        
+
         console.log('Switching to chat group:', existingChatGroup);
         await chatGroupsStore.switchUserChat(existingChatGroup);
         console.log('Chat switched successfully');
@@ -656,18 +656,18 @@ export default defineComponent({
         console.error('Error details:', error.response || error.message);
       }
     },
-    
+
     viewFriendProfile(username: string) {
       this.$router.push({ name: 'userDetail', params: { username } });
     },
     async onProfilePictureUpdated(newUrl: string) {
       this.userDetail.profilePictureUrl = newUrl;
-      
+
       // If this is the current user's profile, update auth store too
       if (this.isOwnProfile) {
         authStore().updateProfilePicture(newUrl);
       }
-      
+
       this.loadUserData(); // Refresh user data after upload
     },
     async refreshUserPosts() {
@@ -683,11 +683,11 @@ export default defineComponent({
       // Get unique user IDs from posts, comments, and likes
       const userIds = new Set<number>();
       const userIdToUsernameMap = new Map<number, string>();
-      
+
       this.userPosts.forEach(post => {
         userIds.add(post.user.id);
         userIdToUsernameMap.set(post.user.id, post.user.username);
-        
+
         if (post.comments) {
           post.comments.forEach(comment => {
             if (comment.user?.id && comment.user?.username) {
@@ -696,7 +696,7 @@ export default defineComponent({
             }
           });
         }
-        
+
         if (post.likes) {
           post.likes.forEach(like => {
             if (like.user?.id && like.user?.username) {
@@ -709,7 +709,7 @@ export default defineComponent({
 
       // Fetch user data for all unique user IDs
       const usersMap = new Map();
-      
+
       for (const userId of userIds) {
         try {
           const username = userIdToUsernameMap.get(userId);
@@ -775,21 +775,21 @@ export default defineComponent({
     getUserProfilePictureUrl(url: string) {
       // Handle profile pictures which should be served from identity service
       if (!url) return null;
-      
+
       // Check if this is a profile picture path (correct path)
       if (url.startsWith('/uploads/profile-pictures/')) {
         return import.meta.env.DEV
           ? `http://localhost:8094${url}`
           : url;
       }
-      
+
       // Handle any other uploads path - default to identity service for profile pics
       if (url.startsWith('/uploads/')) {
         return import.meta.env.DEV
           ? `http://localhost:8094${url}`
           : url;
       }
-      
+
       // If it's already a full URL, return as is
       return url;
     },
@@ -982,41 +982,41 @@ export default defineComponent({
   .cover-photo {
     height: 150px;
   }
-  
+
   .profile-content {
     margin-top: -40px;
   }
-  
+
   .profile-avatar-container .profile-avatar {
     width: 80px !important;
     height: 80px !important;
   }
-  
+
   .profile-actions {
     flex-direction: column;
     width: 100%;
     gap: 8px;
   }
-  
+
   .profile-actions .v-btn {
     width: 100%;
     margin-right: 0 !important;
   }
-  
+
   .profile-actions .d-flex {
     flex-direction: column;
     width: 100%;
     gap: 8px;
   }
-  
+
   .profile-stats .v-row {
     justify-content: center;
   }
-  
+
   .profile-stats .stat-item {
     padding: 0 12px;
   }
-  
+
   .friends-grid .v-col {
     padding: 4px;
   }

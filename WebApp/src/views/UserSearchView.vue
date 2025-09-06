@@ -1,8 +1,8 @@
 <template>
   <div class="user-search-page">
     <!-- Search Header -->
-    <v-card 
-      class="search-header-card mb-6" 
+    <v-card
+      class="search-header-card mb-6"
       elevation="2"
       rounded="lg"
     >
@@ -19,7 +19,7 @@
               {{ searchResultsText }}
             </p>
           </div>
-          
+
           <!-- Search Stats -->
           <div class="d-none d-md-flex align-center">
             <div class="text-center">
@@ -36,9 +36,9 @@
       <!-- Loading State -->
       <div v-if="loading" class="loading-state">
         <v-card class="pa-8 text-center" elevation="1" rounded="lg">
-          <v-progress-circular 
-            indeterminate 
-            color="matf-red" 
+          <v-progress-circular
+            indeterminate
+            color="matf-red"
             size="48"
             class="mb-4"
           />
@@ -60,8 +60,8 @@
           <p class="text-body-2 text--secondary mb-4">
             Try searching with different terms or check the spelling.
           </p>
-          <v-btn 
-            color="matf-red" 
+          <v-btn
+            color="matf-red"
             variant="outlined"
             @click="goToAllUsers"
           >
@@ -77,20 +77,20 @@
           <v-icon class="mr-2" color="matf-red">mdi-account-group</v-icon>
           MATF Community Members
         </h3>
-        
+
         <v-row>
           <v-col
-            v-for="user in currentSearchedUsers" 
+            v-for="user in currentSearchedUsers"
             :key="user.id"
-            cols="12" 
-            sm="12" 
+            cols="12"
+            sm="12"
             lg="6"
             class="mb-4"
           >
-            <UserCardComponent 
+            <UserCardComponent
               :text="user.username"
               :firstName="user.firstName"
-              :lastName="user.lastName" 
+              :lastName="user.lastName"
               :userId="user.id"
               :relation="user.relation"
               :profilePictureUrl="user.profilePictureUrl"
@@ -101,7 +101,7 @@
             />
           </v-col>
         </v-row>
-        
+
       </div>
     </div>
   </div>
@@ -109,11 +109,11 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { userStore } from '../stores/user.ts';
-import { authStore } from '../stores/auth.ts';
-import { userCacheService } from '@/services/userCacheService';
-import UserCardComponent from '@/components/UserSearch/UserCard.vue';
-import type { UserPreviewDTO } from '@/dtos/user/userPreviewDTO.ts';
+import { userStore } from '../stores/user';
+import { authStore } from '../stores/auth';
+import { userCacheService } from '../services/userCacheService';
+import UserCardComponent from '../components/UserSearch/UserCard.vue';
+import type { UserPreviewDTO } from '../dtos/user/userPreviewDTO';
 
 export default defineComponent({
   name: 'UserSearchView',
@@ -133,7 +133,7 @@ export default defineComponent({
     searchResultsText() {
       if (this.loading) return 'Searching...';
       if (!this.searchPerformed) return 'Enter a search term to find users';
-      
+
       const count = this.currentSearchedUsers.length;
       if (count === 0) {
         return `No results found for "${this.userSearchName}"`;
@@ -154,22 +154,22 @@ export default defineComponent({
         this.searchPerformed = false;
         return;
       }
-      
+
       try {
         this.loading = true;
         this.searchPerformed = true;
         const userstore = userStore();
-        
+
         console.log('Searching for:', searchTerm);
         console.log('Current user ID:', authStore().userId);
-        
+
         const results = await userstore.GetSearchedUsers(searchTerm.trim());
-        
+
         // Filter out current user from results and enhance with profile pictures
-        const filteredResults = results.filter(user => 
+        const filteredResults = results.filter(user =>
           user.username !== authStore().username
         );
-        
+
         // Enhance each result with profile picture data
         const enhancedResults = await Promise.all(
           filteredResults.map(async (user) => {
@@ -188,9 +188,9 @@ export default defineComponent({
             }
           })
         );
-        
+
         this.currentSearchedUsers = enhancedResults;
-        
+
         console.log('Search results with relations and profile pictures:', this.currentSearchedUsers);
       } catch (error) {
         console.error('Error searching users:', error);
@@ -199,30 +199,30 @@ export default defineComponent({
         this.loading = false;
       }
     },
-    
-    
+
+
     async goToAllUsers() {
       try {
         this.loading = true;
-        
+
         const userstore = userStore();
         const allUsers = await userstore.GetUsers();
-        
+
         // Filter out current user and get relationship status for each user
-        const filteredUsers = allUsers.filter(user => 
+        const filteredUsers = allUsers.filter(user =>
           user.username !== authStore().username
         );
-        
+
         // Fetch relationship status and profile pictures for each user
         const enhancedUsers = await Promise.all(
           filteredUsers.map(async (user) => {
             try {
               // Get relationship status
               const relation = await userstore.GetRelation(authStore().userId, user.id);
-              
+
               // Get profile picture
               const userDetails = await userCacheService.getUserByUsername(user.username);
-              
+
               return {
                 ...user,
                 relation: relation,
@@ -238,10 +238,10 @@ export default defineComponent({
             }
           })
         );
-        
+
         this.currentSearchedUsers = enhancedUsers;
         this.searchPerformed = true;
-        
+
         console.log('All users with relations and profile pictures:', this.currentSearchedUsers);
       } catch (error) {
         console.error('Error loading all users:', error);
@@ -249,7 +249,7 @@ export default defineComponent({
         this.loading = false;
       }
     },
-    
+
     onRequestSent(userId: number) {
       // Update the user's status in the list
       const user = this.currentSearchedUsers.find(u => u.id === userId);
@@ -258,7 +258,7 @@ export default defineComponent({
         console.log(`Updated relation for user ${userId} to: REQUESTED_FRIENDSHIP_WITH`);
       }
     },
-    
+
     onRequestAccepted(userId: number) {
       // Update the user's status in the list
       const user = this.currentSearchedUsers.find(u => u.id === userId);
@@ -360,7 +360,7 @@ export default defineComponent({
   .search-header-card .v-card-text {
     padding: 1.5rem;
   }
-  
+
   .user-search-page {
     animation: none; /* Reduce animations on mobile */
   }
@@ -371,7 +371,7 @@ export default defineComponent({
     flex-direction: column;
     text-align: center;
   }
-  
+
   .search-header-card .mr-4 {
     margin-right: 0 !important;
     margin-bottom: 1rem;

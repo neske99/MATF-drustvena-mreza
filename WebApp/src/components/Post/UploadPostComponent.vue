@@ -5,9 +5,9 @@
         <v-card-text class="pa-6">
             <div class="d-flex align-start">
                 <v-avatar size="56" color="matf-red" class="mr-4 flex-shrink-0">
-                    <img 
-                        v-if="currentUserProfilePicture" 
-                        :src="currentUserProfilePicture" 
+                    <img
+                        v-if="currentUserProfilePicture"
+                        :src="currentUserProfilePicture"
                         alt="Your Profile Picture"
                         @error="() => {}"
                     />
@@ -34,21 +34,21 @@
                                     <v-avatar size="48" :color="getFileColor()" class="mr-3">
                                         <v-icon color="white" size="24">{{ getFileIcon() }}</v-icon>
                                     </v-avatar>
-                                    
+
                                     <!-- File info -->
                                     <div class="flex-grow-1">
                                         <h4 class="text-subtitle-1 font-weight-bold mb-1">
                                             {{ attachedFile.name }}
                                         </h4>
                                         <p class="text-caption text--secondary mb-0">
-                                            {{ getFileTypeLabel() }} • {{ formatFileSize(attachedFile.size) }}
+                                            {{ getFileTypeLabel() }} ï¿½ {{ formatFileSize(attachedFile.size) }}
                                         </p>
                                     </div>
-                                    
+
                                     <!-- Remove file button -->
-                                    <v-btn 
-                                        icon 
-                                        variant="text" 
+                                    <v-btn
+                                        icon
+                                        variant="text"
                                         size="small"
                                         color="error"
                                         @click="removeFile"
@@ -57,12 +57,12 @@
                                         <v-icon>mdi-close</v-icon>
                                     </v-btn>
                                 </div>
-                                
+
                                 <!-- Image preview for image files -->
                                 <div v-if="isImageFile() && imagePreview" class="image-preview mt-3">
-                                    <img 
-                                        :src="imagePreview" 
-                                        alt="Preview" 
+                                    <img
+                                        :src="imagePreview"
+                                        alt="Preview"
                                         class="preview-image"
                                     />
                                 </div>
@@ -84,7 +84,7 @@
                             <v-icon class="mr-2">mdi-paperclip</v-icon>
                             Attach File
                         </v-btn>
-                        
+
                         <!-- Hidden file input -->
                         <input
                             ref="fileInput"
@@ -127,8 +127,8 @@
 </template>
 
 <script lang='ts'>
-    import { authStore } from '@/stores/auth';
-    import { postStore } from '@/stores/post';
+    import { authStore } from '../../stores/auth';
+    import { postStore } from '../../stores/post';
     import { defineComponent } from 'vue'
 
     export default defineComponent({
@@ -154,7 +154,7 @@
                     const userId = authStore().userId;
                     const formData = new FormData();
                     formData.append('text', this.newPost);
-                    formData.append('userId', userId);
+                    formData.append('userId', userId.toString());
                     if (this.attachedFile) {
                         formData.append('file', this.attachedFile);
                     }
@@ -181,10 +181,10 @@
             handleFileSelect(event: Event) {
                 const target = event.target as HTMLInputElement;
                 const file = target.files?.[0];
-                
+
                 if (file) {
                     this.attachedFile = file;
-                    
+
                     // Create image preview for image files
                     if (this.isImageFile()) {
                         const reader = new FileReader();
@@ -247,49 +247,49 @@
 
             getFileIcon(): string {
                 if (!this.attachedFile) return 'mdi-file';
-                
+
                 if (this.isImageFile()) return 'mdi-image';
                 if (this.isPdfFile()) return 'mdi-file-pdf-box';
                 if (this.isWordFile()) return 'mdi-file-word-box';
                 if (this.isExcelFile()) return 'mdi-file-excel-box';
                 if (this.isPowerPointFile()) return 'mdi-file-powerpoint-box';
-                
+
                 const fileName = this.attachedFile.name.toLowerCase();
                 if (fileName.endsWith('.txt')) return 'mdi-file-document-outline';
                 if (fileName.match(/\.(zip|rar|7z)$/)) return 'mdi-zip-box';
                 if (fileName.match(/\.(mp3|wav|ogg)$/)) return 'mdi-music-box';
                 if (fileName.match(/\.(mp4|avi|mov|wmv)$/)) return 'mdi-video-box';
-                
+
                 return 'mdi-file-outline';
             },
 
             getFileColor(): string {
                 if (!this.attachedFile) return 'grey';
-                
+
                 if (this.isImageFile()) return 'green';
                 if (this.isPdfFile()) return 'red';
                 if (this.isWordFile()) return 'blue';
                 if (this.isExcelFile()) return 'green';
                 if (this.isPowerPointFile()) return 'orange';
-                
+
                 return 'grey';
             },
 
             getFileTypeLabel(): string {
                 if (!this.attachedFile) return 'File';
-                
+
                 if (this.isImageFile()) return 'Image';
                 if (this.isPdfFile()) return 'PDF Document';
                 if (this.isWordFile()) return 'Word Document';
                 if (this.isExcelFile()) return 'Excel Spreadsheet';
                 if (this.isPowerPointFile()) return 'PowerPoint Presentation';
-                
+
                 const fileName = this.attachedFile.name.toLowerCase();
                 if (fileName.endsWith('.txt')) return 'Text Document';
                 if (fileName.match(/\.(zip|rar|7z)$/)) return 'Archive';
                 if (fileName.match(/\.(mp3|wav|ogg)$/)) return 'Audio';
                 if (fileName.match(/\.(mp4|avi|mov|wmv)$/)) return 'Video';
-                
+
                 return 'Document';
             },
 
@@ -304,21 +304,21 @@
             getUserProfilePictureUrl(url: string) {
                 // Handle profile pictures which should be served from identity service
                 if (!url) return null;
-                
+
                 // Check if this is a profile picture path (correct path)
                 if (url.startsWith('/uploads/profile-pictures/')) {
                     return import.meta.env.DEV
                         ? `http://localhost:8094${url}`
                         : url;
                 }
-                
+
                 // Handle any other uploads path - default to identity service for profile pics
                 if (url.startsWith('/uploads/')) {
                     return import.meta.env.DEV
                         ? `http://localhost:8094${url}`
                         : url;
                 }
-                
+
                 // If it's already a full URL, return as is
                 return url;
             },
@@ -419,22 +419,22 @@
   .upload-post-card .v-card-text {
     padding: 1.5rem;
   }
-  
+
   .d-flex.align-start {
     flex-direction: column;
   }
-  
+
   .mr-4 {
     margin-right: 0 !important;
     margin-bottom: 1rem;
     align-self: center;
   }
-  
+
   .action-bar {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .action-bar .v-btn {
     width: 100%;
   }

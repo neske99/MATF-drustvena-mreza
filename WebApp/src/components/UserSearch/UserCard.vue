@@ -1,6 +1,6 @@
 <template>
-  <v-card 
-    class="user-card" 
+  <v-card
+    class="user-card"
     elevation="2"
     rounded="lg"
     hover
@@ -10,16 +10,16 @@
     <v-card-text class="pa-4">
       <div class="d-flex align-center mb-3">
         <v-avatar size="56" color="matf-red" class="mr-3">
-          <img 
-            v-if="profilePictureUrl" 
-            :src="getUserProfilePictureUrl(profilePictureUrl)" 
+          <img
+            v-if="profilePictureUrl"
+            :src="getUserProfilePictureUrl(profilePictureUrl)"
             alt="Profile Picture"
             @error="() => {}"
             class="user-card-avatar-image"
           />
           <v-icon v-else size="28" color="white">mdi-account</v-icon>
         </v-avatar>
-        
+
         <div class="flex-grow-1">
           <h3 class="text-h6 font-weight-bold text--primary mb-1">
             {{ firstName }} {{ lastName }}
@@ -31,10 +31,10 @@
             MATF Student
           </p>
         </div>
-        
+
         <!-- Status Badge -->
-        <v-chip 
-          size="small" 
+        <v-chip
+          size="small"
           :color="getStatusColor()"
           variant="outlined"
           prepend-icon="mdi-school"
@@ -42,7 +42,7 @@
           {{ getStatusText() }}
         </v-chip>
       </div>
-      
+
       <!-- User Stats (Mock data for now) -->
       <div class="user-stats mb-3">
         <v-row dense>
@@ -67,7 +67,7 @@
         </v-row>
       </div>
     </v-card-text>
-    
+
     <!-- Card Actions -->
     <v-card-actions class="px-4 pb-4">
       <div class="w-100">
@@ -84,7 +84,7 @@
             Send Friend Request
           </v-btn>
         </div>
-        
+
         <div v-if="showAcceptButton" class="mb-2">
           <div class="d-flex gap-2">
             <v-btn
@@ -110,7 +110,7 @@
             </v-btn>
           </div>
         </div>
-        
+
         <div v-if="showFriendsStatus" class="mb-2">
           <v-btn
             color="error"
@@ -124,7 +124,7 @@
             Remove Friend
           </v-btn>
         </div>
-        
+
         <div v-if="showRequestSentStatus" class="mb-2">
           <v-btn
             color="grey"
@@ -137,7 +137,7 @@
             Request Sent
           </v-btn>
         </div>
-        
+
         <!-- Secondary Actions -->
         <div class="d-flex gap-2">
           <v-btn
@@ -149,7 +149,7 @@
           >
             Profile
           </v-btn>
-          
+
           <!-- Only show Message button when users are friends -->
           <v-btn
             v-if="canMessage"
@@ -167,10 +167,10 @@
 </template>
 
 <script lang='ts'>
-import { authStore } from '@/stores/auth';
-import { userStore } from '@/stores/user';
-import { chatStore } from '@/stores/chat';
-import axiosAuthenticated from '@/plugin/axios';
+import { authStore } from '../../stores/auth';
+import { userStore } from '../../stores/user';
+import { chatStore } from '../../stores/chat';
+import axiosAuthenticated from '../../plugin/axios';
 import { defineComponent } from 'vue'
 
 export default defineComponent({
@@ -219,19 +219,19 @@ export default defineComponent({
       const allowedStatuses = ['NONE', '', null, undefined, 'NO_RELATION'];
       return allowedStatuses.includes(this.localRelation);
     },
-    
+
     showAcceptButton() {
       return this.localRelation === 'RECEIVED_FRIENDSHIP_REQUEST_FROM';
     },
-    
+
     showFriendsStatus() {
       return this.localRelation === 'FRIEND_WITH' || this.localRelation === 'FRIENDS';
     },
-    
+
     showRequestSentStatus() {
       return this.localRelation === 'REQUESTED_FRIENDSHIP_WITH' || this.localRelation === 'SENT_FRIENDSHIP_REQUEST_TO';
     },
-    
+
     canMessage() {
       return this.localRelation === 'FRIEND_WITH' || this.localRelation === 'FRIENDS';
     }
@@ -259,16 +259,16 @@ export default defineComponent({
         this.sendingRequest = false;
       }
     },
-    
+
     async acceptRequest() {
       try {
         this.acceptingRequest = true;
         await userStore().AcceptFriendRequest(authStore().userId, this.userId);
         this.localRelation = 'FRIEND_WITH';
-        
+
         // Emit event to refresh chat groups
         this.$root.$emit('friendship-changed');
-        
+
         this.$emit('request-accepted', this.userId);
         console.log('Friend request accepted from:', this.text);
       } catch (error) {
@@ -278,7 +278,7 @@ export default defineComponent({
         this.acceptingRequest = false;
       }
     },
-    
+
     async declineRequest() {
       try {
         this.decliningRequest = true;
@@ -293,34 +293,34 @@ export default defineComponent({
         this.decliningRequest = false;
       }
     },
-    
+
     async removeFriend() {
       try {
         this.removingFriend = true;
         await userStore().RemoveFriend(authStore().userId, this.userId);
         this.localRelation = 'NONE';
-        
+
         // Clear the user from chat groups when unfriending
         const chatGroupsStore = chatStore();
         const existingGroupIndex = chatGroupsStore.currentChatGroups.findIndex(
           group => group.username === this.text
         );
-        
+
         if (existingGroupIndex !== -1) {
           const removedGroup = chatGroupsStore.currentChatGroups[existingGroupIndex];
           chatGroupsStore.currentChatGroups.splice(existingGroupIndex, 1);
           console.log('Removed unfriended user from chat groups');
-          
+
           // If this was the active chat, reset it
           if (chatGroupsStore.currentChatGroupId === removedGroup.chatId) {
             chatGroupsStore.currentChatGroupId = 0;
             chatGroupsStore.currentChatMessages = [];
           }
         }
-        
+
         // Emit event to refresh chat groups
         this.$root.$emit('friendship-changed');
-        
+
         this.$emit('friendship-removed', this.userId);
         console.log('Friendship removed with:', this.text);
       } catch (error) {
@@ -330,29 +330,29 @@ export default defineComponent({
         this.removingFriend = false;
       }
     },
-    
+
     viewProfile() {
       this.$router.push(`/userdetail/${this.text}`);
     },
-    
+
     async startMessage() {
       if (this.canMessage) {
         console.log('=== STARTING STARTMESSAGE ===');
         console.log('Starting message with', this.text);
         console.log('User ID:', this.userId);
         console.log('Current user ID:', authStore().userId);
-        
+
         try {
           const chatGroupsStore = chatStore();
           console.log('Getting chat groups for user...');
           await chatGroupsStore.getChatGroupsForUser();
           console.log('Current chat groups:', chatGroupsStore.currentChatGroups);
-          
+
           let existingChatGroup = chatGroupsStore.currentChatGroups.find(
             group => group.username === this.text
           );
           console.log('Existing chat group found:', existingChatGroup);
-          
+
           if (!existingChatGroup) {
             console.log('Creating new chat group...');
             try {
@@ -360,22 +360,22 @@ export default defineComponent({
                 `http://localhost:8095/api/v1/Chat/CreateChatGroup?userAId=${authStore().userId}&userBId=${this.userId}`
               );
               console.log('Create chat group response:', response.data);
-              
+
               const newChatGroup = response.data;
-              
+
               existingChatGroup = {
                 chatId: newChatGroup.id,
                 username: this.text,
                 userId: this.userId,
                 hasNewMessages: false
               };
-              
+
               chatGroupsStore.currentChatGroups.unshift(existingChatGroup);
               console.log('New chat group created:', existingChatGroup);
             } catch (error) {
               console.error('Error creating chat group - API response:', error.response);
               console.error('Error creating chat group - full error:', error);
-              
+
               // Create a fallback chat group to allow UI to work
               existingChatGroup = {
                 chatId: Date.now(), // temporary ID
@@ -383,16 +383,16 @@ export default defineComponent({
                 userId: this.userId,
                 hasNewMessages: false
               };
-              
+
               chatGroupsStore.currentChatGroups.unshift(existingChatGroup);
               console.log('Fallback chat group created:', existingChatGroup);
             }
           }
-          
+
           console.log('Switching to chat group:', existingChatGroup);
           await chatGroupsStore.switchUserChat(existingChatGroup);
           console.log('Chat switched successfully');
-          
+
           // Navigate to home to show the chat
           console.log('Navigating to home...');
           this.$router.push('/home');
@@ -410,7 +410,7 @@ export default defineComponent({
         console.log('localRelation:', this.localRelation);
       }
     },
-    
+
     getStatusColor() {
       switch (this.localRelation) {
         case 'FRIEND_WITH':
@@ -425,7 +425,7 @@ export default defineComponent({
           return 'matf-red';
       }
     },
-    
+
     getStatusText() {
       switch (this.localRelation) {
         case 'FRIEND_WITH':
@@ -443,15 +443,15 @@ export default defineComponent({
 
     getUserProfilePictureUrl(url: string) {
       if (!url) return null;
-      
+
       if (url.startsWith('/uploads/profile-pictures/')) {
         return import.meta.env.DEV ? `http://localhost:8094${url}` : url;
       }
-      
+
       if (url.startsWith('/uploads/')) {
         return import.meta.env.DEV ? `http://localhost:8094${url}` : url;
       }
-      
+
       return url;
     },
   }
@@ -530,11 +530,11 @@ export default defineComponent({
     flex-direction: column;
     gap: 8px;
   }
-  
+
   .gap-2 > * + * {
     margin-left: 0;
   }
-  
+
   .user-card {
     margin-bottom: 1rem;
   }
