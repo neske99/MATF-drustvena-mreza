@@ -244,18 +244,21 @@ export default defineComponent({
       showError: false,
       successMessage: '',
       errorMessage: '',
-      rules: {
-        required: (v: string) => !!v || 'This field is required',
-        minLength: (v: string) => (v && v.length >= 3) || 'Username must be at least 3 characters',
-        passwordLength: (v: string) => (v && v.length >= 8) || 'Password must be at least 8 characters',
-        passwordMatch: (v: string) => v === this.passwordData.newPassword || 'Passwords do not match'
-      }
     };
   },
   async created() {
     await this.loadCurrentUser();
   },
   computed: {
+    rules(){
+        return{
+        required: (v: string) => !!v || 'This field is required',
+        minLength: (v: string) => (v && v.length >= 3) || 'Username must be at least 3 characters',
+        passwordLength: (v: string) => (v && v.length >= 8) || 'Password must be at least 8 characters',
+        passwordMatch: (v: string) => v === this.passwordData.newPassword || 'Passwords do not match'
+      };
+
+    },
     hasProfileChanges() {
       return this.profileData.username !== this.originalProfileData.username ||
              this.profileData.firstName !== this.originalProfileData.firstName ||

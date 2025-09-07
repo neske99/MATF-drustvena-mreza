@@ -168,7 +168,6 @@ export default defineComponent({
     await this.loadInitialData();
   },
   mounted() {
-    this.isLoading = true;
     try {
       postStore().GetPosts().then((posts) => {
         this.posts = posts;
@@ -177,7 +176,6 @@ export default defineComponent({
     } catch (error) {
       console.error('Error loading posts:', error);
     } finally {
-      this.isLoading = false;
     }
   },
   computed: {

@@ -9,4 +9,9 @@ export interface postDTO{
   user:userDTO,
   comments?: commentDTO[],
   likes?: likeDTO[],
+  createdDate: Date,
+  fileUrl:string,
+  fileName:string,
+  fileType:string,
+
 };

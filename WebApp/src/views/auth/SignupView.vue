@@ -211,15 +211,21 @@ export default defineComponent({
       loading: false,
       showError: false,
       showSuccess: false,
-      errorMessage: '',
-      rules: {
-        required: (v: string) => !!v || 'This field is required',
-        nameLength: (v: string) => (v && v.length >= 2) || 'Name must be at least 2 characters',
-        minLength: (v: string) => (v && v.length >= 3) || 'Username must be at least 3 characters',
-        passwordLength: (v: string) => (v && v.length >= 8) || 'Password must be at least 8 characters',
-        passwordMatch: (v: string) => v === this.password || 'Passwords do not match'
-      }
+      errorMessage: ''
     };
+  },
+  computed:{
+    rules:function(){
+
+      return    {
+      required: (v: string) => !!v || 'This field is required',
+      nameLength: (v: string) => (v && v.length >= 2) || 'Name must be at least 2 characters',
+      minLength: (v: string) => (v && v.length >= 3) || 'Username must be at least 3 characters',
+      passwordLength: (v: string) => (v && v.length >= 8) || 'Password must be at least 8 characters',
+      passwordMatch: (v: string) => v === this.password || 'Passwords do not match'
+    };
+    }
+
   },
   methods: {
     async onSignUpClick() {

@@ -181,7 +181,7 @@ export default defineComponent({
 
     getCurrentUserProfilePicture() {
       const profilePictureUrl = authStore().profilePictureUrl;
-      if (!profilePictureUrl) return null;
+      if (!profilePictureUrl) return undefined;
 
       if (profilePictureUrl.startsWith('/uploads/profile-pictures/')) {
         return import.meta.env.DEV ? `http://localhost:8094${profilePictureUrl}` : profilePictureUrl;

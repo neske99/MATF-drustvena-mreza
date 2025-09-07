@@ -3,5 +3,5 @@ export interface UserDetailDTO {
   username: string,
   firstName: string,
   lastName: string,
-  profilePictureUrl?: string
+  profilePictureUrl: string
 }

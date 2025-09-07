@@ -416,6 +416,7 @@ import ProfilePictureUpload from '../components/Profile/ProfilePictureUpload.vue
 import { defineComponent } from 'vue';
 import type { UserDetailDTO } from '../dtos/user/userDetailDTO';
 import type { postDTO } from '../dtos/post/postDTO';
+import type { UserWithOnlyIdDTO } from '@/dtos/user/userWithOnlyIdDTO';
 
 export default defineComponent({
   name: 'UserDetailView',
@@ -471,8 +472,8 @@ export default defineComponent({
         await this.fetchUserDataForPosts();
         await this.loadFriendsList();
 
-        this.editedFirstName = this.userDetail.firstName;
-        this.editedLastName = this.userDetail.lastName;
+        /*this.editedFirstName = this.userDetail.firstName;
+        this.editedLastName = this.userDetail.lastName;*/
       } catch (error) {
         // Handle errors silently
       } finally {
@@ -485,7 +486,7 @@ export default defineComponent({
         this.loadingFriends = true;
         const userstore = userStore();
 
-        const friends = await userstore.GetUserFriends(this.userDetail.id);
+        const friends:   UserWithOnlyIdDTO[]= await userstore.GetUserFriends(this.userDetail.id);
         this.friendsCount = friends.length;
 
         if (friends.length === 0) {
@@ -630,7 +631,8 @@ export default defineComponent({
             chatGroupsStore.currentChatGroups.unshift(existingChatGroup);
             console.log('New chat group created:', existingChatGroup);
           } catch (error) {
-            console.error('Error creating chat group - API response:', error.response);
+            if(error instanceof Error)
+              console.error('Error creating chat group - API response:', error.message);
             console.error('Error creating chat group - full error:', error);
 
             // Create a fallback chat group to allow UI to work
@@ -653,7 +655,8 @@ export default defineComponent({
       } catch (error) {
         console.error('=== OPENCHAT ERROR ===');
         console.error('Error in openChat:', error);
-        console.error('Error details:', error.response || error.message);
+        if(error instanceof Error)
+          console.error('Error details:',  error.message);
       }
     },
 
@@ -774,7 +777,7 @@ export default defineComponent({
 
     getUserProfilePictureUrl(url: string) {
       // Handle profile pictures which should be served from identity service
-      if (!url) return null;
+      if (!url) return undefined;
 
       // Check if this is a profile picture path (correct path)
       if (url.startsWith('/uploads/profile-pictures/')) {

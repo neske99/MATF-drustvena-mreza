@@ -373,7 +373,8 @@ export default defineComponent({
               chatGroupsStore.currentChatGroups.unshift(existingChatGroup);
               console.log('New chat group created:', existingChatGroup);
             } catch (error) {
-              console.error('Error creating chat group - API response:', error.response);
+              if(error instanceof Error)
+                console.error('Error creating chat group - API response:', error.message);
               console.error('Error creating chat group - full error:', error);
 
               // Create a fallback chat group to allow UI to work
@@ -400,7 +401,8 @@ export default defineComponent({
         } catch (error) {
           console.error('=== STARTMESSAGE ERROR ===');
           console.error('Error starting message:', error);
-          console.error('Error details:', error.response || error.message);
+          if(error instanceof Error)
+            console.error('Error details:',  error.message);
           // Still navigate to home in case of error
           this.$router.push('/home');
         }
@@ -442,7 +444,7 @@ export default defineComponent({
     },
 
     getUserProfilePictureUrl(url: string) {
-      if (!url) return null;
+      if (!url) return undefined;
 
       if (url.startsWith('/uploads/profile-pictures/')) {
         return import.meta.env.DEV ? `http://localhost:8094${url}` : url;

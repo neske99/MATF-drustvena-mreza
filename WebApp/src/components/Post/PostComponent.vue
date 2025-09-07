@@ -258,7 +258,7 @@ export default defineComponent({
             return this.userId === currentUserId;
         },
 
-        formattedProfilePictureUrl(): string | null {
+        formattedProfilePictureUrl(): string | undefined {
             // Use the profilePictureUrl passed from parent (fetched from Identity Service)
             return this.getUserProfilePictureUrl(this.userProfilePictureUrl);
         },
@@ -315,7 +315,7 @@ export default defineComponent({
         },
 
         getUserProfilePictureUrl(url: string) {
-            if (!url) return null;
+            if (!url) return  undefined;
 
             if (url.startsWith('/uploads/profile-pictures/')) {
                 return import.meta.env.DEV ? `http://localhost:8094${url}` : url;
