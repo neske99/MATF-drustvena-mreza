@@ -160,7 +160,7 @@ import { defineComponent } from 'vue'
 import MessageComponent from './Chat/MessageComponent.vue';
 import { chatStore } from '../stores/chat'
 import { userCacheService } from '../services/userCacheService'
-import { startSignalRConnection, getSignalRConnection, stopSignalRConnection } from '../plugin/signalr'
+import { startSignalRConnection, getSignalRConnection, stopSignalRConnection, addCallback } from '../plugin/signalr'
 import type { HubConnection } from '@microsoft/signalr';
 import { authStore } from '../stores/auth';
 
@@ -214,8 +214,9 @@ export default defineComponent({
   },
   async created() {
     this.connection = await getSignalRConnection();
-    if (this.connection) {
-      this.connection.on("ReceiveMessageReal", (userId: number, message: string, chatGroupId: number, messageId: number, timestamp?: string) => {
+    let self= this;
+
+    addCallback("ReceiveMessageReal", (userId: number, message: string, chatGroupId: number, messageId: number, timestamp?: string) => {
         console.log('Received message via SignalR:', { userId, message, chatGroupId, messageId });
 
         const store = chatStore();
@@ -232,7 +233,7 @@ export default defineComponent({
 
           console.log('Added message to current chat, total messages:', store.currentChatMessages.length);
 
-          this.scrollToBottom();
+          self.scrollToBottom();
         }
 
         const chGroup = store.currentChatGroups.find(x => x.chatId === chatGroupId);
@@ -245,7 +246,6 @@ export default defineComponent({
           }
         }
       });
-    }
   },
   beforeUnmount() {
     // Clean up SignalR connection

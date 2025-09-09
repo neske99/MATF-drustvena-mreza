@@ -540,7 +540,6 @@ export default defineComponent({
         this.relation = 'FRIEND_WITH';
 
         // Emit event to refresh chat groups when accepting friend request
-        this.$root.$emit('friendship-changed');
 
         await this.loadFriendsList();
       } catch (error) {
@@ -571,7 +570,6 @@ export default defineComponent({
         }
 
         // Emit event to refresh chat groups in left sidebar
-        this.$root.$emit('friendship-changed');
 
         await this.loadFriendsList();
       } catch (error) {

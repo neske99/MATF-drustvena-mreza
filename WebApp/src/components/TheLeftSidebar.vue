@@ -216,7 +216,7 @@ import { userCacheService } from '../services/userCacheService'
 import type { HubConnection } from '@microsoft/signalr';
 import type { ChatGroupDTO } from '../dtos/chat/chatGroupDTO';
 import type { UserPreviewDTO } from '../dtos/user/userPreviewDTO';
-import { getSignalRConnection } from '../plugin/signalr'
+import { addCallback, getSignalRConnection } from '../plugin/signalr'
 
 export default defineComponent({
   name: 'TheLeftSidebar',
@@ -252,10 +252,7 @@ export default defineComponent({
 
       await this.loadUserProfilePictures();
 
-      this.connection = await getSignalRConnection();
-      if (this.connection) {
-        console.log('SignalR connection established');
-        this.connection.on("ReceiveMessage", (chatGroupId: number, userId: number, username: string) => {
+      addCallback("ReceiveMessage",async (chatGroupId: number, userId: number, username: string) => {
           const store = chatStore();
           store.currentChatGroups.unshift({
             username: username,
@@ -263,25 +260,19 @@ export default defineComponent({
             userId: userId,
             hasNewMessages: true
           });
-          this.connection?.invoke("RegisterToGroup", chatGroupId);
+          (await getSignalRConnection())?.invoke("RegisterToGroup", chatGroupId);
         });
-      } else {
-        console.log('SignalR connection failed');
-        this.debugInfo = 'SignalR connection failed';
-      }
-    } catch (error) {
+   } catch (error) {
       console.error('Error in LeftSidebar created:', error);
       this.debugInfo = `Error: ${error}`;
     }
   },
   async mounted() {
     // Listen for friendship changes from other components
-    this.$root.$on('friendship-changed', this.refreshChatGroups);
   },
 
   beforeUnmount() {
     // Clean up event listener
-    this.$root.$off('friendship-changed', this.refreshChatGroups);
 
     // Clean up SignalR connection
     if (this.connection) {

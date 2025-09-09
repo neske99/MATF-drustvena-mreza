@@ -267,7 +267,6 @@ export default defineComponent({
         this.localRelation = 'FRIEND_WITH';
 
         // Emit event to refresh chat groups
-        this.$root.$emit('friendship-changed');
 
         this.$emit('request-accepted', this.userId);
         console.log('Friend request accepted from:', this.text);
@@ -319,7 +318,6 @@ export default defineComponent({
         }
 
         // Emit event to refresh chat groups
-        this.$root.$emit('friendship-changed');
 
         this.$emit('friendship-removed', this.userId);
         console.log('Friendship removed with:', this.text);
