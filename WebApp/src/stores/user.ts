@@ -5,6 +5,7 @@ import type { UserPreviewDTO } from '@/dtos/user/userPreviewDTO';
 import type { UserDetailDTO } from '@/dtos/user/userDetailDTO';
 import type { UpdateProfileDTO, ChangePasswordDTO } from '@/dtos/user/updateUserDTO';
 import { authStore } from './auth';
+import type { UserRelationDTO } from '@/dtos/user/userRelationDTO';
 
 export const userStore = defineStore('user', () => {
   // state
@@ -30,7 +31,7 @@ export const userStore = defineStore('user', () => {
 
   const GetFriendRequests = async function (){
 
-    let result = (await axiosAuthenticated.get(`http://localhost:8094/api/v1/User/GetFriendRequests?userId=${authStore().userId}`)).data;
+    let result:UserRelationDTO[] = (await axiosAuthenticated.get(`http://localhost:8094/api/v1/User/GetFriendRequests?userId=${authStore().userId}`)).data;
     numFriendRequests.value = result.length;
     return result;
   };
@@ -45,12 +46,12 @@ export const userStore = defineStore('user', () => {
     try {
       console.log(`=== Frontend GetRelation Call ===`);
       console.log(`Calling: http://localhost:8000/api/v1/Relations/relations/${userId}/${friendId}`);
-      
+
       const response = await axiosAuthenticated.get(`http://localhost:8000/api/v1/Relations/relations/${userId}/${friendId}`);
-      
+
       console.log(`API Response Status: ${response.status}`);
       console.log(`API Response Data:`, response.data);
-      
+
       // Just return the raw response - no normalization needed
       return response.data || "NONE";
     } catch (error) {
@@ -86,7 +87,7 @@ export const userStore = defineStore('user', () => {
   }
 
   const GetUserFriends = async function (userId: number) {
-    const result = (await axiosAuthenticated.get(`http://localhost:8000/api/v1/Relations/friends/${userId}`)).data;
+    const result = (await axiosAuthenticated.get(`http://localhost:8000/api/v1/Relations/friends/${userId}`)).data ;
     return result;
   }
 
@@ -114,21 +115,21 @@ export const userStore = defineStore('user', () => {
     // Clear any other reactive state if needed
   };
 
-  return { 
-    getSearchedUsers, 
-    numFriendRequests, 
-    GetFriendRequests, 
-    GetUserFriends, 
-    GetRelation, 
-    GetUsers, 
-    GetSearchedUsers, 
-    GetUser, 
-    SendFriendRequest, 
-    AcceptFriendRequest, 
-    DeclineFriendRequest, 
-    RemoveFriend, 
-    UpdateProfile, 
-    ChangePassword, 
+  return {
+    getSearchedUsers,
+    numFriendRequests,
+    GetFriendRequests,
+    GetUserFriends,
+    GetRelation,
+    GetUsers,
+    GetSearchedUsers,
+    GetUser,
+    SendFriendRequest,
+    AcceptFriendRequest,
+    DeclineFriendRequest,
+    RemoveFriend,
+    UpdateProfile,
+    ChangePassword,
     UploadProfilePicture,
     clearState
   };

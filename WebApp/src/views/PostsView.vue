@@ -1,17 +1,17 @@
 <template>
   <div class="posts-page">
     <!-- Welcome Section -->
-    <v-card 
-      class="welcome-card mb-6" 
+    <v-card
+      class="welcome-card mb-6"
       elevation="2"
       rounded="lg"
     >
       <v-card-text class="pa-6">
         <div class="d-flex align-center">
           <v-avatar size="60" color="matf-red" class="mr-4">
-            <img 
-                v-if="currentUserProfilePicture" 
-                :src="currentUserProfilePicture" 
+            <img
+                v-if="currentUserProfilePicture"
+                :src="currentUserProfilePicture"
                 alt="Your Profile Picture"
                 @error="() => {}"
             />
@@ -25,7 +25,7 @@
               Share your thoughts with the MATF community
             </p>
           </div>
-          
+
           <!-- Quick Stats -->
           <div class="d-none d-md-flex align-center">
             <div class="text-center mr-4">
@@ -60,9 +60,9 @@
       <!-- Loading State -->
       <div v-if="loading" class="loading-state">
         <v-card class="pa-8 text-center" elevation="1" rounded="lg">
-          <v-progress-circular 
-            indeterminate 
-            color="matf-red" 
+          <v-progress-circular
+            indeterminate
+            color="matf-red"
             size="48"
             class="mb-4"
           />
@@ -81,8 +81,8 @@
           <p class="text-body-1 text--secondary mb-4">
             Be the first to share something with the MATF community!
           </p>
-          <v-btn 
-            color="matf-red" 
+          <v-btn
+            color="matf-red"
             size="large"
             class="text-none px-6"
             @click="scrollToCreatePost"
@@ -96,17 +96,17 @@
       <!-- Posts List -->
       <div v-else class="posts-list">
         <TransitionGroup name="post" tag="div">
-          <PostComponent 
-            v-for="post in posts" 
-            :id="post.id" 
-            :text="post.text" 
-            :username="post.user.username" 
+          <PostComponent
+            v-for="post in posts"
+            :id="post.id"
+            :text="post.text"
+            :username="post.user.username"
             :firstName="post.user.firstName"
             :lastName="post.user.lastName"
             :userId="post.user.id"
             :createdDate="post.createdDate"
             :userProfilePictureUrl="post.user.profilePictureUrl"
-            :comments="post.comments" 
+            :comments="post.comments"
             :likes="post.likes"
             :fileUrl="post.fileUrl"
             :fileName="post.fileName"
@@ -118,15 +118,15 @@
             class="mb-4"
           />
         </TransitionGroup>
-        
+
         <!-- Load More Section -->
         <div class="load-more-section text-center mt-6">
           <v-card class="pa-4" elevation="1" rounded="lg">
             <p class="text-body-2 text--secondary mb-3">
               You've reached the end of the feed
             </p>
-            <v-btn 
-              color="matf-red" 
+            <v-btn
+              color="matf-red"
               variant="outlined"
               class="text-none"
               @click="scrollToTop"
@@ -142,12 +142,12 @@
 </template>
 
 <script lang="ts">
-import { authStore } from '@/stores/auth';
-import { postStore } from '@/stores/post';
-import { userStore } from '@/stores/user';
-import { userCacheService } from '@/services/userCacheService';
-import PostComponent from '@/components/Post/PostComponent.vue';
-import UploadPostComponent from '@/components/Post/UploadPostComponent.vue';
+import { authStore } from '../stores/auth';
+import { postStore } from '../stores/post';
+import { userStore } from '../stores/user';
+import { userCacheService } from '../services/userCacheService';
+import PostComponent from '../components/Post/PostComponent.vue';
+import UploadPostComponent from '../components/Post/UploadPostComponent.vue';
 import { defineComponent } from 'vue';
 import type { postDTO } from '../dtos/post/postDTO.ts';
 
@@ -168,7 +168,6 @@ export default defineComponent({
     await this.loadInitialData();
   },
   mounted() {
-    this.isLoading = true;
     try {
       postStore().GetPosts().then((posts) => {
         this.posts = posts;
@@ -177,7 +176,6 @@ export default defineComponent({
     } catch (error) {
       console.error('Error loading posts:', error);
     } finally {
-      this.isLoading = false;
     }
   },
   computed: {
@@ -194,13 +192,13 @@ export default defineComponent({
       try {
         this.loading = true;
         this.username = authStore().username;
-        
+
         // Load posts and friend requests in parallel
         const [posts] = await Promise.all([
           postStore().GetPosts(),
           this.loadFriendRequests()
         ]);
-        
+
         this.posts = posts;
         console.log('Posts loaded:', this.posts);
       } catch (error) {
@@ -209,7 +207,7 @@ export default defineComponent({
         this.loading = false;
       }
     },
-    
+
     async loadFriendRequests() {
       try {
         await userStore().GetFriendRequests();
@@ -217,7 +215,7 @@ export default defineComponent({
         console.error('Error loading friend requests:', error);
       }
     },
-    
+
     async loadPosts() {
       try {
         this.loading = true;
@@ -230,7 +228,7 @@ export default defineComponent({
         this.loading = false;
       }
     },
-    
+
     async refreshPosts() {
       try {
         this.posts = await postStore().GetPosts();
@@ -244,11 +242,11 @@ export default defineComponent({
       // Get unique user IDs from posts, comments, and likes
       const userIds = new Set<number>();
       const userIdToUsernameMap = new Map<number, string>();
-      
+
       this.posts.forEach(post => {
         userIds.add(post.user.id);
         userIdToUsernameMap.set(post.user.id, post.user.username);
-        
+
         if (post.comments) {
           post.comments.forEach(comment => {
             if (comment.user?.id && comment.user?.username) {
@@ -257,7 +255,7 @@ export default defineComponent({
             }
           });
         }
-        
+
         if (post.likes) {
           post.likes.forEach(like => {
             if (like.user?.id && like.user?.username) {
@@ -270,7 +268,7 @@ export default defineComponent({
 
       // Fetch user data for all unique user IDs
       const usersMap = new Map();
-      
+
       for (const userId of userIds) {
         try {
           const username = userIdToUsernameMap.get(userId);
@@ -332,14 +330,14 @@ export default defineComponent({
         }
       });
     },
-    
+
     scrollToCreatePost() {
       const createPostElement = document.querySelector('.upload-post-card');
       if (createPostElement) {
         createPostElement.scrollIntoView({ behavior: 'smooth' });
       }
     },
-    
+
     scrollToTop() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
@@ -347,21 +345,21 @@ export default defineComponent({
     getUserProfilePictureUrl(url: string) {
       // Handle profile pictures which should be served from identity service
       if (!url) return null;
-      
+
       // Check if this is a profile picture path (correct path)
       if (url.startsWith('/uploads/profile-pictures/')) {
         return import.meta.env.DEV
           ? `http://localhost:8094${url}`
           : url;
       }
-      
+
       // Handle any other uploads path - default to identity service for profile pics
       if (url.startsWith('/uploads/')) {
         return import.meta.env.DEV
           ? `http://localhost:8094${url}`
           : url;
       }
-      
+
       // If it's already a full URL, return as is
       return url;
     }
@@ -463,11 +461,11 @@ export default defineComponent({
   .welcome-card .v-card-text {
     padding: 1.5rem;
   }
-  
+
   .feed-header {
     padding: 0 4px;
   }
-  
+
   .posts-page {
     animation: none; /* Reduce animations on mobile */
   }
@@ -478,7 +476,7 @@ export default defineComponent({
     flex-direction: column;
     text-align: center;
   }
-  
+
   .welcome-card .mr-4 {
     margin-right: 0 !important;
     margin-bottom: 1rem;

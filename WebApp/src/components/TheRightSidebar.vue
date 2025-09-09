@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer 
+  <v-navigation-drawer
     permanent
     location="right"
     class="right-sidebar"
@@ -15,13 +15,13 @@
             <p class="text-body-2 text--secondary">Choose from your existing conversations or start a new one</p>
           </div>
         </div>
-        
+
         <div v-else class="active-chat-header">
           <div class="d-flex align-center">
             <v-avatar size="40" color="matf-red" class="mr-3">
-              <img 
-                v-if="getCurrentChatUserProfilePicture()" 
-                :src="getCurrentChatUserProfilePicture()" 
+              <img
+                v-if="getCurrentChatUserProfilePicture()"
+                :src="getCurrentChatUserProfilePicture()"
                 alt="Profile Picture"
                 @error="() => {}"
                 class="chat-avatar-image"
@@ -36,9 +36,9 @@
                 {{ getCurrentChatUserDisplayName }}
               </p>
             </div>
-            <v-btn 
-              icon 
-              variant="text" 
+            <v-btn
+              icon
+              variant="text"
               size="small"
               color="grey"
             >
@@ -58,19 +58,19 @@
             <p class="text-body-2 text--secondary">No messages to display</p>
           </div>
         </div>
-        
+
         <div v-else-if="loading" class="loading-messages">
           <div class="text-center pa-6">
-            <v-progress-circular 
-              indeterminate 
-              color="matf-red" 
+            <v-progress-circular
+              indeterminate
+              color="matf-red"
               size="32"
               class="mb-3"
             />
             <p class="text-body-2 text--secondary">Loading messages...</p>
           </div>
         </div>
-        
+
         <div v-else-if="messages.length === 0" class="empty-chat">
           <div class="text-center pa-6">
             <v-icon size="48" color="matf-red" class="mb-3">mdi-chat-plus</v-icon>
@@ -82,12 +82,12 @@
             </p>
           </div>
         </div>
-        
+
         <div v-else class="messages-list">
-          <MessageComponent 
-            v-for="message in messages" 
-            :message="message.message" 
-            :timestamp="new Date(message.timestamp)" 
+          <MessageComponent
+            v-for="message in messages"
+            :message="message.message"
+            :timestamp="new Date(message.timestamp)"
             :key="message.id"
             :isSender="message.isSender"
             class="message-item"
@@ -98,7 +98,7 @@
       <!-- Message Input -->
       <div class="message-input-container" v-if="currentChatGroupId !== 0">
         <v-divider />
-        
+
         <div class="message-input pa-4">
           <div class="d-flex align-end">
             <v-text-field
@@ -112,7 +112,7 @@
               @keydown.enter.prevent="onSend"
               :disabled="sendingMessage"
             />
-            
+
             <v-btn
               color="matf-red"
               class="ml-2 send-button"
@@ -125,7 +125,7 @@
               <v-icon>mdi-send</v-icon>
             </v-btn>
           </div>
-          
+
           <!-- Quick Actions -->
           <div class="quick-actions mt-2" v-if="!sendingMessage">
             <v-btn
@@ -158,11 +158,11 @@
 <script lang='ts'>
 import { defineComponent } from 'vue'
 import MessageComponent from './Chat/MessageComponent.vue';
-import { chatStore } from '../stores/chat.ts'
-import { userCacheService } from '@/services/userCacheService'
-import { startSignalRConnection, getSignalRConnection, stopSignalRConnection } from '../plugin/signalr.ts'
+import { chatStore } from '../stores/chat'
+import { userCacheService } from '../services/userCacheService'
+import { startSignalRConnection, getSignalRConnection, stopSignalRConnection, addCallback } from '../plugin/signalr'
 import type { HubConnection } from '@microsoft/signalr';
-import { authStore } from '@/stores/auth.ts';
+import { authStore } from '../stores/auth';
 
 export default defineComponent({
   name: 'TheRightSidebar',
@@ -184,17 +184,17 @@ export default defineComponent({
       console.log('RIGHT SIDEBAR: messages computed property called, returning:', messages);
       return messages;
     },
-    
+
     isSendMessageDisabled() {
       return chatStore().currentChatGroupId === 0;
     },
-    
+
     currentChatGroupId() {
       const chatId = chatStore().currentChatGroupId;
       console.log('RIGHT SIDEBAR: currentChatGroupId computed property called, returning:', chatId);
       return chatId;
     },
-    
+
     currentChatUser() {
       const store = chatStore();
       const currentGroup = store.currentChatGroups.find(
@@ -214,27 +214,28 @@ export default defineComponent({
   },
   async created() {
     this.connection = await getSignalRConnection();
-    if (this.connection) {
-      this.connection.on("ReceiveMessageReal", (userId: number, message: string, chatGroupId: number, messageId: number, timestamp?: string) => {
+    let self= this;
+
+    addCallback("ReceiveMessageReal", (userId: number, message: string, chatGroupId: number, messageId: number, timestamp?: string) => {
         console.log('Received message via SignalR:', { userId, message, chatGroupId, messageId });
-        
+
         const store = chatStore();
         if (store.currentChatGroupId === chatGroupId) {
-          const newMessage = { 
-            message: message, 
-            isSender: userId === authStore().userId, 
+          const newMessage = {
+            message: message,
+            isSender: userId === authStore().userId,
             id: messageId,
             timestamp: timestamp ? new Date(timestamp) : new Date()
           };
-          
+
           // Add message to the store's message array
           store.currentChatMessages.push(newMessage);
-          
+
           console.log('Added message to current chat, total messages:', store.currentChatMessages.length);
-          
-          this.scrollToBottom();
+
+          self.scrollToBottom();
         }
-        
+
         const chGroup = store.currentChatGroups.find(x => x.chatId === chatGroupId);
         if (chGroup) {
           chGroup.hasNewMessages = userId !== authStore().userId;
@@ -245,7 +246,6 @@ export default defineComponent({
           }
         }
       });
-    }
   },
   beforeUnmount() {
     // Clean up SignalR connection
@@ -257,35 +257,35 @@ export default defineComponent({
   methods: {
     getCurrentChatUserProfilePicture() {
       if (!this.currentChatUserInfo?.profilePictureUrl) return null;
-      
+
       const url = this.currentChatUserInfo.profilePictureUrl;
       if (url.startsWith('/uploads/profile-pictures/')) {
         return import.meta.env.DEV ? `http://localhost:8094${url}` : url;
       }
-      
+
       if (url.startsWith('/uploads/')) {
         return import.meta.env.DEV ? `http://localhost:8094${url}` : url;
       }
-      
+
       return url;
     },
     async onSend() {
       if (!this.messageToSend.trim() || this.sendingMessage) return;
-      
+
       try {
         this.sendingMessage = true;
         const messageText = this.messageToSend.trim();
-        
+
         // Try to get connection, but send message regardless
         if (!this.connection) {
           this.connection = await getSignalRConnection();
         }
-        
+
         if (this.connection) {
           const store = chatStore();
           await this.connection.invoke("SendMessageToGroup", store.currentChatGroupId, messageText);
         }
-        
+
         // Clear message regardless of success/failure
         this.messageToSend = "";
       } catch (error) {
@@ -296,7 +296,7 @@ export default defineComponent({
         this.sendingMessage = false;
       }
     },
-    
+
     scrollToBottom() {
       this.$nextTick(() => {
         const container = this.$refs.messagesContainer as HTMLElement;
@@ -305,10 +305,10 @@ export default defineComponent({
         }
       });
     },
-    
+
     async loadMessages() {
       if (this.currentChatGroupId === 0) return;
-      
+
       this.loading = true;
       try {
         // Messages are loaded via chatStore.switchUserChat
@@ -327,22 +327,22 @@ export default defineComponent({
         console.log('CurrentChatGroupId changed:', newChatId, 'from:', oldChatId);
         console.log('Messages length after chat switch:', this.messages.length);
         console.log('Current messages:', this.messages);
-        
+
         if (newChatId !== oldChatId) {
           console.log('Chat ID actually changed, processing...');
-          
+
           if (newChatId !== 0) {
             console.log('New chat ID is not 0, loading user info...');
-            
+
             // Load user info for current chat user
             const store = chatStore();
             const currentGroup = store.currentChatGroups.find(
               group => group.chatId === newChatId
             );
-            
+
             console.log('Current group from store:', currentGroup);
             console.log('All groups in store:', store.currentChatGroups);
-            
+
             if (currentGroup?.username) {
               try {
                 console.log('Fetching user info for username:', currentGroup.username);
@@ -354,7 +354,7 @@ export default defineComponent({
             } else {
               console.log('No current group found or no username');
             }
-            
+
             await this.loadMessages();
             this.$nextTick(() => {
               this.scrollToBottom();
@@ -366,7 +366,7 @@ export default defineComponent({
         } else {
           console.log('Chat ID did not change, skipping...');
         }
-        
+
         console.log('=== RIGHT SIDEBAR: CurrentChatGroupId watcher completed ===');
       }
     }

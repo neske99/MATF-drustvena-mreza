@@ -1,8 +1,8 @@
 <template>
-  <v-app-bar 
+  <v-app-bar
     app
-    color="matf-red" 
-    dark 
+    color="matf-red"
+    dark
     height="64"
     class="university-header"
     elevation="2"
@@ -23,21 +23,21 @@
 
         <!-- Navigation Links -->
         <div class="d-flex align-center mx-4 flex-shrink-0">
-          <v-btn 
+          <v-btn
             to="/home"
-            variant="text" 
-            color="white" 
+            variant="text"
+            color="white"
             class="text-none mr-2 nav-btn"
             prepend-icon="mdi-home"
             :class="{ 'active-nav': $route.path === '/home' }"
           >
             Home
           </v-btn>
-          
-          <v-btn 
+
+          <v-btn
             :to="`/userDetail/${currentUsername}`"
-            variant="text" 
-            color="white" 
+            variant="text"
+            color="white"
             class="text-none mr-2 nav-btn"
             prepend-icon="mdi-account"
             :class="{ 'active-nav': $route.path.includes('/userDetail/') }"
@@ -67,16 +67,16 @@
         <!-- Right Actions -->
         <div class="d-flex align-center flex-shrink-0" style="min-width: 200px; justify-content: flex-end;">
           <!-- Friend Requests -->
-          <v-btn 
+          <v-btn
             to="/friendRequests"
-            variant="text" 
-            color="white" 
+            variant="text"
+            color="white"
             class="text-none mr-2 nav-btn"
             :class="{ 'active-nav': $route.path === '/friendRequests' }"
           >
-            <v-badge 
+            <v-badge
               v-if="numFriendRequests > 0"
-              :content="numFriendRequests" 
+              :content="numFriendRequests"
               color="error"
               overlap
             >
@@ -89,16 +89,16 @@
           <!-- User Menu -->
           <v-menu offset-y>
             <template v-slot:activator="{ props }">
-              <v-btn 
-                variant="text" 
-                color="white" 
+              <v-btn
+                variant="text"
+                color="white"
                 class="text-none user-menu-btn"
                 v-bind="props"
               >
                 <v-avatar size="32" class="mr-2">
-                  <img 
-                    v-if="getCurrentUserProfilePicture()" 
-                    :src="getCurrentUserProfilePicture()" 
+                  <img
+                    v-if="getCurrentUserProfilePicture()"
+                    :src="getCurrentUserProfilePicture()"
                     alt="Your Profile Picture"
                     @error="() => {}"
                     class="navbar-avatar-image"
@@ -109,7 +109,7 @@
                 <v-icon class="ml-1">mdi-chevron-down</v-icon>
               </v-btn>
             </template>
-            
+
             <v-list class="user-menu">
               <v-list-item :to="`/userDetail/${currentUsername}`">
                 <v-list-item-title>
@@ -117,16 +117,16 @@
                   My Profile
                 </v-list-item-title>
               </v-list-item>
-              
+
               <v-list-item to="/settings">
                 <v-list-item-title>
                   <v-icon class="mr-3">mdi-cog</v-icon>
                   Settings
                 </v-list-item-title>
               </v-list-item>
-              
+
               <v-divider />
-              
+
               <v-list-item @click="onSignoutClick" class="logout-item">
                 <v-list-item-title>
                   <v-icon class="mr-3">mdi-logout</v-icon>
@@ -143,9 +143,9 @@
 
 <script lang='ts'>
 import { defineComponent } from 'vue'
-import { authStore } from '../stores/auth.ts'
-import { userStore } from '../stores/user.ts'
-import { chatStore } from '@/stores/chat.ts'
+import { authStore } from '../stores/auth'
+import { userStore } from '../stores/user'
+import { chatStore } from '../stores/chat'
 
 export default defineComponent({
   name: 'TheNavbar',
@@ -158,7 +158,7 @@ export default defineComponent({
     isAuthenticated() {
       return authStore().isAuthenticated;
     },
-    
+
     currentUsername() {
       return authStore().username;
     },
@@ -171,7 +171,7 @@ export default defineComponent({
     async onSignoutClick() {
       authStore().logout();
     },
-    
+
     search() {
       if (this.searchText.trim() !== "") {
         this.$router.push(`/usersearch/${this.searchText.trim()}`);
@@ -181,16 +181,16 @@ export default defineComponent({
 
     getCurrentUserProfilePicture() {
       const profilePictureUrl = authStore().profilePictureUrl;
-      if (!profilePictureUrl) return null;
-      
+      if (!profilePictureUrl) return undefined;
+
       if (profilePictureUrl.startsWith('/uploads/profile-pictures/')) {
         return import.meta.env.DEV ? `http://localhost:8094${profilePictureUrl}` : profilePictureUrl;
       }
-      
+
       if (profilePictureUrl.startsWith('/uploads/')) {
         return import.meta.env.DEV ? `http://localhost:8094${profilePictureUrl}` : profilePictureUrl;
       }
-      
+
       return profilePictureUrl;
     }
   }
@@ -276,15 +276,15 @@ export default defineComponent({
   .university-header .v-container {
     padding: 0 12px;
   }
-  
+
   .search-field {
     max-width: 250px !important;
   }
-  
+
   .mx-4 {
     margin: 0 8px !important;
   }
-  
+
   .flex-shrink-0[style*="min-width: 200px"] {
     min-width: 150px !important;
   }
@@ -294,15 +294,15 @@ export default defineComponent({
   .search-field {
     max-width: 180px !important;
   }
-  
+
   .text-h6 {
     font-size: 0.9rem !important;
   }
-  
+
   .text-caption {
     font-size: 0.65rem !important;
   }
-  
+
   .nav-btn .v-btn__prepend {
     margin-inline-end: 4px !important;
   }

@@ -1,8 +1,8 @@
 <template>
   <div class="settings-page">
     <!-- Settings Header -->
-    <v-card 
-      class="settings-header-card mb-6" 
+    <v-card
+      class="settings-header-card mb-6"
       elevation="2"
       rounded="lg"
     >
@@ -19,7 +19,7 @@
               Manage your account information and preferences
             </p>
           </div>
-          
+
           <!-- Settings Icon -->
           <div class="d-none d-md-flex align-center">
             <v-icon size="48" color="matf-red">mdi-account-cog</v-icon>
@@ -37,7 +37,7 @@
             <v-icon class="mr-3" color="matf-red">mdi-account-edit</v-icon>
             <h3 class="text-h6 font-weight-bold">Profile Information</h3>
           </v-card-title>
-          
+
           <v-card-text class="pa-4">
             <v-form ref="profileForm" @submit.prevent="updateProfile">
               <v-text-field
@@ -86,7 +86,7 @@
                   <v-icon class="mr-2">mdi-refresh</v-icon>
                   Reset
                 </v-btn>
-                
+
                 <v-btn
                   type="submit"
                   color="matf-red"
@@ -110,7 +110,7 @@
             <v-icon class="mr-3" color="matf-red">mdi-lock</v-icon>
             <h3 class="text-h6 font-weight-bold">Change Password</h3>
           </v-card-title>
-          
+
           <v-card-text class="pa-4">
             <v-form ref="passwordForm" @submit.prevent="changePassword">
               <v-text-field
@@ -162,7 +162,7 @@
                   <v-icon class="mr-2">mdi-refresh</v-icon>
                   Clear
                 </v-btn>
-                
+
                 <v-btn
                   type="submit"
                   color="matf-red"
@@ -212,7 +212,7 @@
 import { defineComponent } from 'vue';
 import { authStore } from '../stores/auth';
 import { userStore } from '../stores/user';
-import type { UpdateProfileDTO, ChangePasswordDTO } from '@/dtos/user/updateUserDTO';
+import type { UpdateProfileDTO, ChangePasswordDTO } from '../dtos/user/updateUserDTO';
 
 export default defineComponent({
   name: 'SettingsView',
@@ -244,24 +244,27 @@ export default defineComponent({
       showError: false,
       successMessage: '',
       errorMessage: '',
-      rules: {
-        required: (v: string) => !!v || 'This field is required',
-        minLength: (v: string) => (v && v.length >= 3) || 'Username must be at least 3 characters',
-        passwordLength: (v: string) => (v && v.length >= 8) || 'Password must be at least 8 characters',
-        passwordMatch: (v: string) => v === this.passwordData.newPassword || 'Passwords do not match'
-      }
     };
   },
   async created() {
     await this.loadCurrentUser();
   },
   computed: {
+    rules(){
+        return{
+        required: (v: string) => !!v || 'This field is required',
+        minLength: (v: string) => (v && v.length >= 3) || 'Username must be at least 3 characters',
+        passwordLength: (v: string) => (v && v.length >= 8) || 'Password must be at least 8 characters',
+        passwordMatch: (v: string) => v === this.passwordData.newPassword || 'Passwords do not match'
+      };
+
+    },
     hasProfileChanges() {
       return this.profileData.username !== this.originalProfileData.username ||
              this.profileData.firstName !== this.originalProfileData.firstName ||
              this.profileData.lastName !== this.originalProfileData.lastName;
     },
-    
+
     hasPasswordData() {
       return this.passwordData.currentPassword.trim() !== '' &&
              this.passwordData.newPassword.trim() !== '' &&
@@ -273,40 +276,40 @@ export default defineComponent({
       try {
         const auth = authStore();
         const userstore = userStore();
-        
+
         // Get current user data
         this.currentUser = await userstore.GetUser(auth.username);
-        
+
         // Set form data
         this.profileData = {
           username: this.currentUser.username,
           firstName: this.currentUser.firstName,
           lastName: this.currentUser.lastName
         };
-        
+
         // Store original data for comparison
         this.originalProfileData = { ...this.profileData };
-        
+
         console.log('Current user loaded:', this.currentUser);
       } catch (error) {
         console.error('Error loading current user:', error);
         this.showErrorMessage('Failed to load user information');
       }
     },
-    
+
     async updateProfile() {
       try {
         // Validate form
         const { valid } = await (this.$refs.profileForm as any).validate();
         if (!valid) return;
-        
+
         this.profileLoading = true;
         const userstore = userStore();
         const auth = authStore();
-        
+
         // Prepare update data (only send changed fields)
         const updateData: UpdateProfileDTO = {};
-        
+
         if (this.profileData.username !== this.originalProfileData.username) {
           updateData.username = this.profileData.username;
         }
@@ -316,21 +319,21 @@ export default defineComponent({
         if (this.profileData.lastName !== this.originalProfileData.lastName) {
           updateData.lastName = this.profileData.lastName;
         }
-        
+
         // Update profile
         const updatedUser = await userstore.UpdateProfile(updateData);
-        
+
         // Update auth store if username changed
         if (updateData.username) {
           auth.username = updateData.username;
         }
-        
+
         // Update local data
         this.currentUser = updatedUser;
         this.originalProfileData = { ...this.profileData };
-        
+
         this.showSuccessMessage('Profile updated successfully!');
-        
+
       } catch (error: any) {
         console.error('Error updating profile:', error);
         this.showErrorMessage(error.response?.data?.message || 'Failed to update profile');
@@ -338,31 +341,31 @@ export default defineComponent({
         this.profileLoading = false;
       }
     },
-    
+
     async changePassword() {
       try {
         // Validate form
         const { valid } = await (this.$refs.passwordForm as any).validate();
         if (!valid) return;
-        
+
         this.passwordLoading = true;
         const userstore = userStore();
-        
+
         const passwordData: ChangePasswordDTO = {
           currentPassword: this.passwordData.currentPassword,
           newPassword: this.passwordData.newPassword
         };
-        
+
         await userstore.ChangePassword(passwordData);
-        
+
         // Clear password form
         this.resetPasswordForm();
-        
+
         this.showSuccessMessage('Password changed successfully!');
-        
+
       } catch (error: any) {
         console.error('Error changing password:', error);
-        const errorMsg = error.response?.data?.errors 
+        const errorMsg = error.response?.data?.errors
           ? Object.values(error.response.data.errors).flat().join(', ')
           : error.response?.data?.message || 'Failed to change password';
         this.showErrorMessage(errorMsg);
@@ -370,11 +373,11 @@ export default defineComponent({
         this.passwordLoading = false;
       }
     },
-    
+
     resetProfileForm() {
       this.profileData = { ...this.originalProfileData };
     },
-    
+
     resetPasswordForm() {
       this.passwordData = {
         currentPassword: '',
@@ -382,12 +385,12 @@ export default defineComponent({
       };
       this.confirmNewPassword = '';
     },
-    
+
     showSuccessMessage(message: string) {
       this.successMessage = message;
       this.showSuccess = true;
     },
-    
+
     showErrorMessage(message: string) {
       this.errorMessage = message;
       this.showError = true;
@@ -464,12 +467,12 @@ export default defineComponent({
   .settings-header-card .v-card-text {
     padding: 1.5rem;
   }
-  
+
   .gap-2 {
     flex-direction: column;
     gap: 8px;
   }
-  
+
   .gap-2 > * + * {
     margin-left: 0;
   }
@@ -480,7 +483,7 @@ export default defineComponent({
     flex-direction: column;
     text-align: center;
   }
-  
+
   .settings-header-card .mr-4 {
     margin-right: 0 !important;
     margin-bottom: 1rem;

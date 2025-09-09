@@ -1,7 +1,7 @@
 <template>
-  <v-dialog 
-    v-model="isVisible" 
-    max-width="500px" 
+  <v-dialog
+    v-model="isVisible"
+    max-width="500px"
     persistent
     transition="dialog-transition"
   >
@@ -33,7 +33,7 @@
 
         <!-- File upload area -->
         <div class="upload-area mb-4">
-          <div 
+          <div
             class="upload-dropzone"
             :class="{ 'dragover': isDragOver, 'has-file': selectedFile }"
             @drop="handleDrop"
@@ -49,7 +49,7 @@
                 <p class="text-body-2 text-white mt-2 mb-0">Click to change</p>
               </div>
             </div>
-            
+
             <!-- Upload prompt -->
             <div v-else class="upload-prompt text-center pa-6">
               <v-icon size="48" :color="isDragOver ? 'matf-red' : 'grey-lighten-1'" class="mb-3">
@@ -66,7 +66,7 @@
               </v-chip>
             </div>
           </div>
-          
+
           <!-- Hidden file input -->
           <input
             ref="fileInput"
@@ -86,12 +86,12 @@
                 <div class="flex-grow-1">
                   <p class="text-subtitle-2 font-weight-medium mb-1">{{ selectedFile.name }}</p>
                   <p class="text-caption text--secondary mb-0">
-                    {{ formatFileSize(selectedFile.size) }} • {{ selectedFile.type }}
+                    {{ formatFileSize(selectedFile.size) }} ï¿½ {{ selectedFile.type }}
                   </p>
                 </div>
-                <v-btn 
-                  icon 
-                  variant="text" 
+                <v-btn
+                  icon
+                  variant="text"
                   size="small"
                   color="error"
                   @click="removeFile"
@@ -121,7 +121,7 @@
       <!-- Actions -->
       <v-card-actions class="pa-6 pt-4">
         <v-spacer></v-spacer>
-        
+
         <v-btn
           color="grey"
           variant="outlined"
@@ -132,7 +132,7 @@
         >
           Cancel
         </v-btn>
-        
+
         <v-btn
           color="matf-red"
           size="large"
@@ -152,8 +152,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { userStore } from '@/stores/user';
-import { authStore } from '@/stores/auth';
+import { userStore } from '../../stores/user';
+import { authStore } from '../../stores/auth';
 
 export default defineComponent({
   name: 'ProfilePictureUpload',
@@ -184,7 +184,7 @@ export default defineComponent({
         }
       }
     },
-    
+
     currentProfilePicture() {
       return this.getUserProfilePictureUrl(authStore().profilePictureUrl);
     }
@@ -211,7 +211,7 @@ export default defineComponent({
     handleDrop(event: DragEvent) {
       event.preventDefault();
       this.isDragOver = false;
-      
+
       const file = event.dataTransfer?.files[0];
       this.processFile(file);
     },
@@ -246,7 +246,7 @@ export default defineComponent({
       this.selectedFile = null;
       this.imagePreview = null;
       this.errorMessage = '';
-      
+
       // Reset file input
       const fileInput = this.$refs.fileInput as HTMLInputElement;
       if (fileInput) fileInput.value = '';
@@ -260,13 +260,13 @@ export default defineComponent({
         this.errorMessage = '';
 
         const result = await userStore().UploadProfilePicture(this.selectedFile);
-        
+
         // Update auth store with new profile picture
         authStore().updateProfilePicture(result);
-        
+
         this.$emit('profile-picture-updated', result);
         this.closeModal();
-        
+
       } catch (error) {
         console.error('Error uploading profile picture:', error);
         this.errorMessage = 'Failed to upload profile picture. Please try again.';
@@ -285,19 +285,19 @@ export default defineComponent({
 
     getUserProfilePictureUrl(url: string) {
       if (!url) return null;
-      
+
       if (url.startsWith('/uploads/profile-pictures/')) {
         return import.meta.env.DEV
           ? `http://localhost:8094${url}`
           : url;
       }
-      
+
       if (url.startsWith('/uploads/')) {
         return import.meta.env.DEV
           ? `http://localhost:8094${url}`
           : url;
       }
-      
+
       return url;
     },
   }
@@ -432,16 +432,16 @@ export default defineComponent({
     width: 80px !important;
     height: 80px !important;
   }
-  
+
   .upload-dropzone {
     min-height: 140px;
   }
-  
+
   .preview-image {
     max-width: 120px;
     max-height: 120px;
   }
-  
+
   .upload-prompt {
     padding: 1rem !important;
   }

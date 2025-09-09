@@ -1,8 +1,8 @@
 <template>
   <div class="friend-requests-page">
     <!-- Friend Requests Header -->
-    <v-card 
-      class="requests-header-card mb-6" 
+    <v-card
+      class="requests-header-card mb-6"
       elevation="2"
       rounded="lg"
     >
@@ -19,7 +19,7 @@
               {{ requestsText }}
             </p>
           </div>
-          
+
           <!-- Request Stats -->
           <div class="d-none d-md-flex align-center">
             <div class="text-center">
@@ -36,9 +36,9 @@
       <!-- Loading State -->
       <div v-if="loading" class="loading-state">
         <v-card class="pa-8 text-center" elevation="1" rounded="lg">
-          <v-progress-circular 
-            indeterminate 
-            color="matf-red" 
+          <v-progress-circular
+            indeterminate
+            color="matf-red"
             size="48"
             class="mb-4"
           />
@@ -57,8 +57,8 @@
           <p class="text-body-1 text--secondary mb-4">
             You don't have any friend requests at the moment.
           </p>
-          <v-btn 
-            color="matf-red" 
+          <v-btn
+            color="matf-red"
             @click="goToUserSearch"
           >
             <v-icon class="mr-2">mdi-account-search</v-icon>
@@ -73,20 +73,20 @@
           <v-icon class="mr-2" color="matf-red">mdi-account-clock</v-icon>
           Pending Friend Requests
         </h3>
-        
+
         <v-row>
           <v-col
-            v-for="request in friendRequests" 
+            v-for="request in friendRequests"
             :key="request.id"
-            cols="12" 
-            sm="12" 
+            cols="12"
+            sm="12"
             lg="6"
             class="mb-4"
           >
-            <userCardComponent 
+            <userCardComponent
               :text="request.username"
               :firstName="request.firstName"
-              :lastName="request.lastName" 
+              :lastName="request.lastName"
               :userId="request.id"
               :relation="request.relation"
               :profilePictureUrl="request.profilePictureUrl"
@@ -101,13 +101,13 @@
 </template>
 
 <script lang="ts">
-import PostComponent from '@/components/Post/PostComponent.vue';
+import PostComponent from '../components/Post/PostComponent.vue';
 import { defineComponent } from 'vue';
-import { authStore } from '../stores/auth.ts'
-import { userStore } from '../stores/user.ts'
-import { userCacheService } from '@/services/userCacheService';
-import userCardComponent from '@/components/UserSearch/UserCard.vue'
-import type { UserPreviewDTO } from '@/dtos/user/userPreviewDTO.ts';
+import { authStore } from '../stores/auth'
+import { userStore } from '../stores/user'
+import { userCacheService } from '../services/userCacheService';
+import userCardComponent from '../components/UserSearch/UserCard.vue'
+import type { UserPreviewDTO } from '../dtos/user/userPreviewDTO.ts';
 
 export default defineComponent({
   name: 'FriendRequestsView',
@@ -123,7 +123,7 @@ export default defineComponent({
   computed: {
     requestsText() {
       if (this.loading) return 'Loading requests...';
-      
+
       const count = this.friendRequests.length;
       if (count === 0) {
         return 'No pending friend requests';
@@ -139,10 +139,10 @@ export default defineComponent({
     async loadFriendRequests() {
       try {
         this.loading = true;
-        
+
         // Get friend requests
         const requests = await userStore().GetFriendRequests();
-        
+
         // Enhance each request with profile picture data
         const enhancedRequests = await Promise.all(
           requests.map(async (request) => {
@@ -161,7 +161,7 @@ export default defineComponent({
             }
           })
         );
-        
+
         this.friendRequests = enhancedRequests;
         console.log('Enhanced friend requests:', this.friendRequests);
       } catch (error) {
@@ -182,7 +182,7 @@ export default defineComponent({
     },
 
     onRequestDeclined(userId: number) {
-      // Remove the declined request from the list  
+      // Remove the declined request from the list
       const requestIndex = this.friendRequests.findIndex(r => r.id === userId);
       if (requestIndex !== -1) {
         this.friendRequests.splice(requestIndex, 1);
@@ -258,7 +258,7 @@ export default defineComponent({
   .requests-header-card .v-card-text {
     padding: 1.5rem;
   }
-  
+
   .friend-requests-page {
     animation: none; /* Reduce animations on mobile */
   }
@@ -269,7 +269,7 @@ export default defineComponent({
     flex-direction: column;
     text-align: center;
   }
-  
+
   .requests-header-card .mr-4 {
     margin-right: 0 !important;
     margin-bottom: 1rem;

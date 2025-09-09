@@ -21,11 +21,9 @@ export default defineConfig({
     }),
     // Temporarily disable vue-devtools to fix module loading
     // vueDevTools(),
-    vuetify({ 
+    vuetify({
       autoImport: true,
-      theme: {
-        defaultTheme: 'light'
-      }
+
     })
   ],
   resolve: {

@@ -15,7 +15,7 @@
                     <p class="text-caption text-white opacity-80">Faculty of Mathematics</p>
                   </div>
                 </div>
-                
+
                 <h1 class="display-1 font-weight-bold text-white mb-4">
                   Join the Student Community
                 </h1>
@@ -39,8 +39,8 @@
                     <p class="text-body-2 text-white opacity-80">Connections</p>
                   </div>
                 </div>
-                
-                
+
+
               </div>
             </div>
           </v-col>
@@ -197,7 +197,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { authStore } from '../../stores/auth.ts';
+import { authStore } from '../../stores/auth';
 
 export default defineComponent({
   name: 'SignupView',
@@ -211,15 +211,21 @@ export default defineComponent({
       loading: false,
       showError: false,
       showSuccess: false,
-      errorMessage: '',
-      rules: {
-        required: (v: string) => !!v || 'This field is required',
-        nameLength: (v: string) => (v && v.length >= 2) || 'Name must be at least 2 characters',
-        minLength: (v: string) => (v && v.length >= 3) || 'Username must be at least 3 characters',
-        passwordLength: (v: string) => (v && v.length >= 8) || 'Password must be at least 8 characters',
-        passwordMatch: (v: string) => v === this.password || 'Passwords do not match'
-      }
+      errorMessage: ''
     };
+  },
+  computed:{
+    rules:function(){
+
+      return    {
+      required: (v: string) => !!v || 'This field is required',
+      nameLength: (v: string) => (v && v.length >= 2) || 'Name must be at least 2 characters',
+      minLength: (v: string) => (v && v.length >= 3) || 'Username must be at least 3 characters',
+      passwordLength: (v: string) => (v && v.length >= 8) || 'Password must be at least 8 characters',
+      passwordMatch: (v: string) => v === this.password || 'Passwords do not match'
+    };
+    }
+
   },
   methods: {
     async onSignUpClick() {
@@ -234,14 +240,14 @@ export default defineComponent({
         const store = authStore();
         await store.signup(this.username, this.password, this.firstName, this.lastName);
         this.showSuccess = true;
-        
+
         // Clear form
         this.firstName = '';
         this.lastName = '';
         this.username = '';
         this.password = '';
         this.confirmPassword = '';
-        
+
       } catch (err: any) {
         this.showError = true;
         this.errorMessage = err.response?.data?.message || 'Registration failed. Please try again.';
@@ -361,20 +367,20 @@ export default defineComponent({
   .auth-container {
     background: linear-gradient(135deg, #8B0000 0%, #660000 100%);
   }
-  
+
   .auth-form-section {
     background: transparent;
   }
-  
+
   .auth-form-container {
     padding: 2rem 1.5rem;
   }
-  
+
   .auth-card {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
   }
-  
+
   .stats-grid {
     grid-template-columns: 1fr;
     gap: 1rem;

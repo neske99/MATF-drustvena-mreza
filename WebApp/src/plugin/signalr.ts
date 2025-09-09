@@ -2,6 +2,8 @@ import { authStore } from '@/stores/auth';
 import { HubConnection, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
 
 let connection: HubConnection | null = null;
+let callbackEventNames:string[]=[];
+let callbacks:((...args:any[])=>void)[] =[];
 
 export async function startSignalRConnection(): Promise<HubConnection | null> {
   try {
@@ -23,6 +25,9 @@ export async function startSignalRConnection(): Promise<HubConnection | null> {
       .build();
 
     await connection.start();
+    for(let i=0;i<callbacks.length;i++){
+      connection.on(callbackEventNames[i],callbacks[i]);
+    }
     return connection;
   } catch (error) {
     connection = null;
@@ -47,4 +52,13 @@ export async function stopSignalRConnection(): Promise<void> {
       connection = null;
     }
   }
+}
+export function addCallback(name:string,callback:(...args:any[])=>void): void {
+  callbacks.push(callback);
+  callbackEventNames.push(name);
+  if(connection!==null){
+    connection.on(name,callback);
+  }
+
+
 }
