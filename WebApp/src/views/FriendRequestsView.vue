@@ -150,13 +150,17 @@ export default defineComponent({
               const userDetails = await userCacheService.getUserByUsername(request.username);
               return {
                 ...request,
-                profilePictureUrl: userDetails?.profilePictureUrl || null
+                firstName: userDetails?.firstName || '',
+                lastName: userDetails?.lastName || '',
+                profilePictureUrl: userDetails?.profilePictureUrl || undefined
               };
             } catch (error) {
               console.error(`Error fetching details for ${request.username}:`, error);
               return {
                 ...request,
-                profilePictureUrl: null
+                firstName: '',
+                lastName: '',
+                profilePictureUrl: undefined
               };
             }
           })
