@@ -177,13 +177,13 @@ export default defineComponent({
               const userDetails = await userCacheService.getUserByUsername(user.username);
               return {
                 ...user,
-                profilePictureUrl: userDetails?.profilePictureUrl || null
+                profilePictureUrl: userDetails?.profilePictureUrl || undefined
               };
             } catch (error) {
               console.error(`Error fetching details for ${user.username}:`, error);
               return {
                 ...user,
-                profilePictureUrl: null
+                profilePictureUrl: undefined
               };
             }
           })
@@ -226,14 +226,14 @@ export default defineComponent({
               return {
                 ...user,
                 relation: relation,
-                profilePictureUrl: userDetails?.profilePictureUrl || null
+                profilePictureUrl: userDetails?.profilePictureUrl || undefined
               };
             } catch (error) {
               console.error(`Error getting data for user ${user.id}:`, error);
               return {
                 ...user,
                 relation: 'NONE', // Default relation if error
-                profilePictureUrl: null
+                profilePictureUrl: undefined
               };
             }
           })

@@ -188,7 +188,12 @@ namespace IdentityService.Controllers
 
         [HttpPost("UploadProfilePicture")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> UploadProfilePicture([FromForm] IFormFile file)
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadProfilePicture(IFormFile file)
         {
             // Get user ID from token
             var userId = User.FindFirst("nameid")?.Value ?? 
