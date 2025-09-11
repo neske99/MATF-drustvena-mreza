@@ -5,6 +5,7 @@ using Post.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
 using Post.Application.DTOs;
+using Post.API.DTOs;
 using MediatR;
 using Post.Application.Features.Posts.Command.CreatePostForUser;
 using Post.Application.Features.Posts.Query;
@@ -30,6 +31,7 @@ public class PostController : ControllerBase
   }
 
     [HttpGet("[action]")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     public async Task<ActionResult> GetPostsForUser([FromQuery] int userId)
     {
         return Ok(await _mediator.Send(new GetPostForUserQuery(){UserId=userId}));
@@ -39,35 +41,32 @@ public class PostController : ControllerBase
     [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> CreatePostForUser(
-    [FromForm] int userId,
-    [FromForm] string text,
-    [FromForm] IFormFile? file
-)
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult> CreatePostForUser([FromForm] CreatePostFormDTO formData)
     {
         string? fileUrl = null;
         string? fileName = null;
         string? fileType = null;
 
-        if (file != null && file.Length > 0)
+        if (formData.File != null && formData.File.Length > 0)
         {
             // Fixed: Add wwwroot to the path so static file middleware can serve the files
             var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "post-files");
             Directory.CreateDirectory(uploadsFolder);
-            fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+            fileName = Guid.NewGuid() + Path.GetExtension(formData.File.FileName);
             var filePath = Path.Combine(uploadsFolder, fileName);
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
-                await file.CopyToAsync(stream);
+                await formData.File.CopyToAsync(stream);
             }
             fileUrl = $"/uploads/post-files/{fileName}";
-            fileType = file.ContentType;
+            fileType = formData.File.ContentType;
         }
 
         var post = new CreatePostDTO
         {
-            UserId = userId,
-            Text = text,
+            UserId = formData.UserId,
+            Text = formData.Text,
             FileUrl = fileUrl,
             FileName = fileName,
             FileType = fileType,
@@ -75,7 +74,7 @@ public class PostController : ControllerBase
 
         var createCommand = new CreatePostForUserCommand
         {
-            UserId = userId,
+            UserId = formData.UserId,
             Post = post
         };
         return Ok(await _mediator.Send(createCommand));
@@ -83,18 +82,24 @@ public class PostController : ControllerBase
 
 
     [HttpPost("[action]")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> AddCommentToPost([FromQuery] int postId, [FromBody] CreateCommentDTO comment)
     {
         return Ok(await _mediator.Send(new AddCommentToPostCommand(){PostId=postId,Comment=comment}));
     }
 
     [HttpPost("[action]")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> AddLikeToPost([FromQuery] int postId, [FromBody] CreateLikeDTO like)
     {
         return Ok(await _mediator.Send(new AddLikeToPostCommand(){PostId=postId,Like=like}));
     }
 
     [HttpDelete("[action]")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> RemoveLikeFromPost([FromQuery] int postId, [FromQuery] int userId)
     {
         return Ok(await _mediator.Send(new RemoveLikeFromPostCommand(){UserId=userId,PostId=postId}));
