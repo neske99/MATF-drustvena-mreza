@@ -36,6 +36,9 @@ public class PostController : ControllerBase
     }
 
     [HttpPost("[action]")]
+    [Consumes("multipart/form-data")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> CreatePostForUser(
     [FromForm] int userId,
     [FromForm] string text,
