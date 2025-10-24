@@ -113,32 +113,28 @@ cd MATF-drustvena-mreza
 
 ### 2. Pokretanje Backend Servisa
 
-#### Identity Service (Port 8094)
+```bash
+docker compose build
+docker compose up
+```
+
+#### Identity Service migracije
 ```bash
 cd Security/IdentityServer
-dotnet restore
-dotnet run
+dotnet ef database update
 ```
 
-#### Post Service (Port 8080)
+#### Post Service migracije
 ```bash
-cd Services/Post/Post.API
-dotnet restore
-dotnet run
+cd Services/Post/Post.Infrastructure
+dotnet ef database update
 ```
 
-#### Relations Service (Port 8000)
-```bash
-cd Services/Relations/Relations.API
-dotnet restore
-dotnet run
-```
 
-#### Chat Service (Port 8095)
+#### Chat Service migracije
 ```bash
-cd Services/Chat/Chat.API
-dotnet restore
-dotnet run
+cd Services/Chat/Chat.Repository
+dotnet ef database update
 ```
 
 ### 3. Pokretanje Frontend Aplikacije
@@ -151,37 +147,6 @@ npm run dev
 # ili yarn dev
 ```
 
-### 4. Konfiguracija Baza Podataka
-
-#### SQL Server Connection Strings
-Dodajte connection stringove u `appsettings.json` fajlove servisa:
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Database=MatfSocialNetwork;Trusted_Connection=true;"
-  }
-}
-```
-
-#### Neo4j Konfiguracija
-```json
-{
-  "Neo4jSettings": {
-    "Uri": "bolt://localhost:7687",
-    "Username": "neo4j",
-    "Password": "your-password"
-  }
-}
-```
-
-#### RabbitMQ Konfiguracija
-```json
-{
-  "EventBusSettings": {
-    "HostAddress": "amqp://guest:guest@localhost:5672"
-  }
-}
-```
 
 ## 📁 Struktura Projekta
 
