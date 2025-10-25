@@ -114,27 +114,27 @@ cd MATF-drustvena-mreza
 ### 2. Pokretanje Backend Servisa
 
 ```bash
-docker compose build
-docker compose up
+docker compose -f docker-compose.yml -f docker-compose.override.yml build
+docker compose f docker-compose.yml -f docker-compose.override.yml up
 ```
 
 #### Identity Service migracije
 ```bash
 cd Security/IdentityServer
-dotnet ef database update
+dotnet ef database update --project IdentityService.csproj
 ```
 
 #### Post Service migracije
 ```bash
-cd Services/Post/Post.Infrastructure
-dotnet ef database update
+cd Services/Post/
+dotnet ef database update --project ./Post.Infrastructure/Post.Infrastructure.csproj --startup-project ./Post.API/Post.API.csproj
 ```
 
 
 #### Chat Service migracije
 ```bash
 cd Services/Chat/Chat.Repository
-dotnet ef database update
+dotnet ef database update --project ./Chat.Repository/Chat.Repository.csproj --startup-project ./Chat.API/Chat.API.csproj
 ```
 
 ### 3. Pokretanje Frontend Aplikacije
